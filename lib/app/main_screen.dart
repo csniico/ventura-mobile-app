@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/widgets/app_bottom_nav_bar.dart';
+import 'package:ventura/core/widgets/app_drawer.dart';
+import 'package:ventura/core/widgets/main_app_bar.dart';
+import 'package:ventura/features/appointments/presentation/appointments.dart';
+import 'package:ventura/features/home/presentation/home.dart';
+import 'package:ventura/features/marketing/presentation/marketing.dart';
+import 'package:ventura/features/sales/presentation/sales.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -11,38 +18,34 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    Scaffold(
-      appBar: AppBar(title: const Text("Home")),
-      body: const Center(child: Text("Home Screen")),
-    ),
-    Scaffold(
-      appBar: AppBar(title: const Text("Search")),
-      body: const Center(child: Text("Search Screen")),
-    ),
-    Scaffold(
-      appBar: AppBar(title: const Text("Profile")),
-      body: const Center(child: Text("Profile Screen")),
-    ),
-    Scaffold(
-      appBar: AppBar(title: const Text("Settings")),
-      body: const Center(child: Text("Settings Screen")),
-    ),
-  ];
-
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
     });
   }
 
+  Widget _buildBody() {
+    switch (_currentIndex) {
+      case 0:
+        return const Home();
+      case 1:
+        return const Sales();
+      case 2:
+        return const Appointments();
+      case 3:
+        return const Marketing();
+      default:
+        return const Home();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      appBar: MainAppBar(),
+      key: const Key('main_screen_scaffold'),
+      drawer: SafeArea(child: const AppDrawer()),
+      body: SafeArea(child: RepaintBoundary(child: _buildBody())),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,

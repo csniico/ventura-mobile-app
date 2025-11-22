@@ -3,7 +3,8 @@ import 'package:ventura/app/routes.dart';
 import 'package:ventura/core/theme/app_theme.dart';
 
 class App extends StatelessWidget {
-  const App({super.key});
+  final String initialRoute;
+  const App({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,7 @@ class App extends StatelessWidget {
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
       onGenerateRoute: AppRoutes.onGenerateRoute,
-      initialRoute: AppRoutes.initial,
+      initialRoute: initialRoute,
     );
   }
 }

@@ -23,15 +23,15 @@ class AppTheme {
 
     // AppBar Theme
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF3B82F6), // primary
-      foregroundColor: Colors.white,      // icon/text color
+      backgroundColor: Color(0xFFF5F5F5), // primary
+      foregroundColor: Colors.black87,      // icon/text color
       elevation: 0,
-      iconTheme: IconThemeData(color: Colors.white),
+      iconTheme: IconThemeData(color: Colors.black87),
       titleTextStyle: TextStyle(
         fontFamily: 'NotoSans',
         fontWeight: FontWeight.w600,
         fontSize: 20,
-        color: Colors.white,
+        color: Colors.black87,
       ),
 
       // For status bar icon brightness, you'd use systemOverlayStyle if needed
@@ -180,7 +180,7 @@ class AppTheme {
     scaffoldBackgroundColor: const Color(0xFF1E1E1E),
 
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF2563EB),
+      backgroundColor: Color(0xFF1E1E1E),
       foregroundColor: Colors.white,
       elevation: 0,
       iconTheme: IconThemeData(color: Colors.white),
