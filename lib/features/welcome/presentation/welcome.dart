@@ -4,8 +4,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:ventura/core/models/business/business.dart';
 import 'package:ventura/core/models/user/user.dart';
+import 'package:ventura/core/services/business/business_service.dart';
 import 'package:ventura/core/services/user/user_service.dart';
+import 'package:ventura/core/widgets/switch_business_component.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({super.key});
@@ -17,10 +20,12 @@ class Welcome extends StatefulWidget {
 class _WelcomeState extends State<Welcome> {
   StreamSubscription<GoogleSignInAuthenticationEvent>? _authSubscription;
   GoogleSignInAccount? _currentUser;
+  bool _isSyncing = false;
 
   final dio = Dio();
   final GoogleSignIn signIn = GoogleSignIn.instance;
   final UserService _userService = UserService();
+  final BusinessService _businessService = BusinessService();
 
   String? serverUrl = dotenv.env['SERVER_URL'];
   String? clientId = dotenv.env['GOOGLE_CLIENT_ID'];
@@ -34,12 +39,9 @@ class _WelcomeState extends State<Welcome> {
       signIn
           .initialize(clientId: clientId, serverClientId: serverClientId)
           .then((_) {
-            // Listen to auth events
             _authSubscription = signIn.authenticationEvents.listen(
               _handleAuthEvent,
             );
-
-            // Attempt silent login
             signIn.attemptLightweightAuthentication();
           }),
     );
@@ -88,7 +90,54 @@ class _WelcomeState extends State<Welcome> {
       await _userService.saveUser(user);
 
       if (mounted) {
-        Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+        setState(() => _isSyncing = true);
+        final syncedBusinesses = await _businessService.syncUserBusinesses(
+          user,
+        );
+        debugPrint(
+          "[WelcomeScreen] Synced businesses: ${syncedBusinesses.map((b) => b.name).toList()}",
+        );
+        setState(() {
+          _isSyncing = false;
+        });
+
+        showModalBottomSheet(
+          context: context,
+          isDismissible: true,
+          enableDrag: true,
+          isScrollControlled: true,
+          builder: (context) => Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Colors.white
+                  : Colors.grey[900],
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: FractionallySizedBox(
+              widthFactor: 1,
+              heightFactor: 0.9,
+              child: SwitchBusinessComponent(
+                businesses: syncedBusinesses,
+                displayTitle: "Select Business",
+                onBusinessSwitch: (Business business) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/',
+                    (route) => false,
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        // Pre-cache the user's avatar image
+        if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
+          precacheImage(NetworkImage(user.avatarUrl!), context);
+        }
+        // Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
       }
     } on DioException catch (e) {
       if (e.response != null) {
@@ -117,7 +166,7 @@ class _WelcomeState extends State<Welcome> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (user == null) ...[
+              if (_currentUser == null) ...[
                 const Text("Ventura", style: TextStyle(fontSize: 24)),
                 const SizedBox(height: 40),
                 TextButton(
@@ -132,8 +181,8 @@ class _WelcomeState extends State<Welcome> {
                   ),
                   child: const Text("Continue with Google"),
                 ),
-                const SizedBox(height: 20),
               ],
+              if (_isSyncing) const CircularProgressIndicator(),
 
               if (user != null) ...[
                 CircleAvatar(

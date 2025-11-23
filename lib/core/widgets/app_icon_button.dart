@@ -29,7 +29,6 @@ class _AppIconButtonState extends State<AppIconButton> {
         icon: HugeIcon(
           icon: widget.icon,
           size: widget.size,
-          color: widget.color ?? Colors.black,   // fallback color
         ),
       ),
     );

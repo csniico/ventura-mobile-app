@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/models/business/business.dart';
 import 'package:ventura/core/models/user/user.dart';
+import 'package:ventura/core/services/business/business_service.dart';
 import 'package:ventura/core/services/user/user_service.dart';
 import 'package:ventura/core/widgets/switch_business_component.dart';
 import 'package:ventura/core/widgets/user_avatar.dart';
@@ -14,7 +16,8 @@ class AppDrawer extends StatefulWidget {
 
 class _AppDrawerState extends State<AppDrawer> {
   User? _user;
-
+  Business? _business;
+  List<Business>? _businesses;
   final List<Map<String, dynamic>> _userListItems = [
     {
       'icon': HugeIcons.strokeRoundedPackage,
@@ -60,6 +63,8 @@ class _AppDrawerState extends State<AppDrawer> {
   void initState() {
     super.initState();
     _user = UserService().user;
+    _business = BusinessService().currentBusiness;
+    _businesses = BusinessService().userBusinesses;
   }
 
   void _handleSwitchBusiness() {
@@ -71,16 +76,27 @@ class _AppDrawerState extends State<AppDrawer> {
       isScrollControlled: true,
       builder: (context) => Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.light ? Colors.white : Colors.grey[900],
+          color: Theme.of(context).brightness == Brightness.light
+              ? Colors.white
+              : Colors.grey[900],
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
         ),
-        child: const FractionallySizedBox(
+        child: FractionallySizedBox(
           widthFactor: 1,
           heightFactor: 0.9,
-          child: SwitchBusinessComponent(),
+          child: SwitchBusinessComponent(
+            businesses: [..._businesses!],
+            displayTitle: "Switch Business",
+            onBusinessSwitch: (Business business) {
+              setState(() {
+                _business = business;
+              });
+              Navigator.of(context).pop();
+            },
+          ),
         ),
       ),
     );
@@ -91,7 +107,10 @@ class _AppDrawerState extends State<AppDrawer> {
     return NavigationDrawer(
       tilePadding: const EdgeInsets.all(8),
       children: [
-        RepaintBoundary(child: _drawerHeader()),
+        RepaintBoundary(
+          key: const ValueKey('drawerHeader'),
+          child: _drawerHeader(_business),
+        ),
         ..._userListItems.map(
           (e) => _listItem(
             hugeIcon: e['icon'],
@@ -114,7 +133,7 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  Widget _drawerHeader() {
+  Widget _drawerHeader(Business? business) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(
@@ -123,7 +142,7 @@ class _AppDrawerState extends State<AppDrawer> {
         children: [
           const UserAvatar(),
           const SizedBox(height: 20),
-          _businessUserInfo(),
+          _businessUserInfo(business),
           const SizedBox(height: 10),
           _switchBusinessButton(),
           const SizedBox(height: 5),
@@ -132,19 +151,19 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  Widget _businessUserInfo() {
+  Widget _businessUserInfo(Business? business) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Coffee Coastal Roasters',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Text(
+          business != null ? business.name : "No Business Selected",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         if (_user != null)
           Text(
-            '${_user!.firstName} ${_user!.lastName}',
+            '${_user!.firstName} ${_user!.lastName!.isEmpty || _user!.lastName == null ? "" : _user!.lastName}',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 14,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),

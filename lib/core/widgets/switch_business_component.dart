@@ -1,10 +1,23 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/models/business/business.dart';
+import 'package:ventura/core/services/business/business_service.dart';
 import 'package:ventura/core/widgets/search_bar_component.dart';
 import 'package:ventura/core/widgets/text_component.dart';
 
 class SwitchBusinessComponent extends StatefulWidget {
-  const SwitchBusinessComponent({super.key});
+  const SwitchBusinessComponent({
+    super.key,
+    required this.businesses,
+    required this.displayTitle,
+    required this.onBusinessSwitch,
+  });
+
+  final List<Business> businesses;
+  final String? displayTitle;
+  final Function(Business) onBusinessSwitch;
 
   @override
   State<SwitchBusinessComponent> createState() =>
@@ -12,6 +25,27 @@ class SwitchBusinessComponent extends StatefulWidget {
 }
 
 class _SwitchBusinessComponentState extends State<SwitchBusinessComponent> {
+  Business? currentBusiness;
+  BusinessService? _businessService;
+
+  @override
+  void initState() {
+    super.initState();
+    _businessService = BusinessService();
+    currentBusiness = _businessService?.currentBusiness;
+  }
+
+  void handleBusinessSwitch(Business business) async {
+    setState(() {
+      currentBusiness = business;
+    });
+    await _businessService?.setActiveBusiness(currentBusiness!);
+    if (mounted) {
+      Navigator.pop(context);
+      widget.onBusinessSwitch(business);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,7 +68,7 @@ class _SwitchBusinessComponentState extends State<SwitchBusinessComponent> {
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: TextComponent(text: 'Switch Business', type: 'title'),
               ),
-              SizedBox(height: 12,),
+              SizedBox(height: 12),
               SearchBarComponent<dynamic>(
                 hint: "Search businesses...",
                 onSearch: (query) async {
@@ -43,17 +77,12 @@ class _SwitchBusinessComponentState extends State<SwitchBusinessComponent> {
                 onResults: (results) {},
               ),
               const SizedBox(height: 10),
-              ...[
-                'Coffee Coastal Roasters',
-                'Coffee Roasters',
-                'Coffee Roasters 2',
-              ].map(
+              ...widget.businesses.map(
                 (item) => _switchBusinessCardItem(
-                  item,
-                  isSelected: item == 'Coffee Coastal Roasters',
+                  item.name,
+                  isSelected: item.id == currentBusiness?.id,
                   onTap: () {
-                    debugPrint('Selected $item');
-                    Navigator.pop(context);
+                    handleBusinessSwitch(item);
                   },
                   role: "Admin",
                 ),
@@ -142,7 +171,7 @@ class _SwitchBusinessComponentState extends State<SwitchBusinessComponent> {
         children: [
           Row(
             children: [
-              _businessAvatar(),
+              _businessAvatar(businessName),
               const SizedBox(width: 12),
               _businessNameAndRole(businessName, role, isSelected: isSelected),
             ],
@@ -197,12 +226,26 @@ class _SwitchBusinessComponentState extends State<SwitchBusinessComponent> {
     );
   }
 
-  Widget _businessAvatar() {
+  Widget _businessAvatar(String? businessName) {
+    final colors = [
+      Colors.red,
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.amber,
+    ];
+    final shades = [700, 800, 900];
+    final randomShade = shades[Random().nextInt(shades.length)];
+    final randomColor = colors[Random().nextInt(colors.length)];
     return CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.yellow[900],
-      child: const Text(
-        'B',
+      radius: 24,
+      backgroundColor: randomColor[randomShade],
+      child: Text(
+        businessName != null && businessName.isNotEmpty
+            ? businessName[0].toUpperCase()
+            : '?',
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       ),
     );

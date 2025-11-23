@@ -9,8 +9,6 @@ class DatabaseService {
   static Database? _db;
   static final DatabaseService instance = DatabaseService._internal();
 
-  static final String usersTable = "users";
-
   factory DatabaseService() => instance;
 
   DatabaseService._internal();
@@ -26,7 +24,7 @@ class DatabaseService {
     final databasePath = join(databaseDirPath, "master_db.db");
     final database = await openDatabase(
       databasePath,
-      version: 2, // Version updated to 2
+      version: 3,
       onCreate: (db, version) async {
         await db.execute("""
           CREATE TABLE IF NOT EXISTS users (
@@ -36,7 +34,7 @@ class DatabaseService {
             email TEXT,
             avatarUrl TEXT,
             googleId TEXT,
-            businessId TEXT,
+            employerBusiness TEXT,
             isSystem INTEGER,
             isActive INTEGER DEFAULT 0
           );
@@ -112,11 +110,35 @@ class DatabaseService {
         """);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        // This runs when the version number is increased.
         if (oldVersion < 2) {
           await db.execute(
             "ALTER TABLE users ADD COLUMN isActive INTEGER DEFAULT 0",
           );
+        }
+
+        if (oldVersion < 3) {
+          await db.execute("""
+            CREATE TABLE users_new (
+              id TEXT PRIMARY KEY,
+              firstName TEXT,
+              lastName TEXT,
+              email TEXT,
+              avatarUrl TEXT,
+              googleId TEXT,
+              employerBusiness TEXT,
+              isSystem INTEGER,
+              isActive INTEGER DEFAULT 0
+            );
+          """);
+
+          await db.execute("""
+            INSERT INTO users_new (id, firstName, lastName, email, avatarUrl, googleId, employerBusiness, isSystem, isActive)
+            SELECT id, firstName, lastName, email, avatarUrl, googleId, businessId, isSystem, isActive
+            FROM users;
+          """);
+
+          await db.execute("DROP TABLE users;");
+          await db.execute("ALTER TABLE users_new RENAME TO users;");
         }
       },
     );
@@ -135,17 +157,32 @@ class DatabaseService {
 
   Future<User?> getUser() async {
     final db = await database;
-    final res = await db.query("users", where: "isActive = ?", whereArgs: [1]);
+    final userMaps = await db.query("users", where: "isActive = ?", whereArgs: [1]);
 
-    if (res.length > 1) {
-      // Inconsistent state, more than one active user.
-      // Deactivate all users and return null.
+    if (userMaps.length > 1) {
       await db.update("users", {"isActive": 0});
       return null;
     }
 
-    if (res.isEmpty) return null;
-    return User.fromMap(res.first);
+    if (userMaps.isEmpty) return null;
+
+    final userMap = userMaps.first;
+    final businessId = userMap['employerBusiness'] as String?;
+
+    if (businessId == null) {
+      return User.fromMap(userMap);
+    }
+
+    final businessMaps =
+        await db.query("businesses", where: "id = ?", whereArgs: [businessId]);
+
+    if (businessMaps.isNotEmpty) {
+      final fullUserMap = Map<String, dynamic>.from(userMap);
+      fullUserMap['employerBusiness'] = Business.fromMap(businessMaps.first);
+      return User.fromMap(fullUserMap);
+    } else {
+      return User.fromMap(userMap);
+    }
   }
 
   Future<void> signIn(String userId) async {
@@ -195,6 +232,36 @@ class DatabaseService {
     return res.map((e) => Business.fromMap(e)).toList();
   }
 
+  Future<Business?> getActiveBusiness() async {
+    final db = await database;
+    final res = await db.query("businesses", where: "isActive = ?", whereArgs: [1]);
+    if (res.isEmpty) return null;
+    return Business.fromMap(res.first);
+  }
+
+  Future<void> setActiveBusiness(String businessId) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      await txn.update("businesses", {"isActive": 0});
+      await txn.update(
+        "businesses",
+        {"isActive": 1},
+        where: "id = ?",
+        whereArgs: [businessId],
+      );
+    });
+  }
+
+  Future<List<Business>> getOwnedBusinesses(String userId) async {
+    final db = await database;
+    final res = await db.query(
+      "businesses",
+      where: "ownerId = ?",
+      whereArgs: [userId],
+    );
+    return res.map((e) => Business.fromMap(e)).toList();
+  }
+
   Future<void> deleteBusiness(String id) async {
     final db = await database;
     await db.delete("businesses", where: "id = ?", whereArgs: [id]);
@@ -235,14 +302,12 @@ class DatabaseService {
   Future<void> saveInvoice(Invoice invoice) async {
     final db = await database;
 
-    // Save invoice
     await db.insert(
       "invoices",
       invoice.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
-    // Save invoice items
     for (var item in invoice.items ?? []) {
       await db.insert(
         "invoice_items",
@@ -261,7 +326,6 @@ class DatabaseService {
       whereArgs: [businessId],
     );
 
-    // Load items for each invoice
     List<Invoice> list = [];
     for (var row in res) {
       final invoice = Invoice.fromMap(row);

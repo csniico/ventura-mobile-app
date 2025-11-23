@@ -1,3 +1,5 @@
+import 'package:ventura/core/models/business/business.dart';
+
 class User {
   final String id;
   final String? shortId;
@@ -6,7 +8,7 @@ class User {
   final String email;
   final String? googleId;
   final String? avatarUrl;
-  final String? businessId;
+  final Business? employerBusiness;
   final bool isSystem;
   final bool? isActive;
   final DateTime? createdAt;
@@ -15,7 +17,8 @@ class User {
 
   final List<dynamic>? roles;
   final List<dynamic>? directPermissions;
-  final List<dynamic>? ownedBusinesses;
+  final List<Business>? ownedBusinesses;
+  final List<Business>? memberOfBusinesses;
 
   User({
     required this.id,
@@ -26,7 +29,7 @@ class User {
     this.shortId,
     this.googleId,
     this.avatarUrl,
-    this.businessId,
+    this.employerBusiness,
     this.isActive,
     this.createdAt,
     this.updatedAt,
@@ -34,10 +37,10 @@ class User {
     this.roles,
     this.directPermissions,
     this.ownedBusinesses,
+    this.memberOfBusinesses,
   });
 
-  /// SQLite Converters
-
+  // -------- SQLite Converters --------
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
       id: map['id'],
@@ -46,8 +49,12 @@ class User {
       email: map['email'],
       avatarUrl: map['avatarUrl'],
       googleId: map['googleId'],
-      businessId: map['businessId'],
+      // The service layer is responsible for populating this complex object.
+      employerBusiness: map['employerBusiness'] is Business ? map['employerBusiness'] : null,
+      ownedBusinesses: map['ownedBusinesses'] is List<Business> ? map['ownedBusinesses'] : null,
+      memberOfBusinesses: map['memberOfBusinesses'] is List<Business> ? map['memberOfBusinesses'] : null,
       isSystem: (map['isSystem'] ?? 0) == 1,
+      isActive: (map['isActive'] ?? 0) == 1,
     );
   }
 
@@ -59,13 +66,13 @@ class User {
       'email': email,
       'avatarUrl': avatarUrl,
       'googleId': googleId,
-      'businessId': businessId,
+      'employerBusiness': employerBusiness?.id, // Store only the ID
       'isSystem': isSystem ? 1 : 0,
+      'isActive': isActive == true ? 1 : 0,
     };
   }
 
-  /// JSON Converters
-
+  // -------- JSON Converters --------
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
@@ -75,21 +82,27 @@ class User {
       email: json['email'],
       googleId: json['googleId'],
       avatarUrl: json['avatarUrl'],
-      businessId: json['businessId'],
+      employerBusiness: json['employerBusiness'] != null
+          ? Business.fromJson(json['employerBusiness'])
+          : null,
       isSystem: json['isSystem'] ?? false,
       isActive: json['isActive'],
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
-          : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
-          : null,
-      deletedAt: json['deletedAt'] != null
-          ? DateTime.parse(json['deletedAt'])
-          : null,
+      createdAt:
+          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      updatedAt:
+          json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      deletedAt:
+          json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
       roles: json['roles'],
       directPermissions: json['directPermissions'],
-      ownedBusinesses: json['ownedBusinesses'],
+      ownedBusinesses: json['ownedBusinesses'] != null
+          ? List<Business>.from(
+              json['ownedBusinesses'].map((x) => Business.fromJson(x)))
+          : null,
+      memberOfBusinesses: json['memberOfBusinesses'] != null
+          ? List<Business>.from(
+              json['memberOfBusinesses'].map((x) => Business.fromJson(x)))
+          : null,
     );
   }
 
@@ -102,7 +115,7 @@ class User {
       'email': email,
       'googleId': googleId,
       'avatarUrl': avatarUrl,
-      'businessId': businessId,
+      'employerBusiness': employerBusiness?.toJson(),
       'isSystem': isSystem,
       'isActive': isActive,
       'createdAt': createdAt?.toIso8601String(),
@@ -110,7 +123,8 @@ class User {
       'deletedAt': deletedAt?.toIso8601String(),
       'roles': roles,
       'directPermissions': directPermissions,
-      'ownedBusinesses': ownedBusinesses,
+      'ownedBusinesses': ownedBusinesses?.map((e) => e.toJson()).toList(),
+      'memberOfBusinesses': memberOfBusinesses?.map((e) => e.toJson()).toList(),
     };
   }
 }

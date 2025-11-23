@@ -1,3 +1,4 @@
+import 'package:ventura/core/models/business/business.dart';
 import 'package:ventura/core/models/user/user.dart';
 import 'package:ventura/core/services/database/database_service.dart';
 
@@ -14,13 +15,12 @@ class UserService {
   /// Signs the user out, deactivating them in the database and clearing the cache.
   Future<void> signOut() async {
     if (_currentUser?.id != null) {
-      await _databaseService.signOut(_currentUser!.id!);
+      await _databaseService.signOut(_currentUser!.id);
     }
     _currentUser = null;
   }
 
   /// Loads the user from the local database and caches it in the service.
-  /// This should be called when the app initializes.
   Future<void> loadUser() async {
     _currentUser = await _databaseService.getUser();
   }
@@ -53,6 +53,6 @@ class UserService {
   String? get email => _currentUser?.email;
   String? get avatarUrl => _currentUser?.avatarUrl;
   String? get googleId => _currentUser?.googleId;
-  String? get businessId => _currentUser?.businessId;
+  Business? get employerBusiness => _currentUser?.employerBusiness; // Renamed
   bool? get isSystem => _currentUser?.isSystem;
 }

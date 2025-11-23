@@ -42,7 +42,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MainAppBar(),
+      appBar: const MainAppBar(),
       key: const Key('main_screen_scaffold'),
       drawer: SafeArea(child: const AppDrawer()),
       body: SafeArea(child: RepaintBoundary(child: _buildBody())),
