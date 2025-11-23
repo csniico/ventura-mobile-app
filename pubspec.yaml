@@ -29,6 +29,10 @@ dependencies:
   dio: ^5.9.0
   google_sign_in: ^7.2.0
   flutter_native_splash: ^2.4.7
+  sqflite_common_ffi_web: ^1.0.1+2
+  sqflite_common_ffi:
+
+
 
 dev_dependencies:
   flutter_test:
