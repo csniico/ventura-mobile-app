@@ -1,14 +1,6 @@
-import 'dart:async';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:ventura/core/models/business/business.dart';
-import 'package:ventura/core/models/user/user.dart';
-import 'package:ventura/core/services/business/business_service.dart';
-import 'package:ventura/core/services/user/user_service.dart';
-import 'package:ventura/core/widgets/switch_business_component.dart';
+import 'package:ventura/core/widgets/text_component.dart';
+import 'package:ventura/features/auth/presentation/sign_in_with_google.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({super.key});
@@ -18,182 +10,42 @@ class Welcome extends StatefulWidget {
 }
 
 class _WelcomeState extends State<Welcome> {
-  StreamSubscription<GoogleSignInAuthenticationEvent>? _authSubscription;
-  GoogleSignInAccount? _currentUser;
-  bool _isSyncing = false;
-
-  final dio = Dio();
-  final GoogleSignIn signIn = GoogleSignIn.instance;
-  final UserService _userService = UserService();
-  final BusinessService _businessService = BusinessService();
-
-  String? serverUrl = dotenv.env['SERVER_URL'];
-  String? clientId = dotenv.env['GOOGLE_CLIENT_ID'];
-  String? serverClientId = dotenv.env['GOOGLE_SERVER_CLIENT_ID'];
-
-  @override
-  void initState() {
-    super.initState();
-
-    unawaited(
-      signIn
-          .initialize(clientId: clientId, serverClientId: serverClientId)
-          .then((_) {
-            _authSubscription = signIn.authenticationEvents.listen(
-              _handleAuthEvent,
-            );
-            signIn.attemptLightweightAuthentication();
-          }),
-    );
-  }
-
-  @override
-  void dispose() {
-    _authSubscription?.cancel();
-    super.dispose();
-  }
-
-  Future<void> _handleAuthEvent(GoogleSignInAuthenticationEvent event) async {
-    if (event is GoogleSignInAuthenticationEventSignIn) {
-      final user = event.user;
-      if (mounted) {
-        setState(() => _currentUser = user);
-      }
-      await _logUserIn(user);
-    } else if (event is GoogleSignInAuthenticationEventSignOut) {
-      if (mounted) {
-        setState(() => _currentUser = null);
-      }
-    }
-  }
-
-  Future<void> _logUserIn(GoogleSignInAccount googleUser) async {
-    try {
-      final nameParts = googleUser.displayName?.split(' ') ?? ['', ''];
-      final firstName = nameParts.isNotEmpty ? nameParts.first : '';
-      final lastName = nameParts.length > 1
-          ? nameParts.sublist(1).join(' ')
-          : '';
-
-      var response = await dio.post(
-        "$serverUrl/auth/mobile/signin",
-        data: {
-          'email': googleUser.email,
-          'firstName': firstName,
-          'lastName': lastName,
-          'googleId': googleUser.id,
-          'avatarUrl': googleUser.photoUrl,
-        },
-      );
-
-      final user = User.fromJson(response.data);
-      await _userService.saveUser(user);
-
-      if (mounted) {
-        setState(() => _isSyncing = true);
-        final syncedBusinesses = await _businessService.syncUserBusinesses(
-          user,
-        );
-        debugPrint(
-          "[WelcomeScreen] Synced businesses: ${syncedBusinesses.map((b) => b.name).toList()}",
-        );
-        setState(() {
-          _isSyncing = false;
-        });
-
-        showModalBottomSheet(
-          context: context,
-          isDismissible: true,
-          enableDrag: true,
-          isScrollControlled: true,
-          builder: (context) => Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.light
-                  ? Colors.white
-                  : Colors.grey[900],
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            child: FractionallySizedBox(
-              widthFactor: 1,
-              heightFactor: 0.9,
-              child: SwitchBusinessComponent(
-                businesses: syncedBusinesses,
-                displayTitle: "Select Business",
-                onBusinessSwitch: (Business business) {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/',
-                    (route) => false,
-                  );
-                },
-              ),
-            ),
-          ),
-        );
-
-        // Pre-cache the user's avatar image
-        if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
-          precacheImage(NetworkImage(user.avatarUrl!), context);
-        }
-        // Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-      }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        debugPrint("Error response: ${e.response?.data}");
-      } else {
-        debugPrint("Error sending request: ${e.message}");
-      }
-    }
-  }
-
-  Future<void> continueWithGoogle() async {
-    try {
-      await signIn.authenticate(scopeHint: ['email', 'profile']);
-    } catch (e) {
-      debugPrint("Google Sign-in Error: $e");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final user = _currentUser;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (_currentUser == null) ...[
-                const Text("Ventura", style: TextStyle(fontSize: 24)),
-                const SizedBox(height: 40),
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            padding: EdgeInsets.all(20),
+            height: MediaQuery.heightOf(context) / 2,
+            child: Column(
+              children: [
+                Image.asset(
+                  "assets/images/icon.png",
+                  height: 100,
+                  color: Theme.of(context).primaryColor,
+                ),
+                TextComponent(text: "Welcome to Ventura", type: "title"),
+                SizedBox(height: 20),
+                TextComponent(
+                  text: "Sign in to manage your business",
+                  type: "subtitle",
+                ),
+                SizedBox(height: 20),
+                SignInWithGoogle(),
+                SizedBox(height: 20),
                 TextButton(
-                  onPressed: continueWithGoogle,
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
+                  onPressed: () => Navigator.of(context).pushNamed('/sign-in'),
+                  child: TextComponent(
+                    text: "Continue with email",
+                    type: "body",
                   ),
-                  child: const Text("Continue with Google"),
                 ),
               ],
-              if (_isSyncing) const CircularProgressIndicator(),
-
-              if (user != null) ...[
-                CircleAvatar(
-                  backgroundImage: NetworkImage(user.photoUrl!),
-                  radius: 30,
-                ),
-                const SizedBox(height: 10),
-                Text(user.displayName ?? ""),
-                Text(user.email),
-              ],
-            ],
+            ),
           ),
         ),
       ),

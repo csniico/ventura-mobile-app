@@ -4,6 +4,7 @@ import 'package:ventura/app/not_found.dart';
 import 'package:ventura/core/services/user/user_service.dart';
 import 'package:ventura/features/accounting/presentation/accounting.dart';
 import 'package:ventura/features/analytics/presentation/analytics.dart';
+import 'package:ventura/features/auth/presentation/sign_in_page.dart';
 import 'package:ventura/features/business_profile/presentation/business_profile.dart';
 import 'package:ventura/features/help_and_support/presentation/help_and_support.dart';
 import 'package:ventura/features/inventory/presentation/inventory.dart';
@@ -20,6 +21,7 @@ class AppRoutes {
   static final Map<String, WidgetBuilder> routes = {
     '/': (_) => const MainScreen(),
     '/welcome': (_) => const Welcome(),
+    '/sign-in': (_) => const SignInPage(),
     '/inventory': (_) => const Inventory(),
     '/team': (_) => const Team(),
     '/accounting': (_) => const Accounting(),
