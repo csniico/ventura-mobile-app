@@ -9,6 +9,7 @@ import 'package:ventura/app/app.dart';
 import 'package:ventura/app/routes.dart';
 import 'package:ventura/core/services/business/business_service.dart';
 import 'package:ventura/core/services/user/user_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,15 @@ void main() async {
   await UserService().loadUser();
   await BusinessService().loadActiveBusiness();
 
-  final initialRoute = AppRoutes.getInitialRoute();
-  runApp(App(initialRoute: initialRoute));
+
+  runApp(
+    ProviderScope(
+      child: Consumer(
+        builder: (_, ref, __) {
+          final initialRoute = AppRoutes.getInitialRoute(ref);
+          return App(initialRoute: initialRoute);
+        },
+      ),
+    ),
+  );
 }

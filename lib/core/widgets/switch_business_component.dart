@@ -26,24 +26,20 @@ class SwitchBusinessComponent extends StatefulWidget {
 
 class _SwitchBusinessComponentState extends State<SwitchBusinessComponent> {
   Business? currentBusiness;
-  BusinessService? _businessService;
 
   @override
   void initState() {
     super.initState();
-    _businessService = BusinessService();
-    currentBusiness = _businessService?.currentBusiness;
+    currentBusiness = BusinessService().currentBusiness;
   }
 
-  void handleBusinessSwitch(Business business) async {
+  // The parent now handles all logic and navigation.
+  // This method just reports the event.
+  void handleBusinessSwitch(Business business) {
     setState(() {
       currentBusiness = business;
     });
-    await _businessService?.setActiveBusiness(currentBusiness!);
-    if (mounted) {
-      Navigator.pop(context);
-      widget.onBusinessSwitch(business);
-    }
+    widget.onBusinessSwitch(business);
   }
 
   @override
@@ -72,7 +68,7 @@ class _SwitchBusinessComponentState extends State<SwitchBusinessComponent> {
               SearchBarComponent<dynamic>(
                 hint: "Search businesses...",
                 onSearch: (query) async {
-                  return await [];
+                  return [];
                 },
                 onResults: (results) {},
               ),

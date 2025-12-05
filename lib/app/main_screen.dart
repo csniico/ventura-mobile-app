@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/widgets/app_bottom_nav_bar.dart';
-import 'package:ventura/core/widgets/app_drawer.dart';
 import 'package:ventura/core/widgets/main_app_bar.dart';
-import 'package:ventura/features/appointments/presentation/appointments.dart';
-import 'package:ventura/features/home/presentation/home.dart';
-import 'package:ventura/features/marketing/presentation/marketing.dart';
-import 'package:ventura/features/sales/presentation/sales.dart';
+import 'package:ventura/features/home/presentation/pages/home.dart';
+import 'package:ventura/features/sales/presentation/pages/sales.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -31,9 +27,9 @@ class _MainScreenState extends State<MainScreen> {
       case 1:
         return const Sales();
       case 2:
-        return const Appointments();
+        return const Center(child: Text("Customer"),);
       case 3:
-        return const Marketing();
+        return const Center(child: Text("Appointment"),);
       default:
         return const Home();
     }
@@ -44,7 +40,6 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       appBar: const MainAppBar(),
       key: const Key('main_screen_scaffold'),
-      drawer: SafeArea(child: const AppDrawer()),
       body: SafeArea(child: RepaintBoundary(child: _buildBody())),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentIndex,

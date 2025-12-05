@@ -28,7 +28,7 @@ class AppBottomNavBar extends StatelessWidget {
       selectedLabelStyle: TextStyle(
         fontFamily: 'NotoSans',
         fontSize: 14,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w600,
         color: Theme.of(context).colorScheme.secondary,
       ),
       showUnselectedLabels: true,
@@ -40,15 +40,15 @@ class AppBottomNavBar extends StatelessWidget {
   static final List<BottomNavigationBarItem> _navItems = [
     _navItem(
       icon: HugeIcons.strokeRoundedHome01,
-      label: 'Dashboard',
+      label: 'Home',
     ),
     _navItem(
-      icon: HugeIcons.strokeRoundedInvoice02,
+      icon: HugeIcons.strokeRoundedChart01,
       label: 'Sales',
     ),
     _navItem(
-      icon: HugeIcons.strokeRoundedUserGroup,
-      label: 'Customers',
+      icon: HugeIcons.strokeRoundedPromotion,
+      label: 'Campaigns',
     ),
     _navItem(
       icon: HugeIcons.strokeRoundedCalendar03,

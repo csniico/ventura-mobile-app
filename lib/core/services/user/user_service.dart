@@ -1,3 +1,4 @@
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ventura/core/models/business/business.dart';
 import 'package:ventura/core/models/user/user.dart';
 import 'package:ventura/core/services/database/database_service.dart';
@@ -14,8 +15,10 @@ class UserService {
 
   /// Signs the user out, deactivating them in the database and clearing the cache.
   Future<void> signOut() async {
+    final googleSignIn = GoogleSignIn.instance;
     if (_currentUser?.id != null) {
       await _databaseService.signOut(_currentUser!.id);
+      await googleSignIn.signOut();
     }
     _currentUser = null;
   }

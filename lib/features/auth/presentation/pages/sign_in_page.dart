@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ventura/core/widgets/text_component.dart';
-import 'package:ventura/features/auth/presentation/sign_in_form.dart';
-import 'package:ventura/features/auth/presentation/sign_in_with_google.dart';
+import 'package:ventura/features/auth/presentation/widgets/sign_in_form.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});

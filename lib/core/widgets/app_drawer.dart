@@ -37,7 +37,7 @@ class _AppDrawerState extends State<AppDrawer> {
     {
       'icon': HugeIcons.strokeRoundedCalendar01,
       'title': 'Analytics',
-      'route': '/analytics',
+      'route': '/orders',
     },
   ];
 

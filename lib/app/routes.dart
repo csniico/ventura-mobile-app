@@ -1,34 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ventura/app/main_screen.dart';
 import 'package:ventura/app/not_found.dart';
-import 'package:ventura/core/services/user/user_service.dart';
-import 'package:ventura/features/accounting/presentation/accounting.dart';
-import 'package:ventura/features/analytics/presentation/analytics.dart';
-import 'package:ventura/features/auth/presentation/sign_in_page.dart';
-import 'package:ventura/features/business_profile/presentation/business_profile.dart';
-import 'package:ventura/features/help_and_support/presentation/help_and_support.dart';
-import 'package:ventura/features/inventory/presentation/inventory.dart';
-import 'package:ventura/features/settings/presentation/settings.dart';
-import 'package:ventura/features/team/presentation/team.dart';
-import 'package:ventura/features/welcome/presentation/welcome.dart';
+import 'package:ventura/core/providers/user_provider.dart';
+import 'package:ventura/features/auth/presentation/pages/sign_in_page.dart';
+import 'package:ventura/features/profile/presentation/profile.dart';
+import 'package:ventura/features/welcome/presentation/pages/welcome_page.dart';
 
 class AppRoutes {
 
-  static String getInitialRoute() {
-    return UserService().hasUser ? '/' : '/welcome';
+  static String getInitialRoute(WidgetRef ref) {
+    final user = ref.read(userProvider).value;
+    return user != null ? '/' : '/welcome';
   }
 
   static final Map<String, WidgetBuilder> routes = {
     '/': (_) => const MainScreen(),
-    '/welcome': (_) => const Welcome(),
+    '/welcome': (_) => const WelcomePage(),
     '/sign-in': (_) => const SignInPage(),
-    '/inventory': (_) => const Inventory(),
-    '/team': (_) => const Team(),
-    '/accounting': (_) => const Accounting(),
-    '/analytics': (_) => const Analytics(),
-    '/business_profile': (_) => const BusinessProfile(),
-    '/settings': (_) => const Settings(),
-    '/help_and_support': (_) => const HelpAndSupport(),
+    '/profile': (_) => const Profile(),
   };
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {

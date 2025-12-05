@@ -3,30 +3,25 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/models/business/business.dart';
 import 'package:ventura/core/models/user/user.dart';
-import 'package:ventura/core/services/business/business_service.dart';
-import 'package:ventura/core/services/user/user_service.dart';
-import 'package:ventura/core/widgets/switch_business_component.dart';
+import 'package:ventura/core/providers/business_provider.dart';
+import 'package:ventura/core/providers/user_provider.dart';
 
-class SignInWithGoogle extends StatefulWidget {
+class SignInWithGoogle extends ConsumerStatefulWidget {
   const SignInWithGoogle({super.key});
 
   @override
-  State<SignInWithGoogle> createState() => _SignInWithGoogleState();
+  ConsumerState<SignInWithGoogle> createState() => _SignInWithGoogleState();
 }
 
-class _SignInWithGoogleState extends State<SignInWithGoogle> {
+class _SignInWithGoogleState extends ConsumerState<SignInWithGoogle> {
   StreamSubscription<GoogleSignInAuthenticationEvent>? _authSubscription;
-  GoogleSignInAccount? _currentUser;
-  bool _isSyncing = false;
 
   late final Dio dio;
   final GoogleSignIn signIn = GoogleSignIn.instance;
-  final UserService _userService = UserService();
-  final BusinessService _businessService = BusinessService();
   bool isLoading = false;
 
   String? serverUrl = dotenv.env['SERVER_URL'];
@@ -45,7 +40,6 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
             _authSubscription = signIn.authenticationEvents.listen(
               _handleAuthEvent,
             );
-            signIn.attemptLightweightAuthentication();
           }),
     );
   }
@@ -63,20 +57,14 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
     try {
       if (event is GoogleSignInAuthenticationEventSignIn) {
         final user = event.user;
-        if (mounted) {
-          setState(() => _currentUser = user);
-        }
+
         await _logUserIn(user).timeout(
           const Duration(seconds: 100),
           onTimeout: () {
             throw TimeoutException("Login timed out. Please try again later.");
           },
         );
-      } else if (event is GoogleSignInAuthenticationEventSignOut) {
-        if (mounted) {
-          setState(() => _currentUser = null);
-        }
-      }
+      } else if (event is GoogleSignInAuthenticationEventSignOut) {}
     } catch (e) {
       debugPrint("Error: $e");
     } finally {
@@ -93,7 +81,7 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
           : '';
 
       var response = await dio.post(
-        "$serverUrl/auth/mobile/signin",
+        "$serverUrl/auth/google/login/mobile",
         data: {
           'email': googleUser.email,
           'firstName': firstName,
@@ -104,56 +92,21 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
       );
 
       final user = User.fromJson(response.data);
-      await _userService.saveUser(user);
+      await ref.read(userProvider.notifier).saveUser(user);
+      final List<Business> businesses = await ref
+          .read(businessProvider.notifier)
+          .syncBusinesses(user);
 
-      if (mounted) {
-        setState(() => _isSyncing = true);
-        final syncedBusinesses = await _businessService.syncUserBusinesses(
-          user,
-        );
-        debugPrint(
-          "[WelcomeScreen] Synced businesses: ${syncedBusinesses.map((b) => b.name).toList()}",
-        );
-        setState(() {
-          _isSyncing = false;
-        });
-
-        showModalBottomSheet(
-          context: context,
-          isDismissible: true,
-          enableDrag: true,
-          isScrollControlled: true,
-          builder: (context) => Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.light
-                  ? Colors.white
-                  : Colors.grey[900],
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            child: FractionallySizedBox(
-              widthFactor: 1,
-              heightFactor: 0.9,
-              child: SwitchBusinessComponent(
-                businesses: syncedBusinesses,
-                displayTitle: "Select Business",
-                onBusinessSwitch: (Business business) {
-                  Navigator.of(
-                    context,
-                  ).pushNamedAndRemoveUntil('/', (route) => false);
-                },
-              ),
-            ),
-          ),
-        );
-
-        // Pre-cache the user's avatar image
-        if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
+      if (businesses.isNotEmpty) {
+        await ref
+            .read(businessProvider.notifier)
+            .setActiveBusiness(businesses.first);
+      }
+      // Pre-cache the user's avatar image
+      if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
+        if (mounted) {
           precacheImage(NetworkImage(user.avatarUrl!), context);
         }
-        // Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
       }
     } on DioException catch (e) {
       if (e.response != null) {
@@ -172,6 +125,8 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
     }
     try {
       await signIn.authenticate(scopeHint: ['email', 'profile']);
+    } on GoogleSignInException catch (e) {
+      debugPrint("Google Sign-in Exception: $e");
     } catch (e) {
       debugPrint("Google Sign-in Error: $e");
     } finally {
@@ -187,13 +142,17 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20),
-      child: TextButton(
-        style: TextButton.styleFrom(
-          backgroundColor: Theme.of(context).primaryColor,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          side: BorderSide(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[700]!
+                : Colors.grey[500]!,
+            width: 1,
           ),
+          splashFactory: NoSplash.splashFactory,
         ),
         onPressed: isLoading ? null : () => continueWithGoogle(),
         child: Row(
@@ -212,13 +171,17 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
               Image.asset(
                 "assets/images/google.png",
                 height: 20,
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
               ),
             const SizedBox(width: 10),
-            const Text(
+            Text(
               "Sign in with Google",
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.brightnessOf(context) == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
