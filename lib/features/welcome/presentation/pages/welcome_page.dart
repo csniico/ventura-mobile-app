@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ventura/core/widgets/text_component.dart';
-import 'package:ventura/features/auth/presentation/widgets/sign_in_with_google.dart';
 
-class WelcomePage extends ConsumerStatefulWidget {
+class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
 
   @override
-  ConsumerState<WelcomePage> createState() => _WelcomeState();
+  State<WelcomePage> createState() => _WelcomeState();
 }
 
-class _WelcomeState extends ConsumerState<WelcomePage> {
+class _WelcomeState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

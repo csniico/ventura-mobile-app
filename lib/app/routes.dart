@@ -8,14 +8,15 @@ import 'package:ventura/features/profile/presentation/profile.dart';
 import 'package:ventura/features/welcome/presentation/pages/welcome_page.dart';
 
 class AppRoutes {
+  AppRoutes._internal();
 
-  static String getInitialRoute(WidgetRef ref) {
-    final user = ref.read(userProvider).value;
-    return user != null ? '/' : '/welcome';
-  }
+  static final AppRoutes instance = AppRoutes._internal();
+
+  final String welcome = '/welcome';
+  final String signIn = '/sign-in';
+  final String profile = '/profile';
 
   static final Map<String, WidgetBuilder> routes = {
-    '/': (_) => const MainScreen(),
     '/welcome': (_) => const WelcomePage(),
     '/sign-in': (_) => const SignInPage(),
     '/profile': (_) => const Profile(),

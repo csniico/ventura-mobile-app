@@ -2,22 +2,19 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:ventura/core/models/business/business.dart';
-import 'package:ventura/core/models/user/user.dart';
-import 'package:ventura/core/providers/business_provider.dart';
-import 'package:ventura/core/providers/user_provider.dart';
+import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 
-class SignInWithGoogle extends ConsumerStatefulWidget {
+class SignInWithGoogle extends StatefulWidget {
   const SignInWithGoogle({super.key});
 
   @override
-  ConsumerState<SignInWithGoogle> createState() => _SignInWithGoogleState();
+  State<SignInWithGoogle> createState() => _SignInWithGoogleState();
 }
 
-class _SignInWithGoogleState extends ConsumerState<SignInWithGoogle> {
+class _SignInWithGoogleState extends State<SignInWithGoogle> {
   StreamSubscription<GoogleSignInAuthenticationEvent>? _authSubscription;
 
   late final Dio dio;
@@ -80,40 +77,40 @@ class _SignInWithGoogleState extends ConsumerState<SignInWithGoogle> {
           ? nameParts.sublist(1).join(' ')
           : '';
 
-      var response = await dio.post(
-        "$serverUrl/auth/google/login/mobile",
-        data: {
-          'email': googleUser.email,
-          'firstName': firstName,
-          'lastName': lastName,
-          'googleId': googleUser.id,
-          'avatarUrl': googleUser.photoUrl,
-        },
+      context.read<AuthBloc>().add(
+        AuthSignInWithGoogle(
+          email: googleUser.email,
+          googleId: googleUser.id,
+          firstName: firstName,
+          lastName: lastName,
+          avatarUrl: googleUser.photoUrl,
+        ),
       );
 
-      final user = User.fromJson(response.data);
-      await ref.read(userProvider.notifier).saveUser(user);
-      final List<Business> businesses = await ref
-          .read(businessProvider.notifier)
-          .syncBusinesses(user);
+      // var response = await dio.post(
+      //   "$serverUrl/auth/google/login/mobile",
+      //   data: {
+      //     'email': googleUser.email,
+      //     'firstName': firstName,
+      //     'lastName': lastName,
+      //     'googleId': googleUser.id,
+      //     'avatarUrl': googleUser.photoUrl,
+      //   },
+      // );
 
-      if (businesses.isNotEmpty) {
-        await ref
-            .read(businessProvider.notifier)
-            .setActiveBusiness(businesses.first);
-      }
-      // Pre-cache the user's avatar image
-      if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
-        if (mounted) {
-          precacheImage(NetworkImage(user.avatarUrl!), context);
-        }
-      }
+      // final user = User.fromJson(response.data);
+      // // Pre-cache the user's avatar image
+      // if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
+      //   if (mounted) {
+      //     precacheImage(NetworkImage(user.avatarUrl!), context);
+      //   }
+      // }
     } on DioException catch (e) {
-      if (e.response != null) {
-        debugPrint("Error response: ${e.response?.data}");
-      } else {
-        debugPrint("Error sending request: ${e.message}");
-      }
+      // if (e.response != null) {
+      //   debugPrint("Error response: ${e.response?.data}");
+      // } else {
+      //   debugPrint("Error sending request: ${e.message}");
+      // }
     }
   }
 

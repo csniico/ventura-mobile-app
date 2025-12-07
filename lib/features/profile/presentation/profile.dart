@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:ventura/core/providers/user_provider.dart';
 import 'package:ventura/core/widgets/secondary_app_bar.dart';
 import 'package:ventura/core/widgets/text_component.dart';
 
-class Profile extends ConsumerStatefulWidget {
+class Profile extends StatefulWidget {
   const Profile({super.key});
 
   @override
-  ConsumerState<Profile> createState() => _ProfileState();
+  State<Profile> createState() => _ProfileState();
 }
 
-class _ProfileState extends ConsumerState<Profile> {
+class _ProfileState extends State<Profile> {
   Future<void> _logout() async {
     showDialog(
       context: context,
@@ -41,7 +39,6 @@ class _ProfileState extends ConsumerState<Profile> {
                 ),
                 TextButton(
                   onPressed: () async {
-                    await ref.read(userProvider.notifier).signOut();
                   },
                   child: Text(
                     "Logout",

@@ -1,23 +1,25 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/models/user/user.dart';
 import 'package:ventura/core/providers/user_provider.dart';
 import 'package:ventura/core/services/toast/toast_service.dart';
+import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';
 import 'package:ventura/features/auth/presentation/widgets/sign_in_with_google.dart';
 import 'package:ventura/features/auth/presentation/widgets/submit_form_button.dart';
 
-class SignInForm extends ConsumerStatefulWidget {
+class SignInForm extends StatefulWidget {
   const SignInForm({super.key});
 
   @override
-  ConsumerState<SignInForm> createState() => _SignInFormState();
+  State<SignInForm> createState() => _SignInFormState();
 }
 
-class _SignInFormState extends ConsumerState<SignInForm> {
+class _SignInFormState extends State<SignInForm> {
   final _formKey = GlobalKey<FormState>();
   Dio dio = Dio();
   String? serverUrl = dotenv.env['SERVER_URL'];
@@ -34,31 +36,30 @@ class _SignInFormState extends ConsumerState<SignInForm> {
         _isLoading = true;
         _isDisabled = true;
       });
-
-      final userNotifier = ref.read(userProvider.notifier);
-
       debugPrint("Email: $_email, Password: $_password");
       debugPrint("Server URL: $serverUrl");
+      context.read<AuthBloc>().add(
+        AuthSignIn(email: _email!, password: _password!),
+      );
 
       try {
-        var response = await dio.post(
-          '$serverUrl/auth/signin',
-          data: {'email': _email, 'password': _password},
-        );
-        debugPrint("Response: $response");
-        final user = User.fromJson(response.data);
-        await userNotifier.saveUser(user);
-        if (response.statusCode == 200) {
-          ToastService.showSuccess("Sign In Successful");
-        }
+        // var response = await dio.post(
+        //   '$serverUrl/auth/signin',
+        //   data: {'email': _email, 'password': _password},
+        // );
+        // debugPrint("Response: $response");
+        // final user = User.fromJson(response.data);
+        // if (response.statusCode == 200) {
+        //   ToastService.showSuccess("Sign In Successful");
+        // }
       } on DioException catch (e) {
         debugPrint("Error: $e");
-        if (e.response != null) {
-          ToastService.showError("${e.response!.data['message']}");
-          debugPrint("Error Response: ${e.response!.data}");
-        } else {
-          debugPrint("Error: ${e.message}");
-        }
+        // if (e.response != null) {
+        //   ToastService.showError("${e.response!.data['message']}");
+        //   debugPrint("Error Response: ${e.response!.data}");
+        // } else {
+        //   debugPrint("Error: ${e.message}");
+        // }
       } finally {
         setState(() {
           _isLoading = false;
