@@ -1,16 +1,24 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:ventura/core/models/failure/failure.dart';
+import 'package:ventura/core/data_sources/auth_local_data_source.dart';
+import 'package:ventura/core/models/failure.dart';
+import 'package:ventura/core/models/user_model.dart';
 import 'package:ventura/core/server_exception.dart';
 import 'package:ventura/features/auth/data/data_sources/auth_remote_data_source.dart';
+import 'package:ventura/features/auth/domain/entities/server_sign_up.dart';
+import 'package:ventura/core/entities/user_entity.dart';
 import 'package:ventura/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource authRemoteDataSource;
+  final AuthLocalDataSource authLocalDataSource;
 
-  const AuthRepositoryImpl({required this.authRemoteDataSource});
+  const AuthRepositoryImpl({
+    required this.authRemoteDataSource,
+    required this.authLocalDataSource,
+  });
 
   @override
-  Future<Either<Failure, String>> signInWithEmailPassword({
+  Future<Either<Failure, User>> signInWithEmailPassword({
     required String email,
     required String password,
   }) async {
@@ -26,7 +34,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, String>> signInWithGoogle({
+  Future<Either<Failure, User>> signInWithGoogle({
     required String email,
     required String googleId,
     required String firstName,
@@ -48,7 +56,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, String>> signUp({
+  Future<Either<Failure, ServerSignUp>> signUp({
     required String email,
     required String password,
     required String firstName,
@@ -70,13 +78,55 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, User>> confirmVerificationCode({
+    required String code,
+    required String email,
+    required String shortToken,
+  }) async {
+    try {
+      final user = await authRemoteDataSource.confirmVerificationCode(
+        code: code,
+        email: email,
+        shortToken: shortToken,
+      );
+      return right(user);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> saveUser({required User user}) async {
+    try {
+      return right(
+        await authLocalDataSource.saveUser(UserModel.fromEntity(user)),
+      );
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> getUser() async {
+    try {
+      final user = await authLocalDataSource.getUser();
+      if (user == null) {
+        return left(Failure('User not logged in'));
+      }
+      return right(user);
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, String>> signOut() {
     // TODO: implement signOut
     throw UnimplementedError();
   }
 
   @override
-  Future<Either<Failure, String>> getCurrentUser({required String uid}) {
+  Future<Either<Failure, User>> getCurrentUser({required String uid}) {
     // TODO: implement getCurrentUser
     throw UnimplementedError();
   }

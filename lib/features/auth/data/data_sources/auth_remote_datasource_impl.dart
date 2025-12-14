@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:ventura/core/server_exception.dart';
 import 'package:ventura/core/server_routes.dart';
 import 'package:ventura/features/auth/data/data_sources/auth_remote_data_source.dart';
+import 'package:ventura/features/auth/data/models/server_sign_up_model.dart';
+import 'package:ventura/core/models/user_model.dart';
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
   Dio dio = Dio();
   final routes = ServerRoutes.instance;
 
   @override
-  Future<String> signInWithEmailPassword({
+  Future<UserModel> signInWithEmailPassword({
     required String email,
     required String password,
   }) async {
@@ -18,14 +20,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
         '${routes.serverUrl}${routes.signInWithEmailPassword}',
       );
       debugPrint(response.toString());
-      return 'success';
+      return UserModel.fromJson(response.data);
     } on DioException catch (e) {
       throw ServerException.fromDioError(e);
     }
   }
 
   @override
-  Future<String> signInWithGoogle({
+  Future<UserModel> signInWithGoogle({
     required String googleId,
     required String email,
     required String firstName,
@@ -44,14 +46,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
         },
       );
       debugPrint(response.toString());
-      return 'success';
+      return UserModel.fromJson(response.data);
     } on DioException catch (e) {
       throw ServerException.fromDioError(e);
     }
   }
 
   @override
-  Future<String> signUp({
+  Future<ServerSignUpModel> signUp({
     required String email,
     required String firstName,
     required String password,
@@ -70,7 +72,25 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
         },
       );
       debugPrint(response.toString());
-      return 'success';
+      return ServerSignUpModel.fromJson(response.data);
+    } on DioException catch (e) {
+      throw ServerException.fromDioError(e);
+    }
+  }
+
+  @override
+  Future<UserModel> confirmVerificationCode({
+    required String code,
+    required String email,
+    required String shortToken,
+  }) async {
+    try {
+      var response = await dio.post(
+        '${routes.serverUrl}${routes.confirmVerificationCode}',
+        data: {'code': code, 'email': email, 'shortToken': shortToken},
+      );
+      debugPrint(response.toString());
+      return UserModel.fromJson(response.data);
     } on DioException catch (e) {
       throw ServerException.fromDioError(e);
     }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ventura/app/main_screen.dart';
 import 'package:ventura/app/not_found.dart';
-import 'package:ventura/core/providers/user_provider.dart';
 import 'package:ventura/features/auth/presentation/pages/sign_in_page.dart';
+import 'package:ventura/features/auth/presentation/pages/sign_up_page.dart';
+import 'package:ventura/features/auth/presentation/pages/verify_code_page.dart';
 import 'package:ventura/features/profile/presentation/profile.dart';
 import 'package:ventura/features/welcome/presentation/pages/welcome_page.dart';
 
@@ -14,12 +14,18 @@ class AppRoutes {
 
   final String welcome = '/welcome';
   final String signIn = '/sign-in';
+  final String signUp = '/sign-up';
   final String profile = '/profile';
+  final String main = '/main';
+  final String verifyCode = '/verify-code';
 
   static final Map<String, WidgetBuilder> routes = {
     '/welcome': (_) => const WelcomePage(),
     '/sign-in': (_) => const SignInPage(),
+    '/sign-up': (_) => const SignUpPage(),
+    '/verify-code': (_) => VerifyCodePage(),
     '/profile': (_) => const Profile(),
+    '/main': (_) => const MainScreen(),
   };
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {

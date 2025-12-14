@@ -1,10 +1,13 @@
+import 'package:ventura/features/auth/data/models/server_sign_up_model.dart';
+import 'package:ventura/core/models/user_model.dart';
+
 abstract interface class AuthRemoteDataSource {
-  Future<String> signInWithEmailPassword({
+  Future<UserModel> signInWithEmailPassword({
     required String email,
     required String password,
   });
 
-  Future<String> signInWithGoogle({
+  Future<UserModel> signInWithGoogle({
     required String googleId,
     required String email,
     required String firstName,
@@ -12,12 +15,18 @@ abstract interface class AuthRemoteDataSource {
     String? avatarUrl,
   });
 
-  Future<String> signUp({
+  Future<ServerSignUpModel> signUp({
     required String email,
     required String firstName,
     required String password,
     String? lastName,
     String? avatarUrl,
+  });
+
+  Future<UserModel> confirmVerificationCode({
+    required String code,
+    required String email,
+    required String shortToken,
   });
 
   Future<void> signOut();

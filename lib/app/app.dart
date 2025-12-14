@@ -26,18 +26,17 @@ class App extends StatelessWidget {
         listener: (context, state) {
           if (state is UnAuthenticated) {
             debugPrint('User is unauthenticated');
-            navigatorKey.currentState?.pushNamedAndRemoveUntil(
-              _appRoutes.welcome,
-              (_) => false,
-            );
+
           }
           if (state is Authenticated) {
             debugPrint('User is authenticated');
-            MaterialPageRoute(builder: (context) => const Home());
+            navigatorKey.currentState?.pushNamedAndRemoveUntil(
+              _appRoutes.main,
+                  (_) => false,
+            );
           }
         },
         builder: (context, state) {
-          // Always show a loading indicator initially, and let the listener handle navigation.
           return const WelcomePage();
         },
       ),

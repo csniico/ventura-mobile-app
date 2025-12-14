@@ -10,19 +10,22 @@ import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';
 import 'package:ventura/features/auth/presentation/widgets/sign_in_with_google.dart';
 import 'package:ventura/features/auth/presentation/widgets/submit_form_button.dart';
 
-class SignInForm extends StatefulWidget {
-  const SignInForm({super.key});
+class SignUpForm extends StatefulWidget {
+  const SignUpForm({super.key});
 
   @override
-  State<SignInForm> createState() => _SignInFormState();
+  State<SignUpForm> createState() => _SignUpFormState();
 }
 
-class _SignInFormState extends State<SignInForm> {
+class _SignUpFormState extends State<SignUpForm> {
   final routes = AppRoutes.instance;
   final _formKey = GlobalKey<FormState>();
   String? serverUrl = dotenv.env['SERVER_URL'];
   String? _email = "";
   String? _password = "";
+  String? _firstName = "";
+  String? _lastName = "";
+  String? _avatarUrl = "";
   bool _obscurePassword = true;
   bool _isLoading = false;
   bool _isDisabled = false;
@@ -31,27 +34,33 @@ class _SignInFormState extends State<SignInForm> {
   void reassemble() {
     super.reassemble();
     // Reset state on hot reload
-    resetButtonState();
-  }
-
-  void resetButtonState() {
     setState(() {
-      _isDisabled = false;
       _isLoading = false;
+      _isDisabled = false;
     });
   }
 
-  void _handleSubmit() async {
+  void handleSignUpButtonClicked() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() {
         _isLoading = true;
         _isDisabled = true;
       });
-      debugPrint("Email: $_email, Password: $_password");
-      debugPrint("Server URL: $serverUrl");
+
+      debugPrint(
+        "email is $_email and password is $_password and first and last name is $_firstName $_lastName",
+      );
+      _avatarUrl = "https://picsum.photos/200";
+
       context.read<AuthBloc>().add(
-        AuthSignIn(email: _email!, password: _password!),
+        AuthSignUp(
+          email: _email!,
+          password: _password!,
+          firstName: _firstName!,
+          avatarUrl: _avatarUrl!,
+          lastName: _lastName!,
+        ),
       );
     }
   }
@@ -60,11 +69,25 @@ class _SignInFormState extends State<SignInForm> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
+        if (state is AuthSignUpSuccess) {
+          setState(() {
+            _isLoading = false;
+            _isDisabled = true;
+          });
+          Navigator.of(context).pushNamed(
+            routes.verifyCode,
+            arguments: {
+              'email': state.user.user.email,
+              'shortToken': state.user.shortToken,
+            },
+          );
+        }
         if (state is AuthFailure) {
+          setState(() {
+            _isLoading = false;
+            _isDisabled = false;
+          });
           ToastService.showError(state.message);
-          resetButtonState();
-        } else if (state is AuthSuccess) {
-          debugPrint(state.user.toString());
         }
       },
       builder: (context, state) {
@@ -86,12 +109,42 @@ class _SignInFormState extends State<SignInForm> {
                         color: Theme.of(context).colorScheme.primary,
                       ),
                       const Text(
-                        'Sign In',
+                        'Create an account',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      const SizedBox(height: 40),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: AuthField(
+                              title: 'First name',
+                              hintText: 'First name',
+                              onSaved: (value) {
+                                setState(() {
+                                  _firstName = value;
+                                });
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: AuthField(
+                              title: 'Last name',
+                              hintText: 'Last name',
+                              onSaved: (value) {
+                                setState(() {
+                                  _lastName = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 10),
                       AuthField(
@@ -133,24 +186,24 @@ class _SignInFormState extends State<SignInForm> {
                       ),
                       const SizedBox(height: 30),
                       SubmitFormButton(
-                        title: "Sign In",
+                        title: "Create Account",
                         isLoading: _isLoading,
-                        onPressed: _handleSubmit,
+                        onPressed: handleSignUpButtonClicked,
                         isDisabled: _isDisabled,
                       ),
                       const SizedBox(height: 30),
                       InkWell(
                         onTap: () {
-                          Navigator.of(context).pushNamed(routes.signUp);
+                          Navigator.of(context).popAndPushNamed(routes.signIn);
                         },
                         child: RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(
-                            text: "Don't have an account? ",
+                            text: "Already have an account? ",
                             style: Theme.of(context).textTheme.titleMedium,
                             children: [
                               TextSpan(
-                                text: "Sign Up",
+                                text: "Sign In",
                                 style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(
                                       color: Theme.of(

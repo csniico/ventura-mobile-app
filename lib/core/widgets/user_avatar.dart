@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:ventura/core/models/user/user.dart';
+import 'package:ventura/core/entities/user_entity.dart';
 import 'package:ventura/core/services/user/user_service.dart';
 
 class UserAvatar extends StatefulWidget {
@@ -17,7 +17,6 @@ class _UserAvatarState extends State<UserAvatar> {
   @override
   void initState() {
     super.initState();
-    _user = UserService().user;
   }
 
   @override

@@ -8,7 +8,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 
 class SignInWithGoogle extends StatefulWidget {
-  const SignInWithGoogle({super.key});
+  final String title;
+
+  const SignInWithGoogle({super.key, required this.title});
 
   @override
   State<SignInWithGoogle> createState() => _SignInWithGoogleState();
@@ -174,7 +176,7 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
               ),
             const SizedBox(width: 10),
             Text(
-              "Sign in with Google",
+              widget.title,
               style: TextStyle(
                 color: Theme.brightnessOf(context) == Brightness.dark
                     ? Colors.white
