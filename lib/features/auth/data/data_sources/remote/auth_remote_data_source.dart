@@ -1,3 +1,4 @@
+import 'package:ventura/features/auth/data/models/confirm_email_model.dart';
 import 'package:ventura/features/auth/data/models/server_sign_up_model.dart';
 import 'package:ventura/core/data/models/user_model.dart';
 
@@ -21,6 +22,10 @@ abstract interface class AuthRemoteDataSource {
     required String password,
     String? lastName,
     String? avatarUrl,
+  });
+
+  Future<ConfirmEmailModel> confirmEmailForPasswordReset({
+    required String email,
   });
 
   Future<UserModel> confirmVerificationCode({

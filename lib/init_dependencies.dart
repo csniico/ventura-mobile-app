@@ -14,6 +14,7 @@ import 'package:ventura/features/auth/data/data_sources/remote/auth_remote_data_
 import 'package:ventura/features/auth/data/data_sources/remote/auth_remote_datasource_impl.dart';
 import 'package:ventura/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:ventura/features/auth/domain/repositories/auth_repository.dart';
+import 'package:ventura/features/auth/domain/use_cases/confirm_email.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_verification_code.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in_with_google.dart';
@@ -34,16 +35,16 @@ void _initAuthDependencies() {
     ..registerFactory<AuthLocalDataSource>(
       () => AuthLocalDataSourceImpl(userService: serviceLocator()),
     )
-    ..registerFactory<UserLocalDataSource>(() => UserLocalDataSourceImpl(userService: serviceLocator()))
-
-    // REPOSITORIES
-    ..registerFactory<UserRepository>(() => UserRepositoryImpl(userLocalDataSource: serviceLocator()))
-    ..registerFactory<AuthRepository>(
-      () => AuthRepositoryImpl(
-        authRemoteDataSource: serviceLocator(),
-      ),
+    ..registerFactory<UserLocalDataSource>(
+      () => UserLocalDataSourceImpl(userService: serviceLocator()),
     )
-
+    // REPOSITORIES
+    ..registerFactory<UserRepository>(
+      () => UserRepositoryImpl(userLocalDataSource: serviceLocator()),
+    )
+    ..registerFactory<AuthRepository>(
+      () => AuthRepositoryImpl(authRemoteDataSource: serviceLocator()),
+    )
     // USE CASES
     ..registerFactory(() => UserSignIn(authRepository: serviceLocator()))
     ..registerFactory(() => LocalGetUser(userRepository: serviceLocator()))
@@ -52,12 +53,12 @@ void _initAuthDependencies() {
     ..registerFactory(
       () => UserSignInWithGoogle(authRepository: serviceLocator()),
     )
+    ..registerFactory(() => ConfirmEmail(authRepository: serviceLocator()))
     ..registerFactory(
       () => ConfirmVerificationCode(authRepository: serviceLocator()),
     )
     ..registerFactory(() => UserSignUp(authRepository: serviceLocator()))
     ..registerFactory(() => AppUserCubit())
-
     // BLOC
     ..registerLazySingleton(
       () => AuthBloc(
@@ -66,6 +67,7 @@ void _initAuthDependencies() {
         localGetUser: serviceLocator(),
         localSaveUser: serviceLocator(),
         localSignOut: serviceLocator(),
+        confirmEmail: serviceLocator(),
         userSignInWithGoogle: serviceLocator(),
         confirmVerificationCode: serviceLocator(),
         appUserCubit: serviceLocator(),

@@ -67,3 +67,10 @@ class AuthResendVerificationCode extends AuthEvent {
 
   AuthResendVerificationCode({required this.shortToken});
 }
+
+class AuthVerifyEmail extends AuthEvent {
+  final String email;
+
+  AuthVerifyEmail({required this.email});
+}
+

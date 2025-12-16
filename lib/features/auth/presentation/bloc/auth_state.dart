@@ -38,8 +38,21 @@ final class VerificationCodeConfirmed extends AuthState {
   VerificationCodeConfirmed(this.user);
 }
 
+final class EmailVerificationCodeSendSuccessful extends AuthState {
+  final String message;
+
+  EmailVerificationCodeSendSuccessful(this.message);
+}
+
 final class VerificationCodeResendSuccessful extends AuthState {
   final String message;
 
   VerificationCodeResendSuccessful(this.message);
+}
+
+class AuthEmailIsVerified extends AuthState {
+  final String message;
+  final String shortToken;
+
+  AuthEmailIsVerified({required this.message, required this.shortToken});
 }

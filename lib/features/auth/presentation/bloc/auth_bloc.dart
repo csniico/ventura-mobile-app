@@ -7,6 +7,7 @@ import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.da
 import 'package:ventura/core/domain/use_cases/use_case.dart';
 import 'package:ventura/features/auth/domain/entities/server_sign_up.dart';
 import 'package:ventura/core/domain/entities/user_entity.dart';
+import 'package:ventura/features/auth/domain/use_cases/confirm_email.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_verification_code.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in_with_google.dart';
@@ -22,7 +23,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LocalGetUser _localGetUser;
   final LocalSaveUser _localSaveUser;
   final LocalSignOut _localSignOut;
-
+  final ConfirmEmail _confirmEmail;
   final UserSignInWithGoogle _userSignInWithGoogle;
   final ConfirmVerificationCode _confirmVerificationCode;
   final AppUserCubit _appUserCubit;
@@ -33,19 +34,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required LocalGetUser localGetUser,
     required LocalSaveUser localSaveUser,
     required LocalSignOut localSignOut,
+    required ConfirmEmail confirmEmail,
     required UserSignInWithGoogle userSignInWithGoogle,
     required ConfirmVerificationCode confirmVerificationCode,
     required AppUserCubit appUserCubit,
-  })
-      : _appUserCubit = appUserCubit,
-        _userSignIn = userSignIn,
-        _userSignUp = userSignUp,
-        _localGetUser = localGetUser,
-        _localSaveUser = localSaveUser,
-        _localSignOut = localSignOut,
-        _userSignInWithGoogle = userSignInWithGoogle,
-        _confirmVerificationCode = confirmVerificationCode,
-        super(AuthInitial()) {
+  }) : _appUserCubit = appUserCubit,
+       _userSignIn = userSignIn,
+       _userSignUp = userSignUp,
+       _localGetUser = localGetUser,
+       _localSaveUser = localSaveUser,
+       _localSignOut = localSignOut,
+       _confirmEmail = confirmEmail,
+       _userSignInWithGoogle = userSignInWithGoogle,
+       _confirmVerificationCode = confirmVerificationCode,
+       super(AuthInitial()) {
     on<AuthEvent>((_, emit) => emit(AuthLoading()));
     on<AppStarted>(_onAppStarted);
     on<AuthSignUp>(_onAuthSignUp);
@@ -53,6 +55,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthSignOut>(_onAuthSignOut);
     on<AuthSignInWithGoogle>(_onAuthSignInWithGoogle);
     on<AuthConfirmVerificationCode>(_onAuthConfirmVerificationCode);
+    on<AuthVerifyEmail>(_onAuthVerifyEmail);
   }
 
   void _onAuthSignOut(AuthEvent event, Emitter<AuthState> emit) async {
@@ -83,9 +86,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     debugPrint('app started. I can do what I want here.');
     final res = await _localGetUser(NoParams());
     res.fold(
-          (l) => emit(UnAuthenticated()),
-          (user) =>
-      user == null ? emit(UnAuthenticated()) : emitAuthSuccess(user, emit),
+      (l) => emit(UnAuthenticated()),
+      (user) =>
+          user == null ? emit(UnAuthenticated()) : emitAuthSuccess(user, emit),
     );
   }
 
@@ -94,13 +97,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       UserSignInParams(email: event.email, password: event.password),
     );
     res.fold(
-          (l) => emit(AuthFailure(l.message)),
-          (user) => emitAuthSuccess(user, emit),
+      (l) => emit(AuthFailure(l.message)),
+      (user) => emitAuthSuccess(user, emit),
     );
   }
 
-  void _onAuthSignInWithGoogle(AuthSignInWithGoogle event,
-      Emitter<AuthState> emit,) async {
+  void _onAuthSignInWithGoogle(
+    AuthSignInWithGoogle event,
+    Emitter<AuthState> emit,
+  ) async {
     final res = await _userSignInWithGoogle(
       UserSignInWithGoogleParams(
         email: event.email,
@@ -111,13 +116,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ),
     );
     res.fold(
-          (l) => emit(AuthFailure(l.message)),
-          (user) => emitAuthSuccess(user, emit),
+      (l) => emit(AuthFailure(l.message)),
+      (user) => emitAuthSuccess(user, emit),
     );
   }
 
-  void _onAuthConfirmVerificationCode(AuthConfirmVerificationCode event,
-      Emitter<AuthState> emit,) async {
+  void _onAuthConfirmVerificationCode(
+    AuthConfirmVerificationCode event,
+    Emitter<AuthState> emit,
+  ) async {
     final res = await _confirmVerificationCode(
       ConfirmVerificationCodeParams(
         code: event.code,
@@ -126,8 +133,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ),
     );
     res.fold(
-          (l) => emit(AuthFailure(l.message)),
-          (user) => emitAuthSuccess(user, emit),
+      (l) => emit(AuthFailure(l.message)),
+      (user) => emitAuthSuccess(user, emit),
+    );
+  }
+
+  void _onAuthVerifyEmail(
+    AuthVerifyEmail event,
+    Emitter<AuthState> emit,
+  ) async {
+    final res = await _confirmEmail(ConfirmEmailParams(email: event.email));
+    res.fold(
+      (l) => emit(AuthFailure(l.message)),
+      (response) => emit(
+        AuthEmailIsVerified(
+          message: response.message,
+          shortToken: response.shortToken,
+        ),
+      ),
     );
   }
 

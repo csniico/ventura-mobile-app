@@ -133,6 +133,23 @@ class _SignInFormState extends State<SignInForm> {
                           });
                         },
                       ),
+                      const SizedBox(height: 10),
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context)
+                              .pushNamed(routes.forgotPassword);
+                        },
+                        child: RichText(
+                          textAlign: TextAlign.right,
+                          text: TextSpan(
+                            text: "Forgot your password?",
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 30),
                       SubmitFormButton(
                         title: "Sign In",

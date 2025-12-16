@@ -9,5 +9,6 @@ class ServerRoutes {
   final String signInWithEmailPassword = '/auth/signin';
   final String signInWithGoogle = '/auth/google/login/mobile';
   final String signUp = '/auth/signup';
+  final String confirmEmail = '/auth/confirm-email';
   final String confirmVerificationCode = '/auth/verify-code';
 }

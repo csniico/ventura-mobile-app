@@ -1,9 +1,8 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:ventura/features/auth/data/data_sources/local/auth_local_data_source.dart';
 import 'package:ventura/core/data/models/failure.dart';
-import 'package:ventura/core/data/models/user_model.dart';
 import 'package:ventura/core/data/models/server_exception.dart';
 import 'package:ventura/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
+import 'package:ventura/features/auth/data/models/confirm_email_model.dart';
 import 'package:ventura/features/auth/domain/entities/server_sign_up.dart';
 import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/features/auth/domain/repositories/auth_repository.dart';
@@ -94,6 +93,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, ConfirmEmailModel>> confirmEmailForPasswordReset({required String email}) async {
+   try {
+     final response = await authRemoteDataSource.confirmEmailForPasswordReset(email: email);
+      return right(response);
+   } on ServerException catch (e) {
+     return left(Failure(e.message));
+   }
+  }
+
+  @override
   Future<Either<Failure, String>> signOut() {
     // TODO: implement signOut
     throw UnimplementedError();
@@ -104,4 +113,5 @@ class AuthRepositoryImpl implements AuthRepository {
     // TODO: implement getCurrentUser
     throw UnimplementedError();
   }
+
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ventura/core/data/models/server_exception.dart';
 import 'package:ventura/core/data/datasources/remote/server_routes.dart';
 import 'package:ventura/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
+import 'package:ventura/features/auth/data/models/confirm_email_model.dart';
 import 'package:ventura/features/auth/data/models/server_sign_up_model.dart';
 import 'package:ventura/core/data/models/user_model.dart';
 
@@ -102,5 +103,21 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
   Future<void> signOut() {
     // TODO: implement signOut
     throw UnimplementedError();
+  }
+
+  @override
+  Future<ConfirmEmailModel> confirmEmailForPasswordReset({required String email}) async {
+    try {
+      var response = await dio.post(
+        '${routes.serverUrl}${routes.confirmEmail}',
+        data: {'email': email},
+      );
+      debugPrint(response.toString());
+      return ConfirmEmailModel.fromJson(response.data);
+    } on DioException catch (e) {
+      throw ServerException.fromDioError(e);
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: 404, status: '');
+    }
   }
 }
