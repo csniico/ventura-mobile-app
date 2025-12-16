@@ -1,4 +1,4 @@
-import 'package:ventura/core/models/user_model.dart';
+import 'package:ventura/core/data/models/user_model.dart';
 import 'package:ventura/features/auth/domain/entities/server_sign_up.dart';
 
 class ServerSignUpModel extends ServerSignUp {

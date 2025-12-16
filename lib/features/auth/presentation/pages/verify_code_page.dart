@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ventura/core/services/toast/toast_service.dart';
+import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:ventura/features/auth/presentation/widgets/sign_in_form.dart';
 import 'package:ventura/features/auth/presentation/widgets/submit_form_button.dart';
 
 class VerifyCodePage extends StatefulWidget {
@@ -51,6 +50,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   }
 
   void handleConfirmCodeButtonClicked() {
+    setState(() {
+      _isDisabled = true;
+      _isLoading = true;
+    });
     if (_formKey.currentState!.validate()) {
       debugPrint("We're making good progress!");
       debugPrint(
@@ -74,9 +77,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthFailure) {
-            ToastService.showError(state.message);
             resetButtonState();
+            ToastService.showError(state.message);
           } else if (state is AuthSuccess) {
+            resetButtonState();
             debugPrint("state is ${state.user.toString()}");
           }
         },

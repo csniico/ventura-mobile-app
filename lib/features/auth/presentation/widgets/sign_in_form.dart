@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:ventura/app/routes.dart';
-import 'package:ventura/core/services/toast/toast_service.dart';
+import 'package:ventura/core/common/routes.dart';
+import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';
 import 'package:ventura/features/auth/presentation/widgets/sign_in_with_google.dart';
@@ -64,10 +64,12 @@ class _SignInFormState extends State<SignInForm> {
           ToastService.showError(state.message);
           resetButtonState();
         } else if (state is AuthSuccess) {
+          ToastService.showSuccess('Login successful!');
+          Navigator.of(context).pushReplacementNamed(routes.main);
           debugPrint(state.user.toString());
         }
       },
-      builder: (context, state) {
+      builder: (_, _) {
         return Form(
           key: _formKey,
           child: Padding(

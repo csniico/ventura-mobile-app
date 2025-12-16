@@ -23,6 +23,10 @@ class AuthSignUp extends AuthEvent {
   });
 }
 
+class AuthSignOut extends AuthEvent {
+  AuthSignOut();
+}
+
 class AuthSignIn extends AuthEvent {
   final String email;
   final String password;

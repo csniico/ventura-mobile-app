@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ventura/core/widgets/text_component.dart';
+import 'package:ventura/core/presentation/widgets/text_component.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});

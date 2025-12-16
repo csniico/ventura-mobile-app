@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:ventura/core/models/failure.dart';
+import 'package:ventura/core/data/models/failure.dart';
 import 'package:ventura/features/auth/domain/entities/server_sign_up.dart';
-import 'package:ventura/core/entities/user_entity.dart';
+import 'package:ventura/core/domain/entities/user_entity.dart';
 
 abstract interface class AuthRepository {
   Future<Either<Failure, String>> signOut();
@@ -35,6 +35,4 @@ abstract interface class AuthRepository {
     required String shortToken,
   });
 
-  Future<Either<Failure, User>> saveUser({required User user});
-  Future<Either<Failure, User>> getUser();
 }

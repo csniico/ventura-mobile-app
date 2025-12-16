@@ -1,15 +1,20 @@
 import 'package:get_it/get_it.dart';
-import 'package:ventura/core/cubit/app_user_cubit/app_user_cubit.dart';
-import 'package:ventura/core/data_sources/auth_local_data_source.dart';
-import 'package:ventura/core/data_sources/auth_local_data_source_impl.dart';
-import 'package:ventura/core/services/user/user_service.dart';
-import 'package:ventura/features/auth/data/data_sources/auth_remote_data_source.dart';
-import 'package:ventura/features/auth/data/data_sources/auth_remote_datasource_impl.dart';
+import 'package:ventura/core/data/datasources/local/user_local_data_source.dart';
+import 'package:ventura/core/data/datasources/local/user_local_data_source_impl.dart';
+import 'package:ventura/core/data/repositories/user_repository_impl.dart';
+import 'package:ventura/core/domain/repositories/user_repository.dart';
+import 'package:ventura/core/domain/use_cases/local_get_user.dart';
+import 'package:ventura/core/domain/use_cases/local_save_user.dart';
+import 'package:ventura/core/domain/use_cases/local_sign_out.dart';
+import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.dart';
+import 'package:ventura/features/auth/data/data_sources/local/auth_local_data_source.dart';
+import 'package:ventura/features/auth/data/data_sources/local/auth_local_data_source_impl.dart';
+import 'package:ventura/core/services/user_service.dart';
+import 'package:ventura/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
+import 'package:ventura/features/auth/data/data_sources/remote/auth_remote_datasource_impl.dart';
 import 'package:ventura/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:ventura/features/auth/domain/repositories/auth_repository.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_verification_code.dart';
-import 'package:ventura/features/auth/domain/use_cases/get_current_user.dart';
-import 'package:ventura/features/auth/domain/use_cases/save_current_user.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in_with_google.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_up.dart';
@@ -23,20 +28,27 @@ Future<void> initDependencies() async {
 }
 
 void _initAuthDependencies() {
+  // DATA SOURCES
   serviceLocator
     ..registerFactory<AuthRemoteDataSource>(() => AuthRemoteDatasourceImpl())
     ..registerFactory<AuthLocalDataSource>(
       () => AuthLocalDataSourceImpl(userService: serviceLocator()),
     )
+    ..registerFactory<UserLocalDataSource>(() => UserLocalDataSourceImpl(userService: serviceLocator()))
+
+    // REPOSITORIES
+    ..registerFactory<UserRepository>(() => UserRepositoryImpl(userLocalDataSource: serviceLocator()))
     ..registerFactory<AuthRepository>(
       () => AuthRepositoryImpl(
         authRemoteDataSource: serviceLocator(),
-        authLocalDataSource: serviceLocator(),
       ),
     )
+
+    // USE CASES
     ..registerFactory(() => UserSignIn(authRepository: serviceLocator()))
-    ..registerFactory(() => GetCurrentUser(authRepository: serviceLocator()))
-    ..registerFactory(() => SaveCurrentUser(authRepository: serviceLocator()))
+    ..registerFactory(() => LocalGetUser(userRepository: serviceLocator()))
+    ..registerFactory(() => LocalSaveUser(userRepository: serviceLocator()))
+    ..registerFactory(() => LocalSignOut(userRepository: serviceLocator()))
     ..registerFactory(
       () => UserSignInWithGoogle(authRepository: serviceLocator()),
     )
@@ -45,12 +57,15 @@ void _initAuthDependencies() {
     )
     ..registerFactory(() => UserSignUp(authRepository: serviceLocator()))
     ..registerFactory(() => AppUserCubit())
+
+    // BLOC
     ..registerLazySingleton(
       () => AuthBloc(
         userSignIn: serviceLocator(),
         userSignUp: serviceLocator(),
-        getCurrentUser: serviceLocator(),
-        saveCurrentUser: serviceLocator(),
+        localGetUser: serviceLocator(),
+        localSaveUser: serviceLocator(),
+        localSignOut: serviceLocator(),
         userSignInWithGoogle: serviceLocator(),
         confirmVerificationCode: serviceLocator(),
         appUserCubit: serviceLocator(),

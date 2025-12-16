@@ -1,4 +1,4 @@
-import 'package:ventura/core/entities/user_entity.dart';
+import 'package:ventura/core/domain/entities/user_entity.dart';
 
 class ServerSignUp {
   final User user;

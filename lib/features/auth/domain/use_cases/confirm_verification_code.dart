@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:ventura/core/models/failure.dart';
-import 'package:ventura/core/use_case/use_case.dart';
-import 'package:ventura/core/entities/user_entity.dart';
+import 'package:ventura/core/data/models/failure.dart';
+import 'package:ventura/core/domain/use_cases/use_case.dart';
+import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/features/auth/domain/repositories/auth_repository.dart';
 
 class ConfirmVerificationCode
