@@ -48,6 +48,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _userSignInWithGoogle = userSignInWithGoogle,
        _confirmVerificationCode = confirmVerificationCode,
        super(AuthInitial()) {
+    on<AuthResetState>((event, emit) => emit(AuthInitial()));
     on<AuthEvent>((_, emit) => emit(AuthLoading()));
     on<AppStarted>(_onAppStarted);
     on<AuthSignUp>(_onAuthSignUp);
@@ -56,6 +57,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthSignInWithGoogle>(_onAuthSignInWithGoogle);
     on<AuthConfirmVerificationCode>(_onAuthConfirmVerificationCode);
     on<AuthVerifyEmail>(_onAuthVerifyEmail);
+    on<AuthResetPasswordConfirmVerificationCode>(
+      _onAuthResetPasswordConfirmVerificationCode,
+    );
+    on<AuthResetPassword>(_onAuthResetPassword);
+    on<AuthForgotPassword>(_onForgotPassword);
   }
 
   void _onAuthSignOut(AuthEvent event, Emitter<AuthState> emit) async {
@@ -138,17 +144,82 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
+  void _onForgotPassword(
+    AuthForgotPassword event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthUserForgotPassword());
+  }
+
   void _onAuthVerifyEmail(
     AuthVerifyEmail event,
     Emitter<AuthState> emit,
   ) async {
-    final res = await _confirmEmail(ConfirmEmailParams(email: event.email));
-    res.fold(
-      (l) => emit(AuthFailure(l.message)),
-      (response) => emit(
-        AuthEmailIsVerified(
-          message: response.message,
-          shortToken: response.shortToken,
+    emit(
+      AuthEmailIsVerified(
+        message: 'response.message',
+        shortToken: 'response.shortToken',
+      ),
+    );
+    // final res = await _confirmEmail(ConfirmEmailParams(email: event.email));
+    // res.fold(
+    //   (l) => emit(AuthFailure(l.message)),
+    //   (response) => emit(
+    //   ),
+    // );
+  }
+
+  void _onAuthResetPasswordConfirmVerificationCode(
+    AuthResetPasswordConfirmVerificationCode event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(
+      VerificationCodeConfirmed(
+        User(
+          isSystem: true,
+          isEmailVerified: true,
+          email: event.email,
+          firstName: '',
+          lastName: '',
+          id: '',
+          avatarUrl: null,
+          isActive: true,
+          businessId: '',
+          googleId: '',
+          shortId: '',
+        ),
+      ),
+    );
+    // final res = await _confirmVerificationCode(
+    //   ConfirmVerificationCodeParams(
+    //     code: event.code,
+    //     email: event.email,
+    //     shortToken: event.shortToken,
+    //   ),
+    // );
+    // res.fold(
+    //   (l) => emit(AuthFailure(l.message)),
+    // );
+  }
+
+  void _onAuthResetPassword(
+    AuthResetPassword event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(
+      PasswordResetSuccessful(
+        user: User(
+          isSystem: true,
+          isEmailVerified: true,
+          email: event.email,
+          firstName: '',
+          lastName: '',
+          id: '',
+          avatarUrl: null,
+          isActive: true,
+          businessId: '',
+          googleId: '',
+          shortId: '',
         ),
       ),
     );

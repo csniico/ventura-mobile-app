@@ -3,6 +3,10 @@ part of 'auth_bloc.dart';
 @immutable
 sealed class AuthEvent {}
 
+final class AuthResetState extends AuthEvent {
+  AuthResetState();
+}
+
 final class AppStarted extends AuthEvent {
   AppStarted();
 }
@@ -62,6 +66,20 @@ class AuthConfirmVerificationCode extends AuthEvent {
   });
 }
 
+class AuthForgotPassword extends AuthEvent {}
+
+class AuthResetPasswordConfirmVerificationCode extends AuthEvent {
+  final String code;
+  final String email;
+  final String shortToken;
+
+  AuthResetPasswordConfirmVerificationCode({
+    required this.code,
+    required this.email,
+    required this.shortToken,
+  });
+}
+
 class AuthResendVerificationCode extends AuthEvent {
   final String shortToken;
 
@@ -74,3 +92,14 @@ class AuthVerifyEmail extends AuthEvent {
   AuthVerifyEmail({required this.email});
 }
 
+class AuthResetPassword extends AuthEvent {
+  final String email;
+  final String newPassword;
+  final String userId;
+
+  AuthResetPassword({
+    required this.email,
+    required this.newPassword,
+    required this.userId,
+  });
+}

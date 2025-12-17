@@ -67,6 +67,8 @@ class _SignInFormState extends State<SignInForm> {
           ToastService.showSuccess('Login successful!');
           Navigator.of(context).pushReplacementNamed(routes.main);
           debugPrint(state.user.toString());
+        } else if (state is AuthUserForgotPassword) {
+          Navigator.of(context).pushNamed(routes.forgotPassword);
         }
       },
       builder: (_, _) {
@@ -136,8 +138,7 @@ class _SignInFormState extends State<SignInForm> {
                       const SizedBox(height: 10),
                       InkWell(
                         onTap: () {
-                          Navigator.of(context)
-                              .pushNamed(routes.forgotPassword);
+                          context.read<AuthBloc>().add(AuthForgotPassword());
                         },
                         child: RichText(
                           textAlign: TextAlign.right,
