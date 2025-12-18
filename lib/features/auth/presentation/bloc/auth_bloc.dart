@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ventura/core/common/app_logger.dart';
 import 'package:ventura/core/domain/use_cases/local_get_user.dart';
 import 'package:ventura/core/domain/use_cases/local_save_user.dart';
 import 'package:ventura/core/domain/use_cases/local_sign_out.dart';
@@ -9,6 +10,7 @@ import 'package:ventura/features/auth/domain/entities/server_sign_up.dart';
 import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_email.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_verification_code.dart';
+import 'package:ventura/features/auth/domain/use_cases/reset_password.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in_with_google.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_up.dart';
@@ -18,6 +20,7 @@ part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  final logger = AppLogger('AuthBloc');
   final UserSignUp _userSignUp;
   final UserSignIn _userSignIn;
   final LocalGetUser _localGetUser;
@@ -26,6 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final ConfirmEmail _confirmEmail;
   final UserSignInWithGoogle _userSignInWithGoogle;
   final ConfirmVerificationCode _confirmVerificationCode;
+  final ResetPassword _resetPassword;
   final AppUserCubit _appUserCubit;
 
   AuthBloc({
@@ -37,6 +41,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required ConfirmEmail confirmEmail,
     required UserSignInWithGoogle userSignInWithGoogle,
     required ConfirmVerificationCode confirmVerificationCode,
+    required ResetPassword resetPassword,
     required AppUserCubit appUserCubit,
   }) : _appUserCubit = appUserCubit,
        _userSignIn = userSignIn,
@@ -47,6 +52,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _confirmEmail = confirmEmail,
        _userSignInWithGoogle = userSignInWithGoogle,
        _confirmVerificationCode = confirmVerificationCode,
+       _resetPassword = resetPassword,
        super(AuthInitial()) {
     on<AuthResetState>((event, emit) => emit(AuthInitial()));
     on<AuthEvent>((_, emit) => emit(AuthLoading()));
@@ -102,10 +108,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final res = await _userSignIn(
       UserSignInParams(email: event.email, password: event.password),
     );
-    res.fold(
-      (l) => emit(AuthFailure(l.message)),
-      (user) => emitAuthSuccess(user, emit),
-    );
+    res.fold((l) => emit(AuthFailure(l.message)), (user) {
+      logger.info('Is email verified? ${user.isEmailVerified.toString()}');
+      if (user.isEmailVerified) {
+        emitAuthSuccess(user, emit);
+      } else {
+        _localSaveUser(UserParams(user: user));
+        _appUserCubit.updateUser(user);
+        emit(AuthSignUpSuccess(ServerSignUp(user: user, shortToken: 'login')));
+      }
+    });
   }
 
   void _onAuthSignInWithGoogle(
@@ -155,73 +167,49 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthVerifyEmail event,
     Emitter<AuthState> emit,
   ) async {
-    emit(
-      AuthEmailIsVerified(
-        message: 'response.message',
-        shortToken: 'response.shortToken',
+    final res = await _confirmEmail(ConfirmEmailParams(email: event.email));
+    res.fold(
+      (failure) {
+        logger.error(failure.message);
+        emit(AuthFailure(failure.message));
+      },
+      (success) => emit(
+        AuthEmailIsVerified(
+          email: event.email,
+          message: success.message,
+          shortToken: success.shortToken,
+        ),
       ),
     );
-    // final res = await _confirmEmail(ConfirmEmailParams(email: event.email));
-    // res.fold(
-    //   (l) => emit(AuthFailure(l.message)),
-    //   (response) => emit(
-    //   ),
-    // );
   }
 
   void _onAuthResetPasswordConfirmVerificationCode(
     AuthResetPasswordConfirmVerificationCode event,
     Emitter<AuthState> emit,
   ) async {
-    emit(
-      VerificationCodeConfirmed(
-        User(
-          isSystem: true,
-          isEmailVerified: true,
-          email: event.email,
-          firstName: '',
-          lastName: '',
-          id: '',
-          avatarUrl: null,
-          isActive: true,
-          businessId: '',
-          googleId: '',
-          shortId: '',
-        ),
+    final res = await _confirmVerificationCode(
+      ConfirmVerificationCodeParams(
+        code: event.code,
+        email: event.email,
+        shortToken: event.shortToken,
       ),
     );
-    // final res = await _confirmVerificationCode(
-    //   ConfirmVerificationCodeParams(
-    //     code: event.code,
-    //     email: event.email,
-    //     shortToken: event.shortToken,
-    //   ),
-    // );
-    // res.fold(
-    //   (l) => emit(AuthFailure(l.message)),
-    // );
+    res.fold(
+      (failure) => emit(AuthFailure(failure.message)),
+      (user) => emit(VerificationCodeConfirmed(user)),
+    );
   }
 
   void _onAuthResetPassword(
     AuthResetPassword event,
     Emitter<AuthState> emit,
   ) async {
-    emit(
-      PasswordResetSuccessful(
-        user: User(
-          isSystem: true,
-          isEmailVerified: true,
-          email: event.email,
-          firstName: '',
-          lastName: '',
-          id: '',
-          avatarUrl: null,
-          isActive: true,
-          businessId: '',
-          googleId: '',
-          shortId: '',
-        ),
-      ),
+    final res = await _resetPassword(
+      ResetPasswordParams(userId: event.userId, newPassword: event.newPassword),
+    );
+    res.fold(
+      (failure) => emit(AuthFailure(failure.message)),
+      (user) => emitAuthSuccess(user, emit),
     );
   }
 

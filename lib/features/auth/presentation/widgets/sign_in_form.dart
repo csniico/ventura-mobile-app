@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -9,6 +8,7 @@ import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';
 import 'package:ventura/features/auth/presentation/widgets/sign_in_with_google.dart';
 import 'package:ventura/features/auth/presentation/widgets/submit_form_button.dart';
+import 'package:ventura/features/auth/presentation/widgets/verify_email_form.dart';
 
 class SignInForm extends StatefulWidget {
   const SignInForm({super.key});
@@ -64,11 +64,23 @@ class _SignInFormState extends State<SignInForm> {
           ToastService.showError(state.message);
           resetButtonState();
         } else if (state is AuthSuccess) {
+          resetButtonState();
           ToastService.showSuccess('Login successful!');
           Navigator.of(context).pushReplacementNamed(routes.main);
           debugPrint(state.user.toString());
         } else if (state is AuthUserForgotPassword) {
+          resetButtonState();
           Navigator.of(context).pushNamed(routes.forgotPassword);
+        } else if (state is AuthSignUpSuccess) {
+          resetButtonState();
+          ToastService.showInfo('You need to verify your email');
+          Navigator.of(context).pushNamed(
+            routes.verifyCode,
+            arguments: {
+              'email': state.user.user.email,
+              'shortToken': state.user.shortToken,
+            },
+          );
         }
       },
       builder: (_, _) {
@@ -138,7 +150,11 @@ class _SignInFormState extends State<SignInForm> {
                       const SizedBox(height: 10),
                       InkWell(
                         onTap: () {
-                          context.read<AuthBloc>().add(AuthForgotPassword());
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => VerifyEmailForm(),
+                            ),
+                          );
                         },
                         child: RichText(
                           textAlign: TextAlign.right,

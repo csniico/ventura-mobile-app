@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:ventura/core/common/app_logger.dart';
 import 'package:ventura/core/data/models/server_exception.dart';
 import 'package:ventura/core/data/datasources/remote/server_routes.dart';
 import 'package:ventura/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
@@ -8,8 +9,11 @@ import 'package:ventura/features/auth/data/models/server_sign_up_model.dart';
 import 'package:ventura/core/data/models/user_model.dart';
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
-  Dio dio = Dio();
+  final Dio dio;
   final routes = ServerRoutes.instance;
+  final logger = AppLogger('AuthRemoteDatasourceImpl');
+
+  AuthRemoteDatasourceImpl({required this.dio});
 
   @override
   Future<UserModel> signInWithEmailPassword({
@@ -106,7 +110,9 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<ConfirmEmailModel> confirmEmailForPasswordReset({required String email}) async {
+  Future<ConfirmEmailModel> confirmEmailForPasswordReset({
+    required String email,
+  }) async {
     try {
       var response = await dio.post(
         '${routes.serverUrl}${routes.confirmEmail}',
@@ -115,9 +121,33 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
       debugPrint(response.toString());
       return ConfirmEmailModel.fromJson(response.data);
     } on DioException catch (e) {
+      logger.error(e.response!.data.toString());
+      throw ServerException.fromDioError(e);
+    }
+  }
+
+  @override
+  Future<UserModel> resetPassword({
+    required String newPassword,
+    required String userId,
+  }) async {
+    try {
+      final response = await dio.post(
+        '${routes.serverUrl}${routes.resetPassword}',
+        data: {'newPassword': newPassword, 'userId': userId},
+      );
+      logger.info(response.data.toString());
+      return UserModel.fromJson(response.data);
+    } on DioException catch (e) {
+      logger.error(e.message.toString());
       throw ServerException.fromDioError(e);
     } catch (e) {
-      throw ServerException(message: e.toString(), statusCode: 404, status: '');
+      logger.error(e.toString());
+      throw ServerException(
+        statusCode: 404,
+        status: "Failed",
+        message: e.toString(),
+      );
     }
   }
 }

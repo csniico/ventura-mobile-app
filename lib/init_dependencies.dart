@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:ventura/core/common/network_module.dart';
 import 'package:ventura/core/data/datasources/local/user_local_data_source.dart';
 import 'package:ventura/core/data/datasources/local/user_local_data_source_impl.dart';
 import 'package:ventura/core/data/repositories/user_repository_impl.dart';
@@ -16,6 +18,7 @@ import 'package:ventura/features/auth/data/repositories/auth_repository_impl.dar
 import 'package:ventura/features/auth/domain/repositories/auth_repository.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_email.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_verification_code.dart';
+import 'package:ventura/features/auth/domain/use_cases/reset_password.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in_with_google.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_up.dart';
@@ -24,6 +27,8 @@ import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 final serviceLocator = GetIt.instance;
 
 Future<void> initDependencies() async {
+  // register global Dio instance from NetworkModule
+  serviceLocator.registerLazySingleton<Dio>(() => NetworkModule.instance.dio);
   _initAuthDependencies();
   serviceLocator.registerLazySingleton(() => UserService());
 }
@@ -31,7 +36,9 @@ Future<void> initDependencies() async {
 void _initAuthDependencies() {
   // DATA SOURCES
   serviceLocator
-    ..registerFactory<AuthRemoteDataSource>(() => AuthRemoteDatasourceImpl())
+    ..registerFactory<AuthRemoteDataSource>(
+      () => AuthRemoteDatasourceImpl(dio: serviceLocator()),
+    )
     ..registerFactory<AuthLocalDataSource>(
       () => AuthLocalDataSourceImpl(userService: serviceLocator()),
     )
@@ -58,6 +65,7 @@ void _initAuthDependencies() {
       () => ConfirmVerificationCode(authRepository: serviceLocator()),
     )
     ..registerFactory(() => UserSignUp(authRepository: serviceLocator()))
+    ..registerFactory(() => ResetPassword(authRepository: serviceLocator()))
     ..registerFactory(() => AppUserCubit())
     // BLOC
     ..registerLazySingleton(
@@ -70,6 +78,7 @@ void _initAuthDependencies() {
         confirmEmail: serviceLocator(),
         userSignInWithGoogle: serviceLocator(),
         confirmVerificationCode: serviceLocator(),
+        resetPassword: serviceLocator(),
         appUserCubit: serviceLocator(),
       ),
     );

@@ -40,4 +40,9 @@ abstract interface class AuthRepository {
     required String shortToken,
   });
 
+  Future<Either<Failure, User>> resetPassword({
+    required String newPassword,
+    required String userId,
+  });
+
 }

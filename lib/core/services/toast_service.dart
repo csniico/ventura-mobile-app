@@ -19,4 +19,13 @@ class ToastService {
       toastLength: Toast.LENGTH_LONG,
     );
   }
+
+  static void showInfo(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      backgroundColor: Colors.orange,
+      gravity: ToastGravity.TOP,
+      toastLength: Toast.LENGTH_LONG,
+    );
+  }
 }

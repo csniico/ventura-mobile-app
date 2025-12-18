@@ -15,6 +15,7 @@ final class AuthSuccess extends AuthState {
 
 final class AuthSignUpSuccess extends AuthState {
   final ServerSignUp user;
+
   AuthSignUpSuccess(this.user);
 }
 
@@ -32,7 +33,7 @@ final class Authenticated extends AuthState {
 
 final class UnAuthenticated extends AuthState {}
 
-final class AuthUserForgotPassword extends AuthState{}
+final class AuthUserForgotPassword extends AuthState {}
 
 final class VerificationCodeConfirmed extends AuthState {
   final User user;
@@ -54,9 +55,14 @@ final class VerificationCodeResendSuccessful extends AuthState {
 
 class AuthEmailIsVerified extends AuthState {
   final String message;
+  final String email;
   final String shortToken;
 
-  AuthEmailIsVerified({required this.message, required this.shortToken});
+  AuthEmailIsVerified({
+    required this.message,
+    required this.shortToken,
+    required this.email,
+  });
 }
 
 class PasswordResetSuccessful extends AuthState {

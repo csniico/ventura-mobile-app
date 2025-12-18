@@ -1,3 +1,4 @@
+import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/features/auth/data/models/confirm_email_model.dart';
 import 'package:ventura/features/auth/data/models/server_sign_up_model.dart';
 import 'package:ventura/core/data/models/user_model.dart';
@@ -32,6 +33,11 @@ abstract interface class AuthRemoteDataSource {
     required String code,
     required String email,
     required String shortToken,
+  });
+
+  Future<UserModel> resetPassword({
+    required String newPassword,
+    required String userId,
   });
 
   Future<void> signOut();

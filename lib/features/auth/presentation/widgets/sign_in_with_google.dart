@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -19,7 +18,6 @@ class SignInWithGoogle extends StatefulWidget {
 class _SignInWithGoogleState extends State<SignInWithGoogle> {
   StreamSubscription<GoogleSignInAuthenticationEvent>? _authSubscription;
 
-  late final Dio dio;
   final GoogleSignIn signIn = GoogleSignIn.instance;
   bool isLoading = false;
 
@@ -30,7 +28,6 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
   @override
   void initState() {
     super.initState();
-    dio = Dio();
 
     unawaited(
       signIn
@@ -72,48 +69,19 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
   }
 
   Future<void> _logUserIn(GoogleSignInAccount googleUser) async {
-    try {
-      final nameParts = googleUser.displayName?.split(' ') ?? ['', ''];
-      final firstName = nameParts.isNotEmpty ? nameParts.first : '';
-      final lastName = nameParts.length > 1
-          ? nameParts.sublist(1).join(' ')
-          : '';
+    final nameParts = googleUser.displayName?.split(' ') ?? ['', ''];
+    final firstName = nameParts.isNotEmpty ? nameParts.first : '';
+    final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
-      context.read<AuthBloc>().add(
-        AuthSignInWithGoogle(
-          email: googleUser.email,
-          googleId: googleUser.id,
-          firstName: firstName,
-          lastName: lastName,
-          avatarUrl: googleUser.photoUrl,
-        ),
-      );
-
-      // var response = await dio.post(
-      //   "$serverUrl/auth/google/login/mobile",
-      //   data: {
-      //     'email': googleUser.email,
-      //     'firstName': firstName,
-      //     'lastName': lastName,
-      //     'googleId': googleUser.id,
-      //     'avatarUrl': googleUser.photoUrl,
-      //   },
-      // );
-
-      // final user = User.fromJson(response.data);
-      // // Pre-cache the user's avatar image
-      // if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
-      //   if (mounted) {
-      //     precacheImage(NetworkImage(user.avatarUrl!), context);
-      //   }
-      // }
-    } on DioException catch (e) {
-      // if (e.response != null) {
-      //   debugPrint("Error response: ${e.response?.data}");
-      // } else {
-      //   debugPrint("Error sending request: ${e.message}");
-      // }
-    }
+    context.read<AuthBloc>().add(
+      AuthSignInWithGoogle(
+        email: googleUser.email,
+        googleId: googleUser.id,
+        firstName: firstName,
+        lastName: lastName,
+        avatarUrl: googleUser.photoUrl,
+      ),
+    );
   }
 
   Future<void> continueWithGoogle() async {

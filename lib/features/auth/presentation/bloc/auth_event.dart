@@ -93,12 +93,12 @@ class AuthVerifyEmail extends AuthEvent {
 }
 
 class AuthResetPassword extends AuthEvent {
-  final String email;
+  final String? email;
   final String newPassword;
   final String userId;
 
   AuthResetPassword({
-    required this.email,
+    this.email,
     required this.newPassword,
     required this.userId,
   });

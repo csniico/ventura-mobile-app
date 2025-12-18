@@ -24,9 +24,9 @@ class UserModel extends User {
       firstName: map['firstName'] ?? '',
       lastName: map['lastName'] ?? '',
       avatarUrl: map['avatarUrl'] ?? '',
-      isSystem: map['isSystem'] == 0 ? false : true,
-      isActive: map['isActive'] == 0 ? false : true,
-      isEmailVerified: map['isEmailVerified'] == 0 ? false : true,
+      isSystem: map['isSystem'] == 0 || map['isSystem'] == false ? false : true,
+      isActive: map['isActive'] == 0 || map['isActive'] == false ? false : true,
+      isEmailVerified: map['isEmailVerified'] == 0 || map['isEmailVerified'] == false ? false : true,
       businessId: map['businessId'] ?? '',
     );
   }
@@ -54,9 +54,9 @@ class UserModel extends User {
       firstName: map['firstName'] ?? '',
       lastName: map['lastName'] ?? '',
       avatarUrl: map['avatarUrl'] ?? '',
-      isSystem: map['isSystem'] == 0 ? false : true,
-      isActive: map['isActive'] == 0 ? false : true,
-      isEmailVerified: map['isEmailVerified'] == 0 ? false : true,
+      isSystem: map['isSystem'] == 0 || map['isSystem'] == false ? false : true,
+      isActive: map['isActive'] == 0 || map['isActive'] == false ? false : true,
+      isEmailVerified: map['isEmailVerified'] == 0 || map['isEmailVerified'] == false ? false : true,
       businessId: map['businessId'] ?? '',
     );
   }

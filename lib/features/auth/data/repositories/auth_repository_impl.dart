@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:ventura/core/common/app_logger.dart';
 import 'package:ventura/core/data/models/failure.dart';
 import 'package:ventura/core/data/models/server_exception.dart';
 import 'package:ventura/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
@@ -9,10 +10,9 @@ import 'package:ventura/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource authRemoteDataSource;
+  final logger = AppLogger('AuthRepositoryImpl');
 
-  const AuthRepositoryImpl({
-    required this.authRemoteDataSource,
-  });
+  AuthRepositoryImpl({required this.authRemoteDataSource});
 
   @override
   Future<Either<Failure, User>> signInWithEmailPassword({
@@ -93,13 +93,34 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, ConfirmEmailModel>> confirmEmailForPasswordReset({required String email}) async {
-   try {
-     final response = await authRemoteDataSource.confirmEmailForPasswordReset(email: email);
+  Future<Either<Failure, ConfirmEmailModel>> confirmEmailForPasswordReset({
+    required String email,
+  }) async {
+    try {
+      final response = await authRemoteDataSource.confirmEmailForPasswordReset(
+        email: email,
+      );
       return right(response);
-   } on ServerException catch (e) {
-     return left(Failure(e.message));
-   }
+    } on ServerException catch (e) {
+      logger.error(e.message);
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> resetPassword({
+    required String newPassword,
+    required String userId,
+  }) async {
+    try {
+      final response = await authRemoteDataSource.resetPassword(
+        newPassword: newPassword,
+        userId: userId,
+      );
+      return right(response);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
   }
 
   @override
@@ -113,5 +134,4 @@ class AuthRepositoryImpl implements AuthRepository {
     // TODO: implement getCurrentUser
     throw UnimplementedError();
   }
-
 }
