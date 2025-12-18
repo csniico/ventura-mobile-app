@@ -73,48 +73,50 @@ class _VerifyEmailFormState extends State<VerifyEmailForm> {
           }
         },
         builder: (context, state) {
-          return Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Text(
-                          'Enter your email to verify your account',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
+          return SafeArea(
+            child: Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            'Enter your email to verify your account',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        AuthField(
-                          hintText: "Email",
-                          title: "Email",
-                          inputType: TextInputType.emailAddress,
-                          onSaved: (value) {
-                            setState(() {
-                              _email = value;
-                            });
-                          },
-                        ),
+                          const SizedBox(height: 10),
+                          AuthField(
+                            hintText: "Email",
+                            title: "Email",
+                            inputType: TextInputType.emailAddress,
+                            onSaved: (value) {
+                              setState(() {
+                                _email = value;
+                              });
+                            },
+                          ),
 
-                        const SizedBox(height: 30),
-                        SubmitFormButton(
-                          title: "Verify Email",
-                          isLoading: _isLoading,
-                          onPressed: _handleSubmit,
-                          isDisabled: _isDisabled,
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(height: 30),
+                          SubmitFormButton(
+                            title: "Verify Email",
+                            isLoading: _isLoading,
+                            onPressed: _handleSubmit,
+                            isDisabled: _isDisabled,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

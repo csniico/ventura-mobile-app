@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:ventura/core/common/app_logger.dart';
 import 'package:ventura/core/data/models/failure.dart';
 import 'package:ventura/core/data/models/server_exception.dart';
-import 'package:ventura/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
+import 'package:ventura/features/auth/data/data_sources/remote/abstract_interfaces/auth_remote_data_source.dart';
 import 'package:ventura/features/auth/data/models/confirm_email_model.dart';
 import 'package:ventura/features/auth/domain/entities/server_sign_up.dart';
 import 'package:ventura/core/domain/entities/user_entity.dart';

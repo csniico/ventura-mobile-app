@@ -5,6 +5,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/common/routes.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ventura/features/auth/presentation/pages/create_business_profile_page.dart';
 import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';
 import 'package:ventura/features/auth/presentation/widgets/sign_in_with_google.dart';
 import 'package:ventura/features/auth/presentation/widgets/submit_form_button.dart';
@@ -60,27 +61,46 @@ class _SignInFormState extends State<SignInForm> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthFailure) {
-          ToastService.showError(state.message);
-          resetButtonState();
-        } else if (state is AuthSuccess) {
-          resetButtonState();
-          ToastService.showSuccess('Login successful!');
-          Navigator.of(context).pushReplacementNamed(routes.main);
-          debugPrint(state.user.toString());
-        } else if (state is AuthUserForgotPassword) {
-          resetButtonState();
-          Navigator.of(context).pushNamed(routes.forgotPassword);
-        } else if (state is AuthSignUpSuccess) {
-          resetButtonState();
-          ToastService.showInfo('You need to verify your email');
-          Navigator.of(context).pushNamed(
-            routes.verifyCode,
-            arguments: {
-              'email': state.user.user.email,
-              'shortToken': state.user.shortToken,
-            },
-          );
+        switch (state) {
+          case AuthFailure():
+            resetButtonState();
+
+            ToastService.showError(state.message);
+            break;
+          case AuthSuccess():
+            resetButtonState();
+
+            ToastService.showSuccess('Login successful!');
+            Navigator.of(context).pushReplacementNamed(routes.main);
+            break;
+          case AuthUserForgotPassword():
+            resetButtonState();
+
+            Navigator.of(context).pushNamed(routes.forgotPassword);
+            break;
+          case AuthSignUpSuccess():
+            resetButtonState();
+            ToastService.showInfo('You need to verify your email');
+            Navigator.of(context).pushNamed(
+              routes.verifyCode,
+              arguments: {
+                'email': state.user.user.email,
+                'shortToken': state.user.shortToken,
+              },
+            );
+            break;
+          case AuthBusinessNotRegistered():
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => CreateBusinessProfilePage(
+                  userId: state.userId,
+                  firstName: state.firstName,
+                ),
+              ),
+            );
+            break;
+          default:
+            break;
         }
       },
       builder: (_, _) {

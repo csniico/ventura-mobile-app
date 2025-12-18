@@ -86,6 +86,11 @@ class AppTheme {
         fontWeight: FontWeight.w600, // SemiBold
         fontSize: 36,
       ),
+      headlineLarge: TextStyle(
+        fontFamily: 'NotoSans',
+        fontWeight: FontWeight.w800,
+        fontSize: 36,
+      ),
       headlineMedium: TextStyle(
         fontFamily: 'NotoSans',
         fontWeight: FontWeight.w600,

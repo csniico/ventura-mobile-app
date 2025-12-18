@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/presentation/pages/main_screen.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ventura/features/auth/presentation/pages/create_business_profile_page.dart';
 import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';
 import 'package:ventura/features/auth/presentation/widgets/submit_form_button.dart';
 
@@ -64,10 +66,33 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
       appBar: AppBar(),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthFailure) {
-            ToastService.showError(state.message);
-          } else if (state is AuthSuccess) {
-            ToastService.showSuccess(state.user.id);
+          switch (state) {
+            case AuthFailure():
+              resetButtonState();
+              ToastService.showError(state.message);
+              break;
+            case AuthSuccess():
+              resetButtonState();
+              ToastService.showSuccess('Password reset successfully');
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => MainScreen()),
+                (_) => false,
+              );
+              break;
+            case AuthBusinessNotRegistered():
+              resetButtonState();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => CreateBusinessProfilePage(
+                    userId: state.userId,
+                    firstName: state.firstName,
+                  ),
+                ),
+                (_) => false,
+              );
+              break;
+            default:
+              break;
           }
         },
         builder: (context, state) {

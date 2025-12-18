@@ -70,3 +70,10 @@ class PasswordResetSuccessful extends AuthState {
 
   PasswordResetSuccessful({required this.user});
 }
+
+class AuthBusinessNotRegistered extends AuthState {
+  final String userId;
+  final String firstName;
+
+  AuthBusinessNotRegistered({required this.userId, required this.firstName});
+}

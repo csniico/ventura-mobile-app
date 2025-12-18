@@ -19,7 +19,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(),
-      body: VerifyEmailForm(),
+      body: SafeArea(child: VerifyEmailForm()),
     );
   }
 }

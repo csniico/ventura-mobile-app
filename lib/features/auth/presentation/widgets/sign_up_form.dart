@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -34,9 +33,13 @@ class _SignUpFormState extends State<SignUpForm> {
   void reassemble() {
     super.reassemble();
     // Reset state on hot reload
+    resetButtonState();
+  }
+
+  void resetButtonState() {
     setState(() {
-      _isLoading = false;
       _isDisabled = false;
+      _isLoading = false;
     });
   }
 
@@ -69,25 +72,23 @@ class _SignUpFormState extends State<SignUpForm> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthSignUpSuccess) {
-          setState(() {
-            _isLoading = false;
-            _isDisabled = true;
-          });
-          Navigator.of(context).pushNamed(
-            routes.verifyCode,
-            arguments: {
-              'email': state.user.user.email,
-              'shortToken': state.user.shortToken,
-            },
-          );
-        }
-        if (state is AuthFailure) {
-          setState(() {
-            _isLoading = false;
-            _isDisabled = false;
-          });
-          ToastService.showError(state.message);
+        switch (state) {
+          case AuthSignUpSuccess():
+            resetButtonState();
+            Navigator.of(context).pushNamed(
+              routes.verifyCode,
+              arguments: {
+                'email': state.user.user.email,
+                'shortToken': state.user.shortToken,
+              },
+            );
+            break;
+          case AuthFailure():
+            resetButtonState();
+            ToastService.showError(state.message);
+            break;
+          default:
+            break;
         }
       },
       builder: (context, state) {

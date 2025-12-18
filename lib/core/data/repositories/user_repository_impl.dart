@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:ventura/core/data/datasources/local/user_local_data_source.dart';
+import 'package:ventura/core/data/data_sources/local/abstract_interfaces/user_local_data_source.dart';
 import 'package:ventura/core/data/models/failure.dart';
 import 'package:ventura/core/data/models/user_model.dart';
 import 'package:ventura/core/domain/entities/user_entity.dart';

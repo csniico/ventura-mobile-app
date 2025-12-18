@@ -4,7 +4,8 @@ import 'package:ventura/core/presentation/pages/main_screen.dart';
 import 'package:ventura/core/common/routes.dart';
 import 'package:ventura/core/presentation/themes/app_theme.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:ventura/features/home/presentation/pages/home.dart';
+import 'package:ventura/features/auth/presentation/pages/create_business_profile_page.dart';
+import 'package:ventura/features/auth/presentation/widgets/verify_code_form.dart';
 import 'package:ventura/features/welcome/presentation/pages/welcome_page.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -25,29 +26,20 @@ class App extends StatelessWidget {
       themeMode: ThemeMode.system,
       home: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is UnAuthenticated) {
-            debugPrint('User is unauthenticated');
-
-          }
           if (state is AuthSuccess) {
             debugPrint('User is authenticated');
             navigatorKey.currentState?.pushNamedAndRemoveUntil(
               _appRoutes.main,
-                  (_) => false,
+              (_) => false,
             );
           }
         },
         builder: (context, state) {
-          if (state is UnAuthenticated) {
-            return const WelcomePage();
-          } else if (state is AuthSuccess) {
-            return const MainScreen();
-          } else {
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
+          switch (state) {
+            case AuthSuccess():
+              return const MainScreen();
+            default:
+              return const WelcomePage();
           }
         },
       ),

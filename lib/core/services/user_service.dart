@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ventura/core/data/models/user_model.dart';
-import 'package:ventura/core/data/datasources/database/database_service.dart';
+import 'package:ventura/core/data/data_sources/database/database_service.dart';
 
 class UserService {
   // Singleton setup

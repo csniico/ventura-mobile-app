@@ -80,48 +80,50 @@ class _VerifyCodeFormState extends State<VerifyCodeForm> {
           }
         },
         builder: (context, state) {
-          return Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Text(
-                          'Enter verification code',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
+          return SafeArea(
+            child: Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            'Enter verification code',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        AuthField(
-                          hintText: "Code",
-                          title: "Code",
-                          inputType: TextInputType.text,
-                          onSaved: (value) {
-                            setState(() {
-                              _code = value;
-                            });
-                          },
-                        ),
+                          const SizedBox(height: 10),
+                          AuthField(
+                            hintText: "Code",
+                            title: "Code",
+                            inputType: TextInputType.text,
+                            onSaved: (value) {
+                              setState(() {
+                                _code = value;
+                              });
+                            },
+                          ),
 
-                        const SizedBox(height: 30),
-                        SubmitFormButton(
-                          title: "Confirm Code",
-                          isLoading: _isLoading,
-                          onPressed: _handleSubmit,
-                          isDisabled: _isDisabled,
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(height: 30),
+                          SubmitFormButton(
+                            title: "Confirm Code",
+                            isLoading: _isLoading,
+                            onPressed: _handleSubmit,
+                            isDisabled: _isDisabled,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

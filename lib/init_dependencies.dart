@@ -1,19 +1,26 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ventura/core/common/network_module.dart';
-import 'package:ventura/core/data/datasources/local/user_local_data_source.dart';
-import 'package:ventura/core/data/datasources/local/user_local_data_source_impl.dart';
+import 'package:ventura/core/data/data_sources/local/abstract_interfaces/business_local_data_source.dart';
+import 'package:ventura/core/data/data_sources/local/abstract_interfaces/user_local_data_source.dart';
+import 'package:ventura/core/data/data_sources/local/implementations/business_local_data_source_impl.dart';
+import 'package:ventura/core/data/data_sources/local/implementations/user_local_data_source_impl.dart';
+import 'package:ventura/core/data/repositories/business_repository_impl.dart';
 import 'package:ventura/core/data/repositories/user_repository_impl.dart';
+import 'package:ventura/core/domain/repositories/business_repository.dart';
 import 'package:ventura/core/domain/repositories/user_repository.dart';
+import 'package:ventura/core/domain/use_cases/local_get_business.dart';
 import 'package:ventura/core/domain/use_cases/local_get_user.dart';
+import 'package:ventura/core/domain/use_cases/local_save_business.dart';
 import 'package:ventura/core/domain/use_cases/local_save_user.dart';
 import 'package:ventura/core/domain/use_cases/local_sign_out.dart';
 import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.dart';
-import 'package:ventura/features/auth/data/data_sources/local/auth_local_data_source.dart';
-import 'package:ventura/features/auth/data/data_sources/local/auth_local_data_source_impl.dart';
+import 'package:ventura/core/services/business_service.dart';
+import 'package:ventura/features/auth/data/data_sources/local/abstract_interfaces/auth_local_data_source.dart';
+import 'package:ventura/features/auth/data/data_sources/local/implementations/auth_local_data_source_impl.dart';
 import 'package:ventura/core/services/user_service.dart';
-import 'package:ventura/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
-import 'package:ventura/features/auth/data/data_sources/remote/auth_remote_datasource_impl.dart';
+import 'package:ventura/features/auth/data/data_sources/remote/abstract_interfaces/auth_remote_data_source.dart';
+import 'package:ventura/features/auth/data/data_sources/remote/implementations/auth_remote_datasource_impl.dart';
 import 'package:ventura/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:ventura/features/auth/domain/repositories/auth_repository.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_email.dart';
@@ -31,6 +38,7 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton<Dio>(() => NetworkModule.instance.dio);
   _initAuthDependencies();
   serviceLocator.registerLazySingleton(() => UserService());
+  serviceLocator.registerLazySingleton(() => BusinessService());
 }
 
 void _initAuthDependencies() {
@@ -45,6 +53,9 @@ void _initAuthDependencies() {
     ..registerFactory<UserLocalDataSource>(
       () => UserLocalDataSourceImpl(userService: serviceLocator()),
     )
+    ..registerFactory<BusinessLocalDataSource>(
+      () => BusinessLocalDataSourceImpl(businessService: serviceLocator()),
+    )
     // REPOSITORIES
     ..registerFactory<UserRepository>(
       () => UserRepositoryImpl(userLocalDataSource: serviceLocator()),
@@ -52,11 +63,20 @@ void _initAuthDependencies() {
     ..registerFactory<AuthRepository>(
       () => AuthRepositoryImpl(authRemoteDataSource: serviceLocator()),
     )
+    ..registerFactory<BusinessRepository>(
+      () => BusinessRepositoryImpl(businessLocalDataSource: serviceLocator()),
+    )
     // USE CASES
     ..registerFactory(() => UserSignIn(authRepository: serviceLocator()))
     ..registerFactory(() => LocalGetUser(userRepository: serviceLocator()))
     ..registerFactory(() => LocalSaveUser(userRepository: serviceLocator()))
     ..registerFactory(() => LocalSignOut(userRepository: serviceLocator()))
+    ..registerFactory(
+      () => LocalGetBusiness(businessRepository: serviceLocator()),
+    )
+    ..registerFactory(
+      () => LocalSaveBusiness(businessRepository: serviceLocator()),
+    )
     ..registerFactory(
       () => UserSignInWithGoogle(authRepository: serviceLocator()),
     )

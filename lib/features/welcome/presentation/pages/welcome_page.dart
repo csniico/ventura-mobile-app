@@ -37,7 +37,7 @@ class _WelcomeState extends State<WelcomePage> {
               padding: const EdgeInsets.only(left: 70, right: 70, bottom: 40),
               child: ElevatedButton(
                 onPressed: () => Navigator.of(context).pushNamed('/sign-in'),
-                child: Text("Get Started"),
+                child: Text("Continue"),
               ),
             ),
           ],

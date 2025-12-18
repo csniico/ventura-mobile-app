@@ -108,16 +108,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final res = await _userSignIn(
       UserSignInParams(email: event.email, password: event.password),
     );
-    res.fold((l) => emit(AuthFailure(l.message)), (user) {
-      logger.info('Is email verified? ${user.isEmailVerified.toString()}');
-      if (user.isEmailVerified) {
-        emitAuthSuccess(user, emit);
-      } else {
-        _localSaveUser(UserParams(user: user));
-        _appUserCubit.updateUser(user);
-        emit(AuthSignUpSuccess(ServerSignUp(user: user, shortToken: 'login')));
-      }
-    });
+    res.fold(
+      (l) => emit(AuthFailure(l.message)),
+      (user) => emitAuthSuccess(user, emit),
+    );
   }
 
   void _onAuthSignInWithGoogle(
@@ -216,6 +210,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void emitAuthSuccess(User user, Emitter<AuthState> emit) {
     _localSaveUser(UserParams(user: user));
     _appUserCubit.updateUser(user);
+    if (!user.isEmailVerified) {
+      logger.error('Email is not verified for user ${user.email}');
+      return emit(
+        AuthSignUpSuccess(ServerSignUp(user: user, shortToken: 'login')),
+      );
+    }
+    if (user.businessId.isEmpty) {
+      logger.error('Business is not registered for user ${user.email}');
+      return emit(
+        AuthBusinessNotRegistered(userId: user.id, firstName: user.firstName),
+      );
+    }
+
     emit(AuthSuccess(user));
   }
 }
