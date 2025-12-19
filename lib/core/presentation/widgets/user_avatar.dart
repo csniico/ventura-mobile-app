@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/domain/entities/user_entity.dart';
-import 'package:ventura/core/services/user_service.dart';
 
 class UserAvatar extends StatefulWidget {
   const UserAvatar({super.key});

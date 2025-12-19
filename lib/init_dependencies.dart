@@ -5,10 +5,15 @@ import 'package:ventura/core/data/data_sources/local/abstract_interfaces/busines
 import 'package:ventura/core/data/data_sources/local/abstract_interfaces/user_local_data_source.dart';
 import 'package:ventura/core/data/data_sources/local/implementations/business_local_data_source_impl.dart';
 import 'package:ventura/core/data/data_sources/local/implementations/user_local_data_source_impl.dart';
+import 'package:ventura/core/data/data_sources/remote/abstract_interfaces/assets_remote_data_source.dart';
+import 'package:ventura/core/data/data_sources/remote/implementations/assets_remote_data_source_impl.dart';
+import 'package:ventura/core/data/repositories/assets_repository_impl.dart';
 import 'package:ventura/core/data/repositories/business_repository_impl.dart';
 import 'package:ventura/core/data/repositories/user_repository_impl.dart';
+import 'package:ventura/core/domain/repositories/assets_repository.dart';
 import 'package:ventura/core/domain/repositories/business_repository.dart';
 import 'package:ventura/core/domain/repositories/user_repository.dart';
+import 'package:ventura/core/domain/use_cases/asset_upload_image.dart';
 import 'package:ventura/core/domain/use_cases/local_get_business.dart';
 import 'package:ventura/core/domain/use_cases/local_get_user.dart';
 import 'package:ventura/core/domain/use_cases/local_save_business.dart';
@@ -30,6 +35,7 @@ import 'package:ventura/features/auth/domain/use_cases/user_sign_in.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in_with_google.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_up.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ventura/features/auth/presentation/cubit/business_creation_cubit.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -56,6 +62,9 @@ void _initAuthDependencies() {
     ..registerFactory<BusinessLocalDataSource>(
       () => BusinessLocalDataSourceImpl(businessService: serviceLocator()),
     )
+    ..registerFactory<AssetsRemoteDataSource>(
+      () => AssetsRemoteDataSourceImpl(dio: serviceLocator()),
+    )
     // REPOSITORIES
     ..registerFactory<UserRepository>(
       () => UserRepositoryImpl(userLocalDataSource: serviceLocator()),
@@ -65,6 +74,9 @@ void _initAuthDependencies() {
     )
     ..registerFactory<BusinessRepository>(
       () => BusinessRepositoryImpl(businessLocalDataSource: serviceLocator()),
+    )
+    ..registerFactory<AssetsRepository>(
+      () => AssetsRepositoryImpl(assetsRemoteDataSource: serviceLocator()),
     )
     // USE CASES
     ..registerFactory(() => UserSignIn(authRepository: serviceLocator()))
@@ -86,8 +98,12 @@ void _initAuthDependencies() {
     )
     ..registerFactory(() => UserSignUp(authRepository: serviceLocator()))
     ..registerFactory(() => ResetPassword(authRepository: serviceLocator()))
-    ..registerFactory(() => AppUserCubit())
+    ..registerFactory(
+      () => AssetUploadImage(assetsRepository: serviceLocator()),
+    )
     // BLOC
+    ..registerFactory(() => AppUserCubit())
+    ..registerFactory(() => BusinessCreationCubit(serviceLocator()))
     ..registerLazySingleton(
       () => AuthBloc(
         userSignIn: serviceLocator(),

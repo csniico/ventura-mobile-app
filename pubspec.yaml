@@ -40,6 +40,7 @@ dependencies:
   dio_cookie_manager: ^3.0.0
   cookie_jar: ^4.0.0
   path_provider: ^2.0.0 # allows persisting cookies across app restarts
+  image_picker: ^1.2.1
 
 
 

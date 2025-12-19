@@ -46,4 +46,11 @@ enum BusinessType {
       orElse: () => BusinessType.other,
     );
   }
+
+  static  BusinessType fromLabel(String label) {
+    return BusinessType.values.firstWhere(
+      (e) => e.label == label,
+      orElse: () => BusinessType.other,
+    );
+  }
 }

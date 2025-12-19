@@ -8,8 +8,9 @@ import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 
 class SignInWithGoogle extends StatefulWidget {
   final String title;
+  final AuthState state;
 
-  const SignInWithGoogle({super.key, required this.title});
+  const SignInWithGoogle({super.key, required this.title, required this.state});
 
   @override
   State<SignInWithGoogle> createState() => _SignInWithGoogleState();
@@ -121,7 +122,9 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
           ),
           splashFactory: NoSplash.splashFactory,
         ),
-        onPressed: isLoading ? null : () => continueWithGoogle(),
+        onPressed: isLoading || widget.state == AuthLoading()
+            ? null
+            : continueWithGoogle,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

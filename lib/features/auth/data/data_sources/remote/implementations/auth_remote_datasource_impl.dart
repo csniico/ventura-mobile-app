@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:ventura/core/common/app_logger.dart';
+import 'package:ventura/core/data/models/business_model.dart';
 import 'package:ventura/core/data/models/server_exception.dart';
 import 'package:ventura/core/data/data_sources/remote/server_routes.dart';
+import 'package:ventura/core/domain/entities/business_entity.dart';
 import 'package:ventura/features/auth/data/data_sources/remote/abstract_interfaces/auth_remote_data_source.dart';
 import 'package:ventura/features/auth/data/models/confirm_email_model.dart';
 import 'package:ventura/features/auth/data/models/server_sign_up_model.dart';
@@ -147,6 +149,25 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
         statusCode: 404,
         status: "Failed",
         message: e.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<BusinessModel> createBusiness({required Business business}) async {
+    try {
+      final businessModel = BusinessModel.fromEntity(business);
+      final response = await dio.post(
+        '${routes.serverUrl}${routes.createBusiness}',
+        data: businessModel.toJson(),
+      );
+      logger.info(response.data.toString());
+      return BusinessModel.fromJson(response.data);
+    } on DioException catch (e) {
+      throw ServerException(
+        statusCode: e.response!.statusCode!,
+        status: e.response!.statusMessage!,
+        message: e.response!.data.toString(),
       );
     }
   }

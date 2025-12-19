@@ -1,4 +1,4 @@
-package com.csniico.ventura.ventura
+package com.csniico.ventura
 
 import io.flutter.embedding.android.FlutterActivity
 

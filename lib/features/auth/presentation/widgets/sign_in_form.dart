@@ -62,6 +62,11 @@ class _SignInFormState extends State<SignInForm> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         switch (state) {
+          case AuthLoading():
+            setState(() {
+              _isDisabled = true;
+            });
+            break;
           case AuthFailure():
             resetButtonState();
 
@@ -103,7 +108,7 @@ class _SignInFormState extends State<SignInForm> {
             break;
         }
       },
-      builder: (_, _) {
+      builder: (_, state) {
         return Form(
           key: _formKey,
           child: Padding(
@@ -223,7 +228,7 @@ class _SignInFormState extends State<SignInForm> {
                   ),
                   Center(child: const Text('or')),
                   const SizedBox(height: 10),
-                  SignInWithGoogle(title: 'Continue with Google'),
+                  SignInWithGoogle(title: 'Continue with Google', state: state,),
                 ],
               ),
             ),

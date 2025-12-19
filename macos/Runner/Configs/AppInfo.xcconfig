@@ -8,7 +8,7 @@
 PRODUCT_NAME = ventura
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.csniico.ventura.ventura
+PRODUCT_BUNDLE_IDENTIFIER = com.csniico.ventura
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2025 com.csniico.ventura. All rights reserved.

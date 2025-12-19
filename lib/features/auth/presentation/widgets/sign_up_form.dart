@@ -73,6 +73,11 @@ class _SignUpFormState extends State<SignUpForm> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         switch (state) {
+          case AuthLoading():
+            setState(() {
+              _isDisabled = true;
+            });
+            break;
           case AuthSignUpSuccess():
             resetButtonState();
             Navigator.of(context).pushNamed(
@@ -221,7 +226,7 @@ class _SignUpFormState extends State<SignUpForm> {
                   ),
                   Center(child: const Text('or')),
                   const SizedBox(height: 10),
-                  SignInWithGoogle(title: 'Continue with Google'),
+                  SignInWithGoogle(title: 'Continue with Google', state: state),
                 ],
               ),
             ),
