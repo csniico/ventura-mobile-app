@@ -24,4 +24,28 @@ class User {
     this.lastName,
     this.avatarUrl,
   });
+
+  User copyWith({
+    String? id,
+    String? email,
+    String? googleId,
+    String? shortId,
+    String? firstName,
+    bool? isSystem,
+    bool? isActive,
+    bool? isEmailVerified,
+    String? businessId,
+  }) {
+    return User(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      googleId: googleId ?? this.googleId,
+      shortId: shortId ?? this.shortId,
+      firstName: firstName ?? this.firstName,
+      isSystem: isSystem ?? this.isSystem,
+      isActive: isActive ?? this.isActive,
+      isEmailVerified: isEmailVerified ?? this.isEmailVerified,
+      businessId: businessId ?? this.businessId,
+    );
+  }
 }

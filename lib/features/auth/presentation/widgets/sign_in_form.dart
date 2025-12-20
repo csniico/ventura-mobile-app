@@ -97,10 +97,8 @@ class _SignInFormState extends State<SignInForm> {
           case AuthBusinessNotRegistered():
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => CreateBusinessProfilePage(
-                  userId: state.userId,
-                  firstName: state.firstName,
-                ),
+                builder: (context) =>
+                    CreateBusinessProfilePage(user: state.user),
               ),
             );
             break;
@@ -228,7 +226,7 @@ class _SignInFormState extends State<SignInForm> {
                   ),
                   Center(child: const Text('or')),
                   const SizedBox(height: 10),
-                  SignInWithGoogle(title: 'Continue with Google', state: state,),
+                  SignInWithGoogle(title: 'Continue with Google', state: state),
                 ],
               ),
             ),

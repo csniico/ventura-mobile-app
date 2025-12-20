@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:ventura/core/data/models/failure.dart';
+import 'package:ventura/core/domain/entities/business_entity.dart';
 import 'package:ventura/features/auth/data/models/confirm_email_model.dart';
 import 'package:ventura/features/auth/domain/entities/server_sign_up.dart';
 import 'package:ventura/core/domain/entities/user_entity.dart';
@@ -45,4 +46,7 @@ abstract interface class AuthRepository {
     required String userId,
   });
 
+  Future<Either<Failure, Business>> createBusinessProfile({
+    required Business business,
+  });
 }

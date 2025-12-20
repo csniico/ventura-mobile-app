@@ -27,19 +27,19 @@ class BusinessModel extends Business {
       id: json['id'] as String,
       shortId: json['shortId'] as String,
       ownerId: json['ownerId'] as String,
-      email: json['email'] as String,
-      phone: json['phone'] as String,
+      email: json['email'] as String?,
+      phone: json['phone'] as String?,
       name: json['name'] as String,
-      description: json['description'] as String,
-      tagLine: json['tagLine'] as String,
+      description: json['description'] as String?,
+      tagLine: json['tagLine'] as String?,
       categories: fromDatabase
-          ? (json['categories'] as String).split(',')
-          : List<String>.from(json['categories'] as List),
-      logo: json['logo'] as String,
-      city: json['city'] as String,
-      state: json['state'] as String,
-      country: json['country'] as String,
-      address: json['address'] as String,
+          ? (json['categories'] as String?)?.split(',') ?? []
+          : List<String>.from((json['categories'] as List?) ?? []),
+      logo: json['logo'] as String?,
+      city: json['city'] as String?,
+      state: json['state'] as String?,
+      country: json['country'] as String?,
+      address: json['address'] as String?,
     );
   }
 
@@ -72,19 +72,19 @@ class BusinessModel extends Business {
       id: map['id'] as String,
       shortId: map['shortId'] as String,
       ownerId: map['ownerId'] as String,
-      email: map['email'] as String,
-      phone: map['phone'] as String,
+      email: map['email'] as String?,
+      phone: map['phone'] as String?,
       name: map['name'] as String,
-      description: map['description'] as String,
-      tagLine: map['tagLine'] as String,
+      description: map['description'] as String?,
+      tagLine: map['tagLine'] as String?,
       categories: fromDatabase
-          ? (map['categories'] as String).split(',')
-          : List<String>.from(map['categories'] as List),
-      logo: map['logo'] as String,
-      city: map['city'] as String,
-      state: map['state'] as String,
-      country: map['country'] as String,
-      address: map['address'] as String,
+          ? (map['categories'] as String?)?.split(',') ??[]
+          : List<String>.from((map['categories'] as List?) ?? []),
+      logo: map['logo'] as String?,
+      city: map['city'] as String?,
+      state: map['state'] as String?,
+      country: map['country'] as String?,
+      address: map['address'] as String?,
     );
   }
 

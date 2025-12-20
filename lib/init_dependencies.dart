@@ -30,6 +30,7 @@ import 'package:ventura/features/auth/data/repositories/auth_repository_impl.dar
 import 'package:ventura/features/auth/domain/repositories/auth_repository.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_email.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_verification_code.dart';
+import 'package:ventura/features/auth/domain/use_cases/create_business_profile.dart';
 import 'package:ventura/features/auth/domain/use_cases/reset_password.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in_with_google.dart';
@@ -101,9 +102,19 @@ void _initAuthDependencies() {
     ..registerFactory(
       () => AssetUploadImage(assetsRepository: serviceLocator()),
     )
+    ..registerFactory(
+      () => CreateBusinessProfile(authRepository: serviceLocator()),
+    )
     // BLOC
     ..registerFactory(() => AppUserCubit())
-    ..registerFactory(() => BusinessCreationCubit(serviceLocator()))
+    ..registerFactory(
+      () => BusinessCreationCubit(
+        localSaveBusiness: serviceLocator(),
+        localSaveUser: serviceLocator(),
+        assetUploadImage: serviceLocator(),
+        createBusinessProfile: serviceLocator(),
+      ),
+    )
     ..registerLazySingleton(
       () => AuthBloc(
         userSignIn: serviceLocator(),

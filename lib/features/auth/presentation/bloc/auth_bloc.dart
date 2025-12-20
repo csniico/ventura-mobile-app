@@ -218,9 +218,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     if (user.businessId.isEmpty) {
       logger.error('Business is not registered for user ${user.email}');
-      return emit(
-        AuthBusinessNotRegistered(userId: user.id, firstName: user.firstName),
-      );
+      return emit(AuthBusinessNotRegistered(user: user));
     }
 
     emit(AuthSuccess(user));

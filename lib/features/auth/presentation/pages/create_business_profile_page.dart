@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ventura/core/domain/use_cases/asset_upload_image.dart';
+import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/features/auth/presentation/cubit/business_creation_cubit.dart';
 import 'package:ventura/features/auth/presentation/widgets/create_business_contact_page.dart';
 import 'package:ventura/features/auth/presentation/widgets/create_business_details.dart';
@@ -8,14 +8,9 @@ import 'package:ventura/features/auth/presentation/widgets/create_business_name.
 import 'package:ventura/init_dependencies.dart';
 
 class CreateBusinessProfilePage extends StatefulWidget {
-  final String userId;
-  final String firstName;
+  final User user;
 
-  const CreateBusinessProfilePage({
-    super.key,
-    required this.userId,
-    required this.firstName,
-  });
+  const CreateBusinessProfilePage({super.key, required this.user});
 
   @override
   State<CreateBusinessProfilePage> createState() =>
@@ -51,7 +46,9 @@ class _CreateBusinessProfilePageState extends State<CreateBusinessProfilePage> {
         appBar: AppBar(),
         body: SafeArea(
           child: BlocProvider(
-            create: (context) => serviceLocator<BusinessCreationCubit>(),
+            create: (context) =>
+                serviceLocator<BusinessCreationCubit>()
+                  ..initialize(widget.user),
             child: PageView(
               physics: NeverScrollableScrollPhysics(),
               controller: controller,
@@ -62,7 +59,7 @@ class _CreateBusinessProfilePageState extends State<CreateBusinessProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        'Create Business Profile 1 for ${widget.firstName}',
+                        'Create Business Profile for ${widget.user.firstName}',
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 30),

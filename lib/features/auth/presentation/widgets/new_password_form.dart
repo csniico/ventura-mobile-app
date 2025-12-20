@@ -83,10 +83,8 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
               resetButtonState();
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
-                  builder: (context) => CreateBusinessProfilePage(
-                    userId: state.userId,
-                    firstName: state.firstName,
-                  ),
+                  builder: (context) =>
+                      CreateBusinessProfilePage(user: state.user),
                 ),
                 (_) => false,
               );

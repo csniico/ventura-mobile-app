@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:ventura/core/common/app_logger.dart';
 import 'package:ventura/core/data/models/failure.dart';
 import 'package:ventura/core/data/models/server_exception.dart';
+import 'package:ventura/core/domain/entities/business_entity.dart';
 import 'package:ventura/features/auth/data/data_sources/remote/abstract_interfaces/auth_remote_data_source.dart';
 import 'package:ventura/features/auth/data/models/confirm_email_model.dart';
 import 'package:ventura/features/auth/domain/entities/server_sign_up.dart';
@@ -133,5 +134,15 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User>> getCurrentUser({required String uid}) {
     // TODO: implement getCurrentUser
     throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, Business>> createBusinessProfile({required Business business}) async {
+    try {
+      final createdBusiness = await authRemoteDataSource.createBusiness(business: business);
+      return right(createdBusiness.toEntity());
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
   }
 }

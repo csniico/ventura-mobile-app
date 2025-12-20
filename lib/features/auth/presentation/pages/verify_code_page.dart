@@ -91,8 +91,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => CreateBusinessProfilePage(
-                    userId: state.userId,
-                    firstName: state.firstName,
+                    user: state.user,
                   ),
                 ),
               );

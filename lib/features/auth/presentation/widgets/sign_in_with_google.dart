@@ -94,9 +94,25 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
     try {
       await signIn.authenticate(scopeHint: ['email', 'profile']);
     } on GoogleSignInException catch (e) {
-      debugPrint("Google Sign-in Exception: $e");
+      // Only show error message for non-cancellation errors
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Sign-in failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       debugPrint("Google Sign-in Error: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('An unexpected error occurred'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
