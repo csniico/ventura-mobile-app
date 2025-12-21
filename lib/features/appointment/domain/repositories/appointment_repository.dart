@@ -44,7 +44,7 @@ abstract interface class AppointmentRepository {
     required String businessId,
   });
 
-  Future<Either<Failure, void>> deleteAppointment({
+  Future<Either<Failure, String>> deleteAppointment({
     required String appointmentId,
     required String businessId,
     required String userId,

@@ -16,19 +16,8 @@ class _MainAppBarState extends State<MainAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      iconTheme: IconThemeData(
-        color: Theme.brightnessOf(context) == Brightness.light
-            ? Colors.grey[800]
-            : Colors.grey[300],
-      ),
-      leading: AppIconButton(
-        size: 28,
-        onPressedHandler: () {
-          Navigator.pushNamed(context, '/profile');
-        },
-        icon: HugeIcons.strokeRoundedUserCircle,
-      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      iconTheme: IconThemeData(color: Colors.white, weight: 800),
       centerTitle: true,
       actions: [
         AppIconButton(

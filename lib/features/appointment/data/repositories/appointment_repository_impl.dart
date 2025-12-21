@@ -39,7 +39,7 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteAppointment({
+  Future<Either<Failure, String>> deleteAppointment({
     required String appointmentId,
     required String businessId,
     required String userId,
@@ -52,7 +52,7 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     if (message == null) {
       return left(Failure('Failed to delete appointment'));
     }
-    return right(null);
+    return right(message);
   }
 
   @override

@@ -21,6 +21,16 @@ import 'package:ventura/core/domain/use_cases/local_save_user.dart';
 import 'package:ventura/core/domain/use_cases/local_sign_out.dart';
 import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.dart';
 import 'package:ventura/core/services/business_service.dart';
+import 'package:ventura/features/appointment/data/data_sources/remote/abstract_interfaces/appointment_remote_data_source.dart';
+import 'package:ventura/features/appointment/data/data_sources/remote/implementations/appointment_remote_data_source_impl.dart';
+import 'package:ventura/features/appointment/data/repositories/appointment_repository_impl.dart';
+import 'package:ventura/features/appointment/domain/repositories/appointment_repository.dart';
+import 'package:ventura/features/appointment/domain/use_cases/create_appointment.dart';
+import 'package:ventura/features/appointment/domain/use_cases/delete_appointment.dart';
+import 'package:ventura/features/appointment/domain/use_cases/get_user_appointment.dart';
+import 'package:ventura/features/appointment/domain/use_cases/update_appointment.dart';
+import 'package:ventura/features/appointment/domain/use_cases/update_google_event_id.dart';
+import 'package:ventura/features/appointment/presentation/bloc/appointment_bloc.dart';
 import 'package:ventura/features/auth/data/data_sources/local/abstract_interfaces/auth_local_data_source.dart';
 import 'package:ventura/features/auth/data/data_sources/local/implementations/auth_local_data_source_impl.dart';
 import 'package:ventura/core/services/user_service.dart';
@@ -44,6 +54,7 @@ Future<void> initDependencies() async {
   // register global Dio instance from NetworkModule
   serviceLocator.registerLazySingleton<Dio>(() => NetworkModule.instance.dio);
   _initAuthDependencies();
+  _initAppointmentDependencies();
   serviceLocator.registerLazySingleton(() => UserService());
   serviceLocator.registerLazySingleton(() => BusinessService());
 }
@@ -127,6 +138,46 @@ void _initAuthDependencies() {
         confirmVerificationCode: serviceLocator(),
         resetPassword: serviceLocator(),
         appUserCubit: serviceLocator(),
+      ),
+    );
+}
+
+void _initAppointmentDependencies() {
+  serviceLocator
+    // DATA SOURCES
+    ..registerFactory<AppointmentRemoteDataSource>(
+      () => AppointmentRemoteDataSourceImpl(dio: serviceLocator()),
+    )
+    //    REPOSITORIES
+    ..registerFactory<AppointmentRepository>(
+      () => AppointmentRepositoryImpl(
+        appointmentRemoteDataSource: serviceLocator(),
+      ),
+    )
+    //     USE-CASES
+    ..registerFactory(
+      () => CreateAppointment(appointmentRepository: serviceLocator()),
+    )
+    ..registerFactory(
+      () => UpdateAppointment(appointmentRepository: serviceLocator()),
+    )
+    ..registerFactory(
+      () => UpdateGoogleEventId(appointmentRepository: serviceLocator()),
+    )
+    ..registerFactory(
+      () => DeleteAppointment(appointmentRepository: serviceLocator()),
+    )
+    ..registerFactory(
+      () => GetUserAppointment(appointmentRepository: serviceLocator()),
+    )
+    //     BLOC
+    ..registerLazySingleton(
+      () => AppointmentBloc(
+        createAppointment: serviceLocator(),
+        updateAppointment: serviceLocator(),
+        updateGoogleEventId: serviceLocator(),
+        getUserAppointment: serviceLocator(),
+        deleteAppointment: serviceLocator(),
       ),
     );
 }

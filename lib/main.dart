@@ -7,6 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:ventura/core/presentation/pages/app.dart';
+import 'package:ventura/features/appointment/presentation/bloc/appointment_bloc.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/init_dependencies.dart';
 
@@ -31,6 +32,9 @@ void main() async {
       providers: [
         BlocProvider<AuthBloc>(
           create: (_) => serviceLocator<AuthBloc>()..add(AppStarted()),
+        ),
+        BlocProvider<AppointmentBloc>(
+          create: (_) => serviceLocator<AppointmentBloc>(),
         ),
       ],
       child: App(),

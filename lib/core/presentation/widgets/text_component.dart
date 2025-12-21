@@ -33,7 +33,7 @@ class TextComponent extends StatelessWidget {
   TextStyle _getTextStyle(BuildContext context) {
     // Default style
     TextStyle base = const TextStyle(
-      fontFamily: 'NotoSans',
+      fontFamily: 'Inter',
     );
 
     switch (type) {

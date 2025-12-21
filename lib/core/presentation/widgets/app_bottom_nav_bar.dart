@@ -13,47 +13,49 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      elevation: 8,
-      currentIndex: currentIndex,
-      onTap: onTap,
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: Theme.of(context).colorScheme.secondary,
-      unselectedItemColor: Colors.grey,
-      unselectedLabelStyle: const TextStyle(
-        fontFamily: 'NotoSans',
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Theme.brightnessOf(context) == Brightness.dark
+                ? Colors.black26
+                : Colors.grey[300]!,
+            width: 1,
+          ),
+        ),
       ),
-      selectedLabelStyle: TextStyle(
-        fontFamily: 'NotoSans',
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: Theme.of(context).colorScheme.secondary,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: BottomNavigationBar(
+          backgroundColor: Theme.of(context).colorScheme.surfaceBright,
+          elevation: 0,
+          currentIndex: currentIndex,
+          onTap: onTap,
+          iconSize: 34,
+          type: BottomNavigationBarType.fixed,
+          unselectedLabelStyle: const TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+          selectedLabelStyle: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+          showUnselectedLabels: true,
+          showSelectedLabels: true,
+          items: _navItems,
+        ),
       ),
-      showUnselectedLabels: true,
-      showSelectedLabels: true,
-      items: _navItems,
     );
   }
 
-  static final List<BottomNavigationBarItem> _navItems = [
-    _navItem(
-      icon: HugeIcons.strokeRoundedHome01,
-      label: 'Home',
-    ),
-    _navItem(
-      icon: HugeIcons.strokeRoundedChart01,
-      label: 'Sales',
-    ),
-    _navItem(
-      icon: HugeIcons.strokeRoundedPromotion,
-      label: 'Campaigns',
-    ),
-    _navItem(
-      icon: HugeIcons.strokeRoundedCalendar03,
-      label: 'Calendar',
-    ),
+  List<BottomNavigationBarItem> get _navItems => [
+    _navItem(icon: HugeIcons.strokeRoundedHome01, label: 'Home'),
+    _navItem(icon: HugeIcons.strokeRoundedChart01, label: 'Sales'),
+    _navItem(icon: HugeIcons.strokeRoundedCalendar03, label: 'Appointment'),
+    _navItem(icon: HugeIcons.strokeRoundedUserCircle02, label: 'Profile'),
   ];
 
   static BottomNavigationBarItem _navItem({
@@ -61,10 +63,7 @@ class AppBottomNavBar extends StatelessWidget {
     required String label,
   }) {
     return BottomNavigationBarItem(
-      icon: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: HugeIcon(icon: icon, size: 24),
-      ),
+      icon: HugeIcon(icon: icon, size: 28),
       label: label,
     );
   }

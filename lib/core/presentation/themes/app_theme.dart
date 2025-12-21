@@ -35,7 +35,7 @@ class AppTheme {
       elevation: 0,
       iconTheme: IconThemeData(color: Colors.black87),
       titleTextStyle: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w600,
         fontSize: 20,
         color: Colors.black87,
@@ -72,72 +72,72 @@ class AppTheme {
     // Text Theme — using your Noto Sans font weights
     textTheme: const TextTheme(
       displayLarge: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w800, // ExtraBold
         fontSize: 57,
       ),
       displayMedium: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w700, // Bold
         fontSize: 45,
       ),
       displaySmall: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w600, // SemiBold
         fontSize: 36,
       ),
       headlineLarge: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w800,
         fontSize: 36,
       ),
       headlineMedium: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w600,
         fontSize: 28,
       ),
       headlineSmall: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w500, // Medium
         fontSize: 24,
       ),
       titleLarge: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w600,
         fontSize: 20,
       ),
       titleMedium: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w500,
         fontSize: 16,
       ),
       titleSmall: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w500,
         fontSize: 14,
       ),
       bodyLarge: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w400, // Regular
         fontSize: 16,
       ),
       bodyMedium: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
         fontSize: 14,
       ),
       bodySmall: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w300, // Light (if you have Light)
         fontSize: 12,
       ),
       labelLarge: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w500,
         fontSize: 14,
       ),
       labelSmall: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
         fontSize: 11,
       ),
@@ -165,17 +165,17 @@ class AppTheme {
         borderSide: const BorderSide(color: Color(0xFFEF4444)),
       ),
       labelStyle: const TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w500,
         color: Color(0xFF525252), // neutral-600
       ),
       hintStyle: const TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
         color: Color(0xFF838383),
       ),
       errorStyle: const TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
         color: Color(0xFFEF4444),
       ),
@@ -186,7 +186,7 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         textStyle: const TextStyle(
-          fontFamily: 'NotoSans',
+          fontFamily: 'Inter',
           fontWeight: FontWeight.w600,
           fontSize: 16,
         ),
@@ -201,7 +201,7 @@ class AppTheme {
       ),
     ),
 
-    fontFamily: 'NotoSans',
+    fontFamily: 'Inter',
   );
 
   // Dark Theme
@@ -233,7 +233,7 @@ class AppTheme {
       elevation: 0,
       iconTheme: IconThemeData(color: Colors.white),
       titleTextStyle: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w600,
         fontSize: 20,
         color: Colors.white,
@@ -261,79 +261,79 @@ class AppTheme {
 
     textTheme: const TextTheme(
       displayLarge: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w800,
         fontSize: 57,
         color: Color(0xFFF5F5F5),
       ),
       displayMedium: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w700,
         fontSize: 45,
         color: Color(0xFFF5F5F5),
       ),
       displaySmall: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w600,
         fontSize: 36,
         color: Color(0xFFF5F5F5),
       ),
       headlineMedium: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w600,
         fontSize: 28,
         color: Color(0xFFF5F5F5),
       ),
       headlineSmall: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w500,
         fontSize: 24,
         color: Color(0xFFF5F5F5),
       ),
       titleLarge: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w600,
         fontSize: 20,
         color: Color(0xFFF5F5F5),
       ),
       titleMedium: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w500,
         fontSize: 16,
         color: Color(0xFFF5F5F5),
       ),
       titleSmall: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w500,
         fontSize: 14,
         color: Color(0xFFF5F5F5),
       ),
       bodyLarge: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
         fontSize: 16,
         color: Color(0xFFF5F5F5),
       ),
       bodyMedium: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
         fontSize: 14,
         color: Color(0xFFF5F5F5),
       ),
       bodySmall: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w300,
         fontSize: 12,
         color: Color(0xFFB0B0B0), // slightly lighter neutral
       ),
       labelLarge: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w500,
         fontSize: 14,
         color: Color(0xFFF5F5F5),
       ),
       labelSmall: TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
         fontSize: 11,
         color: Color(0xFFB0B0B0),
@@ -361,17 +361,17 @@ class AppTheme {
         borderSide: const BorderSide(color: Color(0xFFDC2626)),
       ),
       labelStyle: const TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w500,
         color: Color(0xFF707070),
       ),
       hintStyle: const TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
         color: Color(0xFFA3A3A3),
       ),
       errorStyle: const TextStyle(
-        fontFamily: 'NotoSans',
+        fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
         color: Color(0xFFDC2626),
       ),
@@ -382,7 +382,7 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         textStyle: const TextStyle(
-          fontFamily: 'NotoSans',
+          fontFamily: 'Inter',
           fontWeight: FontWeight.w600,
           fontSize: 16,
         ),
@@ -397,6 +397,6 @@ class AppTheme {
       ),
     ),
 
-    fontFamily: 'NotoSans',
+    fontFamily: 'Inter',
   );
 }
