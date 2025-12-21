@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:ventura/core/presentation/pages/main_screen.dart';
 import 'package:ventura/core/presentation/pages/not_found.dart';
+import 'package:ventura/features/appointment/presentation/pages/create_appointment_page.dart';
 import 'package:ventura/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:ventura/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:ventura/features/auth/presentation/pages/sign_up_page.dart';
 import 'package:ventura/features/auth/presentation/pages/verify_code_page.dart';
 import 'package:ventura/features/auth/presentation/pages/profile.dart';
+import 'package:ventura/features/search/presentation/pages/search_page.dart';
 import 'package:ventura/features/welcome/presentation/pages/welcome_page.dart';
 
 class AppRoutes {
@@ -20,6 +22,8 @@ class AppRoutes {
   final String forgotPassword = '/forgot-password';
   final String main = '/main';
   final String verifyCode = '/verify-code';
+  final String search = '/search';
+  final String createAppointment = '/create-appointment';
 
   static final Map<String, WidgetBuilder> routes = {
     '/welcome': (_) => const WelcomePage(),
@@ -29,6 +33,8 @@ class AppRoutes {
     '/profile': (_) => const Profile(),
     '/forgot-password': (_) => const ForgotPasswordPage(),
     '/main': (_) => const MainScreen(),
+    '/search': (_) => const SearchPage(),
+    '/create-appointment': (_) => const CreateAppointmentPage(),
   };
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {

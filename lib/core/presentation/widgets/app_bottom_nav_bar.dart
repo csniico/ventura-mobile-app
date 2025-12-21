@@ -18,8 +18,8 @@ class AppBottomNavBar extends StatelessWidget {
         border: Border(
           top: BorderSide(
             color: Theme.brightnessOf(context) == Brightness.dark
-                ? Colors.black26
-                : Colors.grey[300]!,
+                ? Colors.white12
+                : Colors.black12,
             width: 1,
           ),
         ),

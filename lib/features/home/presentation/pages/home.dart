@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ventura/features/home/presentation/pages/home_dashboard_page.dart';
+import 'package:ventura/features/home/presentation/pages/not_signed_in_page.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -13,22 +15,10 @@ class Home extends StatelessWidget {
         debugPrint(state.toString());
       },
       builder: (context, state) {
-        return Column(
-          children: [
-            Center(child: Text("Home")),
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/details');
-              },
-              child: Row(
-                children: [
-                  HugeIcon(icon: HugeIcons.strokeRoundedTissuePaper),
-                  Text("Go to Details"),
-                ],
-              ),
-            ),
-          ],
-        );
+        if (state is AuthSuccess) {
+          return HomeDashboardPage();
+        }
+        return NotSignedInPage();
       },
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ventura/core/presentation/widgets/app_bottom_nav_bar.dart';
 import 'package:ventura/core/presentation/widgets/main_app_bar.dart';
+import 'package:ventura/features/appointment/presentation/pages/appointment_page.dart';
 import 'package:ventura/features/auth/presentation/pages/profile.dart';
 import 'package:ventura/features/home/presentation/pages/home.dart';
 import 'package:ventura/features/sales/presentation/pages/sales.dart';
@@ -28,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
       case 1:
         return const Sales();
       case 2:
-        return const Center(child: Text("Appointment"));
+        return const AppointmentPage();
       case 3:
         return const Profile();
       default:
@@ -39,6 +40,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       key: const Key('main_screen_scaffold'),
       body: SafeArea(child: RepaintBoundary(child: _buildBody())),
       bottomNavigationBar: AppBottomNavBar(
