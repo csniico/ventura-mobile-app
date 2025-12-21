@@ -1,9 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:ventura/core/common/app_logger.dart';
 import 'package:ventura/core/common/server_routes.dart';
-import 'package:ventura/core/data/models/failure.dart';
-import 'package:ventura/core/data/models/server_exception.dart';
 import 'package:ventura/features/appointment/data/data_sources/remote/abstract_interfaces/appointment_remote_data_source.dart';
 import 'package:ventura/features/appointment/data/models/appointment_model.dart';
 import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';
@@ -16,7 +13,7 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
   AppointmentRemoteDataSourceImpl({required this.dio});
 
   @override
-  Future<Either<Failure, AppointmentModel>> createAppointment({
+  Future<AppointmentModel?> createAppointment({
     required String title,
     required DateTime startTime,
     required DateTime endTime,
@@ -43,15 +40,15 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         },
       );
       logger.info(response.toString());
-      return right(AppointmentModel.fromJson(response.data));
+      return AppointmentModel.fromJson(response.data);
     } on DioException catch (e) {
       logger.error(e.response.toString());
-      throw ServerException.fromDioError(e);
+      return null;
     }
   }
 
   @override
-  Future<Either<Failure, String>> deleteAppointment({
+  Future<String?> deleteAppointment({
     required String appointmentId,
     required String userId,
     required String businessId,
@@ -62,15 +59,15 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         data: {'businessId': businessId, 'userId': userId},
       );
       logger.info(response.data.toString());
-      return right(response.data.message);
+      return response.data.message;
     } on DioException catch (e) {
       logger.error(e.response.toString());
-      throw ServerException.fromDioError(e);
+      return null;
     }
   }
 
   @override
-  Future<Either<Failure, List<AppointmentModel>>> getBusinessAppointments({
+  Future<List<AppointmentModel>?> getBusinessAppointments({
     required String businessId,
   }) async {
     try {
@@ -79,17 +76,15 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         data: {'businessId': businessId},
       );
       logger.info(response.data.toString());
-      return right(
-        response.data.map((e) => AppointmentModel.fromJson(e)).toList(),
-      );
+      return response.data.map((e) => AppointmentModel.fromJson(e)).toList();
     } on DioException catch (e) {
       logger.error(e.response.toString());
-      throw ServerException.fromDioError(e);
+      return null;
     }
   }
 
   @override
-  Future<Either<Failure, List<AppointmentModel>>> getUserAppointments({
+  Future<List<AppointmentModel>?> getUserAppointments({
     required String userId,
   }) async {
     try {
@@ -98,17 +93,15 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         data: {'userId': userId},
       );
       logger.info(response.data.toString());
-      return right(
-        response.data.map((e) => AppointmentModel.fromJson(e)).toList(),
-      );
+      return response.data.map((e) => AppointmentModel.fromJson(e)).toList();
     } on DioException catch (e) {
       logger.error(e.response.toString());
-      throw ServerException.fromDioError(e);
+      return null;
     }
   }
 
   @override
-  Future<Either<Failure, AppointmentModel>> updateAppointment({
+  Future<AppointmentModel?> updateAppointment({
     required String appointmentId,
     required String title,
     required DateTime startTime,
@@ -136,15 +129,15 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         },
       );
       logger.info(response.data.toString());
-      return right(AppointmentModel.fromJson(response.data));
+      return AppointmentModel.fromJson(response.data);
     } on DioException catch (e) {
       logger.error(e.response.toString());
-      throw ServerException.fromDioError(e);
+      return null;
     }
   }
 
   @override
-  Future<Either<Failure, AppointmentModel>> updateGoogleEventId({
+  Future<AppointmentModel?> updateGoogleEventId({
     required String appointmentId,
     required String googleEventId,
     required String userId,
@@ -160,10 +153,10 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         },
       );
       logger.info(response.data.toString());
-      return right(AppointmentModel.fromJson(response.data));
+      return AppointmentModel.fromJson(response.data);
     } on DioException catch (e) {
       logger.error(e.response.toString());
-      throw ServerException.fromDioError(e);
+      return null;
     }
   }
 }
