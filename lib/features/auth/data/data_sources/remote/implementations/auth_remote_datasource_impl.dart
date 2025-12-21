@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ventura/core/common/app_logger.dart';
 import 'package:ventura/core/data/models/business_model.dart';
 import 'package:ventura/core/data/models/server_exception.dart';
-import 'package:ventura/core/data/data_sources/remote/server_routes.dart';
+import 'package:ventura/core/common/server_routes.dart';
 import 'package:ventura/core/domain/entities/business_entity.dart';
 import 'package:ventura/features/auth/data/data_sources/remote/abstract_interfaces/auth_remote_data_source.dart';
 import 'package:ventura/features/auth/data/models/confirm_email_model.dart';

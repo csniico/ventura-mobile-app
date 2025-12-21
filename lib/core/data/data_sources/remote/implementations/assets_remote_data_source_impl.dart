@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:ventura/core/common/app_logger.dart';
 import 'package:ventura/core/data/data_sources/remote/abstract_interfaces/assets_remote_data_source.dart';
-import 'package:ventura/core/data/data_sources/remote/server_routes.dart';
+import 'package:ventura/core/common/server_routes.dart';
 import 'package:ventura/core/data/models/server_exception.dart';
 
 class AssetsRemoteDataSourceImpl implements AssetsRemoteDataSource {
