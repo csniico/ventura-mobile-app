@@ -1,28 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:ventura/features/appointment/presentation/widgets/action_bottom_sheet.dart';
 
-class TimeListPicker extends StatelessWidget {
+class TimeListPicker extends StatefulWidget {
   final TimeOfDay selectedTime;
   final ValueChanged<TimeOfDay> onChanged;
   final double itemHeight;
   final double height;
+  final TimeOfDay? minTime;
 
   const TimeListPicker({
     super.key,
     required this.selectedTime,
     required this.onChanged,
     this.itemHeight = 48,
-    this.height = 500,
+    this.height = 450,
+    this.minTime,
   });
 
-  // Generate times from 00:00 → 23:30
-  List<TimeOfDay> _generateTimes() {
+  // --- STATIC HELPER METHOD ---
+  static Future<TimeOfDay?> show(
+    BuildContext context,
+    TimeOfDay initialTime, {
+    TimeOfDay? minTime,
+  }) async {
+    TimeOfDay tempTime = initialTime;
+
+    return await showModalBottomSheet<TimeOfDay>(
+      context: context,
+      isScrollControlled: true, // Allows expansion
+      builder: (context) {
+        // We use StatefulBuilder to update the UI inside the sheet
+        // without rebuilding the whole page
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return ActionBottomSheet(
+              onApply: () => Navigator.pop(context, tempTime),
+              child: TimeListPicker(
+                selectedTime: tempTime,
+                minTime: minTime,
+                onChanged: (newTime) {
+                  setState(() => tempTime = newTime);
+                },
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  State<TimeListPicker> createState() => _TimeListPickerState();
+}
+
+class _TimeListPickerState extends State<TimeListPicker> {
+  // Generate times from 00:00 -> 23:30
+  List<TimeOfDay> _generateTimes(TimeOfDay? minTime) {
     final times = <TimeOfDay>[];
-
     for (int hour = 0; hour < 24; hour++) {
-      times.add(TimeOfDay(hour: hour, minute: 0));
-      times.add(TimeOfDay(hour: hour, minute: 30));
+      for (int min in [0, 30]) {
+        final time = TimeOfDay(hour: hour, minute: min);
+        // Only add if no minTime is provided, or if time is after minTime
+        if (minTime == null ||
+            (hour > minTime.hour ||
+                (hour == minTime.hour && min > minTime.minute))) {
+          times.add(time);
+        }
+      }
     }
-
     return times;
   }
 
@@ -30,7 +75,6 @@ class TimeListPicker extends StatelessWidget {
     final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
     final minute = time.minute.toString().padLeft(2, '0');
     final period = time.period == DayPeriod.am ? 'AM' : 'PM';
-
     return '$hour:$minute $period';
   }
 
@@ -40,10 +84,10 @@ class TimeListPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final times = _generateTimes();
+    final times = _generateTimes(widget.minTime);
 
     return SizedBox(
-      height: height,
+      height: widget.height,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -63,12 +107,12 @@ class TimeListPicker extends StatelessWidget {
                 itemCount: times.length,
                 itemBuilder: (context, index) {
                   final time = times[index];
-                  final isSelected = _isSame(time, selectedTime);
+                  final isSelected = _isSame(time, widget.selectedTime);
 
                   return InkWell(
-                    onTap: () => onChanged(time),
+                    onTap: () => widget.onChanged(time),
                     child: Container(
-                      height: itemHeight,
+                      height: widget.itemHeight,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       color: isSelected
                           ? Colors.grey.shade200
@@ -79,7 +123,6 @@ class TimeListPicker extends StatelessWidget {
                             _formatTime(time),
                             style: TextStyle(
                               fontSize: 16,
-                              // color: isSelected  Colors.blu,
                               fontWeight: isSelected
                                   ? FontWeight.w500
                                   : FontWeight.normal,
@@ -87,8 +130,11 @@ class TimeListPicker extends StatelessWidget {
                           ),
                           const Spacer(),
                           if (isSelected)
-                            const Icon(Icons.check,
-                                size: 20, color: Colors.blue),
+                            const Icon(
+                              Icons.check,
+                              size: 20,
+                              color: Colors.blue,
+                            ),
                         ],
                       ),
                     ),

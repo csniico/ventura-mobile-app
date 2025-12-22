@@ -5,18 +5,22 @@ class TextInputComponent extends StatelessWidget {
     super.key,
     required this.hintText,
     required this.onSaved,
+    this.controller,
     this.maxLines = 1,
     this.minLines,
     this.maxLength,
     this.onChanged,
     this.title,
     this.isRequired = false,
+    this.validator,
   });
 
   final String hintText;
   final String? title;
+  final TextEditingController? controller;
   final void Function(String)? onChanged;
   final void Function(String?) onSaved;
+  final String? Function(String?)? validator;
   final int? maxLines;
   final int? minLines;
   final int? maxLength;
@@ -37,20 +41,21 @@ class TextInputComponent extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         TextFormField(
+          controller: controller,
           decoration: InputDecoration(hintText: hintText),
           maxLines: maxLines,
           minLines: minLines,
           maxLength: maxLength,
           onChanged: onChanged,
           onSaved: onSaved,
-          validator: isRequired
+          validator: validator ?? (isRequired
               ? (value) {
                   if (value == null || value.isEmpty) {
                     return '$title is required!';
                   }
                   return null;
                 }
-              : null,
+              : null),
         ),
       ],
     );

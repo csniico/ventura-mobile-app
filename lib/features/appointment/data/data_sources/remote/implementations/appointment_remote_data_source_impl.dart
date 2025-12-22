@@ -36,7 +36,8 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
           'businessId': businessId,
           'description': description,
           'notes': notes,
-          'recurrenceSchedule': recurrenceSchedule,
+          // If isRecurring is true, "spread" the map entry into the data object
+          if (isRecurring) 'recurringSchedule': recurrenceSchedule,
         },
       );
       logger.info(response.toString());
@@ -59,7 +60,11 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         data: {'businessId': businessId, 'userId': userId},
       );
       logger.info(response.data.toString());
-      return response.data.message;
+      // response.data is a Map, extract the message
+      if (response.data is Map<String, dynamic>) {
+        return response.data['message'] as String?;
+      }
+      return response.data as String?;
     } on DioException catch (e) {
       logger.error(e.response.toString());
       return null;
@@ -76,7 +81,9 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         data: {'businessId': businessId},
       );
       logger.info(response.data.toString());
-      return response.data.map((e) => AppointmentModel.fromJson(e)).toList();
+      return List<AppointmentModel>.from(
+          response.data.map((e) => AppointmentModel.fromJson(e))
+      );
     } on DioException catch (e) {
       logger.error(e.response.toString());
       return null;
@@ -93,7 +100,9 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         data: {'userId': userId},
       );
       logger.info(response.data.toString());
-      return response.data.map((e) => AppointmentModel.fromJson(e)).toList();
+      return List<AppointmentModel>.from(
+          response.data.map((e) => AppointmentModel.fromJson(e))
+      );
     } on DioException catch (e) {
       logger.error(e.response.toString());
       return null;
@@ -125,7 +134,7 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
           'businessId': businessId,
           'description': description,
           'notes': notes,
-          'recurrenceSchedule': recurrenceSchedule,
+          if (isRecurring) 'recurringSchedule': recurrenceSchedule,
         },
       );
       logger.info(response.data.toString());

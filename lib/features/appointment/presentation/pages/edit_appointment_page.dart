@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/common/utils/date_time_util.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
+import 'package:ventura/features/appointment/domain/entities/appointment_entity.dart';
 import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';
 import 'package:ventura/features/appointment/presentation/bloc/appointment_bloc.dart';
 import 'package:ventura/features/appointment/presentation/widgets/calendar_widget.dart';
@@ -11,37 +12,79 @@ import 'package:ventura/features/appointment/presentation/widgets/date_time_pick
 import 'package:ventura/features/appointment/presentation/widgets/text_input_component.dart';
 import 'package:ventura/features/appointment/presentation/widgets/time_list_picker.dart';
 
-class CreateAppointmentPage extends StatefulWidget {
-  const CreateAppointmentPage({super.key});
+class EditAppointmentPage extends StatefulWidget {
+  final Appointment appointment;
+
+  const EditAppointmentPage({
+    super.key,
+    required this.appointment,
+  });
 
   @override
-  State<CreateAppointmentPage> createState() => _CreateAppointmentPageState();
+  State<EditAppointmentPage> createState() => _EditAppointmentPageState();
 }
 
-class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
+class _EditAppointmentPageState extends State<EditAppointmentPage> {
   final _formKey = GlobalKey<FormState>();
   bool showCalendar = false;
-  bool isRecurring = false;
+  late bool isRecurring;
 
   // Text controllers for form inputs
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _notesController = TextEditingController();
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
+  late final TextEditingController _notesController;
 
   // startTime
-  DateTime selectedStartDate = DateTime.now();
-  TimeOfDay selectedStartTime = TimeOfDay.now();
+  late DateTime selectedStartDate;
+  late TimeOfDay selectedStartTime;
 
   // End time
-  DateTime selectedEndDate = DateTime.now();
-  TimeOfDay selectedEndTime = TimeOfDay.now();
+  late DateTime selectedEndDate;
+  late TimeOfDay selectedEndTime;
 
   // repeat until time
-  DateTime selectedRepeatUntilDate = DateTime.now();
-  TimeOfDay selectedRepeatUntilTime = TimeOfDay.now();
+  late DateTime selectedRepeatUntilDate;
+  late TimeOfDay selectedRepeatUntilTime;
 
   // Frequency for recurring appointments
   String? selectedFrequency;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize with appointment data
+    _titleController = TextEditingController(text: widget.appointment.title);
+    _descriptionController = TextEditingController(
+      text: widget.appointment.description.isEmpty ? '' : widget.appointment.description,
+    );
+    _notesController = TextEditingController(
+      text: widget.appointment.notes.isEmpty ? '' : widget.appointment.notes,
+    );
+
+    // Initialize dates and times
+    selectedStartDate = widget.appointment.startTime;
+    selectedStartTime = TimeOfDay.fromDateTime(widget.appointment.startTime);
+    selectedEndDate = widget.appointment.endTime;
+    selectedEndTime = TimeOfDay.fromDateTime(widget.appointment.endTime);
+
+    // Initialize recurring settings
+    isRecurring = widget.appointment.isRecurring;
+
+    if (isRecurring && widget.appointment.recurrenceSchedule != null) {
+      selectedRepeatUntilDate = widget.appointment.recurrenceSchedule!.until;
+      selectedRepeatUntilTime = TimeOfDay.fromDateTime(
+        widget.appointment.recurrenceSchedule!.until,
+      );
+      selectedFrequency = _getFrequencyString(
+        widget.appointment.recurrenceSchedule!.frequency,
+      );
+    } else {
+      selectedRepeatUntilDate = DateTime.now();
+      selectedRepeatUntilTime = TimeOfDay.now();
+      selectedFrequency = null;
+    }
+  }
 
   @override
   void dispose() {
@@ -54,6 +97,20 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
   // Combine date and time into DateTime
   DateTime _combineDateTime(DateTime date, TimeOfDay time) {
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  }
+
+  // Convert frequency enum to string
+  String? _getFrequencyString(RecurrenceFrequency frequency) {
+    switch (frequency) {
+      case RecurrenceFrequency.daily:
+        return 'Daily';
+      case RecurrenceFrequency.weekly:
+        return 'Weekly';
+      case RecurrenceFrequency.monthly:
+        return 'Monthly';
+      case RecurrenceFrequency.yearly:
+        return 'Yearly';
+    }
   }
 
   // Convert frequency string to enum
@@ -77,7 +134,7 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
   }
 
   // Submit form via BLoC
-  void _saveAppointment() async {
+  void _updateAppointment() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -117,7 +174,8 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
       // Dispatch event to BLoC
       if (mounted) {
         context.read<AppointmentBloc>().add(
-          AppointmentCreateEvent(
+          AppointmentUpdateEvent(
+            appointmentId: widget.appointment.id,
             title: _titleController.text,
             startTime: startDateTime,
             endTime: endDateTime,
@@ -148,7 +206,8 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
       // For repeat until date, must be after end date
       firstDay = selectedEndDate;
     } else {
-      firstDay = DateTime.now();
+      // For start date, allow selecting from 2 years ago (to support editing old appointments)
+      firstDay = DateTime.now().subtract(Duration(days: 730));
     }
 
     final result = await CalendarWidget.show(
@@ -241,8 +300,8 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
   Widget build(BuildContext context) {
     return BlocListener<AppointmentBloc, AppointmentState>(
       listener: (context, state) {
-        if (state is AppointmentCreateSuccessState) {
-          ToastService.showSuccess('Appointment created successfully');
+        if (state is AppointmentUpdateSuccessState) {
+          ToastService.showSuccess('Appointment updated successfully');
           // Return true to indicate success
           Navigator.pop(context, true);
         } else if (state is AppointmentErrorState) {
@@ -251,7 +310,7 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Add appointment', style: TextStyle(fontSize: 16)),
+          title: Text('Edit appointment', style: TextStyle(fontSize: 16)),
           centerTitle: true,
           actions: [
             Padding(
@@ -268,7 +327,7 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
                     );
                   }
                   return TextButton(
-                    onPressed: _saveAppointment,
+                    onPressed: _updateAppointment,
                     child: Text('Save', style: TextStyle(fontSize: 16)),
                   );
                 },
@@ -318,7 +377,6 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
                       icon: HugeIcons.strokeRoundedClock01,
                       subtitle: selectedStartTime.format(context),
                       onTap: () {
-                        // Pass 'true' for isEndTime to trigger the validation logic
                         handleTimeTap(selectedStartTime, false, (value) {
                           selectedStartTime = value;
                         });
@@ -350,7 +408,6 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
                       icon: HugeIcons.strokeRoundedClock01,
                       subtitle: selectedEndTime.format(context),
                       onTap: () {
-                        // Pass 'true' for isEndTime to trigger the validation logic
                         handleTimeTap(selectedEndTime, true, (value) {
                           selectedEndTime = value;
                         });
@@ -515,3 +572,4 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
     );
   }
 }
+

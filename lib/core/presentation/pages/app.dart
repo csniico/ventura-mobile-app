@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.dart';
 import 'package:ventura/core/presentation/pages/main_screen.dart';
 import 'package:ventura/core/common/routes.dart';
 import 'package:ventura/core/presentation/themes/app_theme.dart';
@@ -26,10 +27,13 @@ class App extends StatelessWidget {
         listener: (context, state) {
           if (state is AuthSuccess) {
             debugPrint('User is authenticated');
+            context.read<AppUserCubit>().updateUser(state.user);
             navigatorKey.currentState?.pushNamedAndRemoveUntil(
               _appRoutes.main,
               (_) => false,
             );
+          } else if (state is UnAuthenticated) {
+            context.read<AppUserCubit>().clearUser();
           }
         },
         builder: (context, state) {

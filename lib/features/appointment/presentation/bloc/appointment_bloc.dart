@@ -136,6 +136,12 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     AppointmentDeleteEvent event,
     Emitter<AppointmentState> emit,
   ) async {
+    // Store current appointments before deletion
+    List<Appointment>? currentAppointments;
+    if (state is AppointmentGetSuccessState) {
+      currentAppointments = (state as AppointmentGetSuccessState).appointments;
+    }
+
     final res = await _deleteAppointment(
       DeleteAppointmentParams(
         appointmentId: event.appointmentId,
@@ -145,7 +151,18 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     );
     res.fold(
       (failure) => emit(AppointmentErrorState(message: failure.message)),
-      (message) => emit(AppointmentDeleteSuccessState(message: message)),
+      (message) {
+        // First emit delete success
+        emit(AppointmentDeleteSuccessState(message: message));
+
+        // Then update the appointments list by removing the deleted one
+        if (currentAppointments != null) {
+          final updatedAppointments = currentAppointments
+              .where((apt) => apt.id != event.appointmentId)
+              .toList();
+          emit(AppointmentGetSuccessState(appointments: updatedAppointments));
+        }
+      },
     );
   }
 }

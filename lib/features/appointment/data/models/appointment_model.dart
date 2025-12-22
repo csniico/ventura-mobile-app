@@ -36,13 +36,13 @@ class AppointmentModel extends Appointment {
       id: json['id'] ?? '',
       userId: json['userId'] ?? '',
       businessId: json['businessId'] ?? '',
-      googleEventId: json['googleEventId'] ?? '',
+      googleEventId: json['googleEventId'] ?? 'none',
       title: json['title'] ?? '',
       startTime: DateTime.parse(json['startTime']),
       endTime: DateTime.parse(json['endTime']),
       description: json['description'] ?? '',
       notes: json['notes'] ?? '',
-      isRecurring: json['isRecurring'] ?? '',
+      isRecurring: json['isRecurring'] ?? false,
       recurrenceSchedule: json['recurrenceSchedule'],
     );
   }
