@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ventura/core/presentation/pages/main_screen.dart';
 import 'package:ventura/core/services/toast_service.dart';
+import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/cubit/business_creation_cubit.dart';
 import 'package:ventura/features/auth/presentation/widgets/image_picker_canvas.dart';
 import 'package:ventura/features/auth/presentation/widgets/step_progress_indicator.dart';
@@ -20,7 +21,6 @@ class CreateBusinessDetails extends StatefulWidget {
 
 class _CreateBusinessDetailsState extends State<CreateBusinessDetails> {
   final _formKey = GlobalKey<FormState>();
-  File? _logoImage;
   final _picker = ImagePicker();
 
   pickImage(File pickedFile) {
@@ -37,6 +37,7 @@ class _CreateBusinessDetailsState extends State<CreateBusinessDetails> {
             break;
           case BusinessCreateSuccess():
             ToastService.showSuccess('Business profile created successfully');
+            context.read<AuthBloc>().add(UserProfileCreateSuccess(user: state.user, business: state.business));
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => MainScreen()),
               (_) => false,

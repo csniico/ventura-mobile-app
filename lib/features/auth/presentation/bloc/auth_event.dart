@@ -103,3 +103,10 @@ class AuthResetPassword extends AuthEvent {
     required this.userId,
   });
 }
+
+class UserProfileCreateSuccess extends AuthEvent {
+  final User user;
+  final Business business;
+
+  UserProfileCreateSuccess({required this.user, required this.business});
+}

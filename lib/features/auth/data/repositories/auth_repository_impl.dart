@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:ventura/core/common/app_logger.dart';
+import 'package:ventura/core/data/data_sources/remote/abstract_interfaces/user_remote_data_source.dart';
 import 'package:ventura/core/data/models/failure.dart';
 import 'package:ventura/core/data/models/server_exception.dart';
 import 'package:ventura/core/domain/entities/business_entity.dart';
@@ -11,9 +12,13 @@ import 'package:ventura/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource authRemoteDataSource;
+  final UserRemoteDataSource userRemoteDataSource;
   final logger = AppLogger('AuthRepositoryImpl');
 
-  AuthRepositoryImpl({required this.authRemoteDataSource});
+  AuthRepositoryImpl({
+    required this.authRemoteDataSource,
+    required this.userRemoteDataSource,
+  });
 
   @override
   Future<Either<Failure, User>> signInWithEmailPassword({
@@ -131,15 +136,13 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, User>> getCurrentUser({required String uid}) {
-    // TODO: implement getCurrentUser
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<Failure, Business>> createBusinessProfile({required Business business}) async {
+  Future<Either<Failure, Business>> createBusinessProfile({
+    required Business business,
+  }) async {
     try {
-      final createdBusiness = await authRemoteDataSource.createBusiness(business: business);
+      final createdBusiness = await authRemoteDataSource.createBusiness(
+        business: business,
+      );
       return right(createdBusiness.toEntity());
     } on ServerException catch (e) {
       return left(Failure(e.message));

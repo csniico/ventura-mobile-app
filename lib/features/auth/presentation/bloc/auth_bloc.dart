@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ventura/core/common/app_logger.dart';
+import 'package:ventura/core/domain/entities/business_entity.dart';
 import 'package:ventura/core/domain/use_cases/local_get_user.dart';
 import 'package:ventura/core/domain/use_cases/local_save_user.dart';
 import 'package:ventura/core/domain/use_cases/local_sign_out.dart';
+import 'package:ventura/core/domain/use_cases/remote_get_user.dart';
 import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.dart';
 import 'package:ventura/core/domain/use_cases/use_case.dart';
+import 'package:ventura/core/services/internet_service.dart';
 import 'package:ventura/features/auth/domain/entities/server_sign_up.dart';
 import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_email.dart';
@@ -26,6 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LocalGetUser _localGetUser;
   final LocalSaveUser _localSaveUser;
   final LocalSignOut _localSignOut;
+  final RemoteGetUser _remoteGetUser;
   final ConfirmEmail _confirmEmail;
   final UserSignInWithGoogle _userSignInWithGoogle;
   final ConfirmVerificationCode _confirmVerificationCode;
@@ -43,6 +47,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required ConfirmVerificationCode confirmVerificationCode,
     required ResetPassword resetPassword,
     required AppUserCubit appUserCubit,
+    required RemoteGetUser remoteGetUser,
   }) : _appUserCubit = appUserCubit,
        _userSignIn = userSignIn,
        _userSignUp = userSignUp,
@@ -53,6 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _userSignInWithGoogle = userSignInWithGoogle,
        _confirmVerificationCode = confirmVerificationCode,
        _resetPassword = resetPassword,
+       _remoteGetUser = remoteGetUser,
        super(AuthInitial()) {
     on<AuthResetState>((event, emit) => emit(AuthInitial()));
     on<AuthEvent>((_, emit) => emit(AuthLoading()));
@@ -68,6 +74,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
     on<AuthResetPassword>(_onAuthResetPassword);
     on<AuthForgotPassword>(_onForgotPassword);
+    on<UserProfileCreateSuccess>(_onUserProfileCreateSuccess);
   }
 
   void _onAuthSignOut(AuthEvent event, Emitter<AuthState> emit) async {
@@ -95,12 +102,32 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {
-    debugPrint('app started. I can do what I want here.');
+    logger.info('app started.');
     final res = await _localGetUser(NoParams());
-    res.fold(
-      (l) => emit(UnAuthenticated()),
-      (user) =>
-          user == null ? emit(UnAuthenticated()) : emitAuthSuccess(user, emit),
+
+    final user = res.fold((l) => null, (user) => user);
+
+    if (user == null) {
+      logger.info('user not found in local storage.');
+      emit(UnAuthenticated());
+      return;
+    }
+
+    final bool connected = await InternetService().isUserConnected();
+    if (!connected) {
+      logger.info('user not connected to the internet, return local user');
+      emitAuthSuccess(user, emit);
+      return;
+    }
+
+    logger.info('user found in local storage, fetching from remote.');
+    final remoteRes = await _remoteGetUser(
+      RemoteGetUserParams(userId: user.id),
+    );
+
+    remoteRes.fold(
+      (l) => emit(AuthFailure(l.message)),
+      (user) => emitAuthSuccess(user, emit),
     );
   }
 
@@ -205,6 +232,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (failure) => emit(AuthFailure(failure.message)),
       (user) => emitAuthSuccess(user, emit),
     );
+  }
+
+  void _onUserProfileCreateSuccess(
+    UserProfileCreateSuccess event,
+    Emitter<AuthState> emit,
+  ) {
+    emitAuthSuccess(event.user, emit);
   }
 
   void emitAuthSuccess(User user, Emitter<AuthState> emit) {

@@ -94,11 +94,17 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
     try {
       await signIn.authenticate(scopeHint: ['email', 'profile']);
     } on GoogleSignInException catch (e) {
-      // Only show error message for non-cancellation errors
+      // Handle cancellation silently
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        debugPrint("User cancelled Google Sign-in");
+        return;
+      }
+
+      // Show error for other exceptions
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Sign-in failed: $e'),
+            content: Text('Sign-in failed: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );

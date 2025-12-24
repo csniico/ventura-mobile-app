@@ -6,7 +6,9 @@ import 'package:ventura/core/data/data_sources/local/abstract_interfaces/user_lo
 import 'package:ventura/core/data/data_sources/local/implementations/business_local_data_source_impl.dart';
 import 'package:ventura/core/data/data_sources/local/implementations/user_local_data_source_impl.dart';
 import 'package:ventura/core/data/data_sources/remote/abstract_interfaces/assets_remote_data_source.dart';
+import 'package:ventura/core/data/data_sources/remote/abstract_interfaces/user_remote_data_source.dart';
 import 'package:ventura/core/data/data_sources/remote/implementations/assets_remote_data_source_impl.dart';
+import 'package:ventura/core/data/data_sources/remote/implementations/user_remote_data_source_impl.dart';
 import 'package:ventura/core/data/repositories/assets_repository_impl.dart';
 import 'package:ventura/core/data/repositories/business_repository_impl.dart';
 import 'package:ventura/core/data/repositories/user_repository_impl.dart';
@@ -19,6 +21,7 @@ import 'package:ventura/core/domain/use_cases/local_get_user.dart';
 import 'package:ventura/core/domain/use_cases/local_save_business.dart';
 import 'package:ventura/core/domain/use_cases/local_save_user.dart';
 import 'package:ventura/core/domain/use_cases/local_sign_out.dart';
+import 'package:ventura/core/domain/use_cases/remote_get_user.dart';
 import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.dart';
 import 'package:ventura/core/services/business_service.dart';
 import 'package:ventura/features/appointment/data/data_sources/remote/abstract_interfaces/appointment_remote_data_source.dart';
@@ -71,6 +74,9 @@ void _initAuthDependencies() {
     ..registerFactory<UserLocalDataSource>(
       () => UserLocalDataSourceImpl(userService: serviceLocator()),
     )
+    ..registerFactory<UserRemoteDataSource>(
+      () => UserRemoteDataSourceImpl(dio: serviceLocator()),
+    )
     ..registerFactory<BusinessLocalDataSource>(
       () => BusinessLocalDataSourceImpl(businessService: serviceLocator()),
     )
@@ -79,10 +85,16 @@ void _initAuthDependencies() {
     )
     // REPOSITORIES
     ..registerFactory<UserRepository>(
-      () => UserRepositoryImpl(userLocalDataSource: serviceLocator()),
+      () => UserRepositoryImpl(
+        userLocalDataSource: serviceLocator(),
+        userRemoteDataSource: serviceLocator(),
+      ),
     )
     ..registerFactory<AuthRepository>(
-      () => AuthRepositoryImpl(authRemoteDataSource: serviceLocator()),
+      () => AuthRepositoryImpl(
+        authRemoteDataSource: serviceLocator(),
+        userRemoteDataSource: serviceLocator(),
+      ),
     )
     ..registerFactory<BusinessRepository>(
       () => BusinessRepositoryImpl(businessLocalDataSource: serviceLocator()),
@@ -91,6 +103,7 @@ void _initAuthDependencies() {
       () => AssetsRepositoryImpl(assetsRemoteDataSource: serviceLocator()),
     )
     // USE CASES
+    ..registerFactory(() => RemoteGetUser(userRepository: serviceLocator()))
     ..registerFactory(() => UserSignIn(authRepository: serviceLocator()))
     ..registerFactory(() => LocalGetUser(userRepository: serviceLocator()))
     ..registerFactory(() => LocalSaveUser(userRepository: serviceLocator()))
@@ -138,6 +151,7 @@ void _initAuthDependencies() {
         confirmVerificationCode: serviceLocator(),
         resetPassword: serviceLocator(),
         appUserCubit: serviceLocator(),
+        remoteGetUser: serviceLocator(),
       ),
     );
 }

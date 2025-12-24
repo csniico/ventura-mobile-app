@@ -8,8 +8,6 @@ import 'package:ventura/core/domain/entities/user_entity.dart';
 abstract interface class AuthRepository {
   Future<Either<Failure, String>> signOut();
 
-  Future<Either<Failure, User>> getCurrentUser({required String uid});
-
   Future<Either<Failure, User>> signInWithEmailPassword({
     required String email,
     required String password,
