@@ -1,3 +1,4 @@
+import 'package:ventura/features/appointment/data/models/recurrence_schedule_model.dart';
 import 'package:ventura/features/appointment/domain/entities/appointment_entity.dart';
 
 class AppointmentModel extends Appointment {
@@ -12,7 +13,7 @@ class AppointmentModel extends Appointment {
     required super.description,
     required super.notes,
     required super.isRecurring,
-    required super.recurrenceSchedule,
+    required super.recurringSchedule,
   });
 
   factory AppointmentModel.empty() {
@@ -27,7 +28,7 @@ class AppointmentModel extends Appointment {
       description: '',
       notes: '',
       isRecurring: false,
-      recurrenceSchedule: null,
+      recurringSchedule: null,
     );
   }
 
@@ -43,7 +44,9 @@ class AppointmentModel extends Appointment {
       description: json['description'] ?? '',
       notes: json['notes'] ?? '',
       isRecurring: json['isRecurring'] ?? false,
-      recurrenceSchedule: json['recurrenceSchedule'],
+      recurringSchedule: json['recurringSchedule'] != null
+          ? RecurringScheduleModel.fromJson(json['recurringSchedule'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -59,7 +62,7 @@ class AppointmentModel extends Appointment {
       description: appointment.description,
       notes: appointment.notes,
       isRecurring: appointment.isRecurring,
-      recurrenceSchedule: appointment.recurrenceSchedule,
+      recurringSchedule: appointment.recurringSchedule,
     );
   }
 
@@ -75,7 +78,7 @@ class AppointmentModel extends Appointment {
       description: map['description'] ?? '',
       notes: map['notes'] ?? '',
       isRecurring: map['isRecurring'] ?? false,
-      recurrenceSchedule: map['recurrenceSchedule'],
+      recurringSchedule: map['recurringSchedule'],
     );
   }
 
@@ -91,7 +94,7 @@ class AppointmentModel extends Appointment {
       'description': description,
       'notes': notes,
       'isRecurring': isRecurring,
-      'recurrenceSchedule': recurrenceSchedule,
+      'recurringSchedule': recurringSchedule,
     };
   }
 
@@ -107,7 +110,7 @@ class AppointmentModel extends Appointment {
       'description': description,
       'notes': notes,
       'isRecurring': isRecurring,
-      'recurrenceSchedule': recurrenceSchedule,
+      'recurringSchedule': recurringSchedule,
     };
   }
 
@@ -123,7 +126,7 @@ class AppointmentModel extends Appointment {
       description: description,
       notes: notes,
       isRecurring: isRecurring,
-      recurrenceSchedule: recurrenceSchedule,
+      recurringSchedule: recurringSchedule,
     );
   }
 }

@@ -6,11 +6,11 @@ enum RecurrenceFrequency {
 }
 
 
-class RecurrenceSchedule {
-  final DateTime until;
-  final RecurrenceFrequency frequency;
-  
-  RecurrenceSchedule({
+class RecurringSchedule {
+  final DateTime? until;
+  final RecurrenceFrequency? frequency;
+
+  RecurringSchedule({
     required this.until,
     required this.frequency,
   });

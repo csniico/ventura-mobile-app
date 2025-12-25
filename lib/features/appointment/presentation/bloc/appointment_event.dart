@@ -12,7 +12,7 @@ final class AppointmentCreateEvent extends AppointmentEvent {
   final String businessId;
   final String? description;
   final String? notes;
-  final RecurrenceSchedule? recurrenceSchedule;
+  final RecurringSchedule? recurringSchedule;
 
   AppointmentCreateEvent({
     required this.title,
@@ -23,11 +23,11 @@ final class AppointmentCreateEvent extends AppointmentEvent {
     required this.businessId,
     this.description,
     this.notes,
-    this.recurrenceSchedule,
+    this.recurringSchedule,
   });
 }
 
-final class AppointmentGetEvent extends AppointmentEvent {
+final class   AppointmentGetEvent extends AppointmentEvent {
   final String? userId;
   final String? businessId;
 
@@ -44,7 +44,7 @@ final class AppointmentUpdateEvent extends AppointmentEvent {
   final String businessId;
   final String? description;
   final String? notes;
-  final RecurrenceSchedule? recurrenceSchedule;
+  final RecurringSchedule? recurringSchedule;
 
   AppointmentUpdateEvent({
     required this.appointmentId,
@@ -56,7 +56,7 @@ final class AppointmentUpdateEvent extends AppointmentEvent {
     required this.businessId,
     this.description,
     this.notes,
-    this.recurrenceSchedule,
+    this.recurringSchedule,
   });
 }
 

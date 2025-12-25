@@ -13,7 +13,7 @@ abstract interface class AppointmentRepository {
     required String businessId,
     String? description,
     String? notes,
-    RecurrenceSchedule? recurrenceSchedule,
+    RecurringSchedule? recurringSchedule,
   });
 
   Future<Either<Failure, Appointment>> updateGoogleEventId({
@@ -33,7 +33,7 @@ abstract interface class AppointmentRepository {
     required String businessId,
     String? description,
     String? notes,
-    RecurrenceSchedule? recurrenceSchedule,
+    RecurringSchedule? recurringSchedule,
   });
 
   Future<Either<Failure, List<Appointment>>> getUserAppointments({

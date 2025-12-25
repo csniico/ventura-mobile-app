@@ -91,15 +91,11 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
       final user = await userService.getUser();
 
       if (user == null) {
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('User not logged in')));
-        }
+        ToastService.showError('User not logged in');
         return;
       }
 
-      RecurrenceSchedule? recurrenceSchedule;
+      RecurringSchedule? recurringSchedule;
       if (isRecurring && selectedFrequency != null) {
         final repeatUntilDateTime = _combineDateTime(
           selectedRepeatUntilDate,
@@ -107,7 +103,7 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
         );
         final frequencyEnum = _getFrequencyEnum(selectedFrequency);
         if (frequencyEnum != null) {
-          recurrenceSchedule = RecurrenceSchedule(
+          recurringSchedule = RecurringSchedule(
             until: repeatUntilDateTime,
             frequency: frequencyEnum,
           );
@@ -128,7 +124,7 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
                 ? null
                 : _descriptionController.text,
             notes: _notesController.text.isEmpty ? null : _notesController.text,
-            recurrenceSchedule: recurrenceSchedule,
+            recurringSchedule: recurringSchedule,
           ),
         );
       }
@@ -244,6 +240,12 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
         if (state is AppointmentCreateSuccessState) {
           ToastService.showSuccess('Appointment created successfully');
           // Return true to indicate success
+          context.read<AppointmentBloc>().add(
+            AppointmentGetEvent(
+              userId: state.appointment.userId,
+              businessId: state.appointment.businessId,
+            ),
+          );
           Navigator.pop(context, true);
         } else if (state is AppointmentErrorState) {
           ToastService.showError(state.message);

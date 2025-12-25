@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:ventura/core/common/app_logger.dart';
 import 'package:ventura/core/common/server_routes.dart';
 import 'package:ventura/features/appointment/data/data_sources/remote/abstract_interfaces/appointment_remote_data_source.dart';
@@ -22,7 +23,7 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
     required String businessId,
     String? description,
     String? notes,
-    RecurrenceSchedule? recurrenceSchedule,
+    RecurringSchedule? recurringSchedule,
   }) async {
     try {
       final response = await dio.post(
@@ -36,8 +37,7 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
           'businessId': businessId,
           'description': description,
           'notes': notes,
-          // If isRecurring is true, "spread" the map entry into the data object
-          if (isRecurring) 'recurringSchedule': recurrenceSchedule,
+          if (isRecurring) 'recurringSchedule': recurringSchedule,
         },
       );
       logger.info(response.toString());
@@ -60,7 +60,6 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         data: {'businessId': businessId, 'userId': userId},
       );
       logger.info(response.data.toString());
-      // response.data is a Map, extract the message
       if (response.data is Map<String, dynamic>) {
         return response.data['message'] as String?;
       }
@@ -99,12 +98,15 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         '${routes.serverUrl}${routes.getBusinessAppointments}',
         data: {'userId': userId},
       );
-      logger.info(response.data.toString());
-      return List<AppointmentModel>.from(
+      final appointments = List<AppointmentModel>.from(
           response.data.map((e) => AppointmentModel.fromJson(e))
-      );
+      ).toList();
+      return appointments;
     } on DioException catch (e) {
       logger.error(e.response.toString());
+      return null;
+    } catch (e) {
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -120,7 +122,7 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
     required String businessId,
     String? description,
     String? notes,
-    RecurrenceSchedule? recurrenceSchedule,
+    RecurringSchedule? recurringSchedule,
   }) async {
     try {
       final response = await dio.put(
@@ -134,7 +136,7 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
           'businessId': businessId,
           'description': description,
           'notes': notes,
-          if (isRecurring) 'recurringSchedule': recurrenceSchedule,
+          if (isRecurring) 'recurringSchedule': recurringSchedule,
         },
       );
       logger.info(response.data.toString());

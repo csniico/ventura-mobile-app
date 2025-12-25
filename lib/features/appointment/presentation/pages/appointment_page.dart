@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/appointment/domain/entities/appointment_entity.dart';
@@ -68,12 +69,18 @@ class _AppointmentPageState extends State<AppointmentPage> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: BlocConsumer<AppointmentBloc, AppointmentState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             if (state is AppointmentErrorState) {
               ToastService.showError(state.message);
+              ToastService.showSuccess('Appointment deleted successfully');
             }
             if (state is AppointmentDeleteSuccessState) {
-              ToastService.showSuccess('Appointment deleted successfully');
+              User? user = UserService().user;
+              if (user == null) {
+                Navigator.pushNamedAndRemoveUntil(context, 'newRouteName', (_) => false);
+              } else {
+                context.read<AppointmentBloc>().add(AppointmentGetEvent(userId: user.id));
+              }
             }
           },
           builder: (context, state) {
@@ -92,7 +99,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                       color: Colors.red,
                     ),
                     const SizedBox(height: 16),
-                    Text('Error loading appointments'),
+                    Text(state.message),
                   ],
                 ),
               );
@@ -126,15 +133,8 @@ class _AppointmentPageState extends State<AppointmentPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.pushNamed(
-            context,
-            '/create-appointment',
-          );
-          // Only refresh if appointment was created successfully
-          if (result == true && mounted) {
-            _getUserAppointments();
-          }
+        onPressed: () {
+          Navigator.pushNamed(context, '/create-appointment');
         },
         child: const HugeIcon(icon: HugeIcons.strokeRoundedPlusSign),
       ),

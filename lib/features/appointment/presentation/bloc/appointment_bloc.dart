@@ -53,7 +53,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
         businessId: event.businessId,
         description: event.description,
         notes: event.notes,
-        recurrenceSchedule: event.recurrenceSchedule,
+        recurringSchedule: event.recurringSchedule,
       ),
     );
     res.fold(

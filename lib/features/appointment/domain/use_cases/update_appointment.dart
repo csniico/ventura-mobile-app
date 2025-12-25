@@ -37,7 +37,7 @@ class UpdateAppointmentParams {
   final String businessId;
   String? description;
   String? notes;
-  RecurrenceSchedule? recurrenceSchedule;
+  RecurringSchedule? recurringSchedule;
 
   UpdateAppointmentParams({
     required this.appointmentId,
@@ -49,6 +49,6 @@ class UpdateAppointmentParams {
     required this.businessId,
     this.description,
     this.notes,
-    this.recurrenceSchedule,
+    this.recurringSchedule,
   });
 }

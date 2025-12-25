@@ -11,7 +11,7 @@ abstract interface class AppointmentRemoteDataSource {
     required String businessId,
     String? description,
     String? notes,
-    RecurrenceSchedule? recurrenceSchedule,
+    RecurringSchedule? recurringSchedule,
   });
 
   Future<AppointmentModel?> updateGoogleEventId({
@@ -31,7 +31,7 @@ abstract interface class AppointmentRemoteDataSource {
     required String businessId,
     String? description,
     String? notes,
-    RecurrenceSchedule? recurrenceSchedule,
+    RecurringSchedule? recurringSchedule,
   });
 
   Future<List<AppointmentModel>?> getUserAppointments({required String userId});

@@ -11,7 +11,7 @@ class Appointment {
   final String description;
   final String notes;
   final bool isRecurring;
-  RecurrenceSchedule? recurrenceSchedule;
+  RecurringSchedule? recurringSchedule;
 
   Appointment({
     required this.id,
@@ -24,7 +24,7 @@ class Appointment {
     required this.description,
     required this.notes,
     required this.isRecurring,
-    this.recurrenceSchedule,
+    this.recurringSchedule,
   });
 
   Appointment copyWith({
@@ -38,7 +38,7 @@ class Appointment {
     String? description,
     String? notes,
     bool? isRecurring,
-    RecurrenceSchedule? recurrenceSchedule,
+    RecurringSchedule? recurringSchedule,
   }) {
     return Appointment(
       id: id ?? this.id,
@@ -51,7 +51,7 @@ class Appointment {
       description: description ?? this.description,
       notes: notes ?? this.notes,
       isRecurring: isRecurring ?? this.isRecurring,
-      recurrenceSchedule: recurrenceSchedule ?? this.recurrenceSchedule,
+      recurringSchedule: recurringSchedule ?? this.recurringSchedule,
     );
   }
 }

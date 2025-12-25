@@ -15,10 +15,7 @@ import 'package:ventura/features/appointment/presentation/widgets/time_list_pick
 class EditAppointmentPage extends StatefulWidget {
   final Appointment appointment;
 
-  const EditAppointmentPage({
-    super.key,
-    required this.appointment,
-  });
+  const EditAppointmentPage({super.key, required this.appointment});
 
   @override
   State<EditAppointmentPage> createState() => _EditAppointmentPageState();
@@ -43,7 +40,7 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
   late TimeOfDay selectedEndTime;
 
   // repeat until time
-  late DateTime selectedRepeatUntilDate;
+  late DateTime? selectedRepeatUntilDate;
   late TimeOfDay selectedRepeatUntilTime;
 
   // Frequency for recurring appointments
@@ -56,7 +53,9 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
     // Initialize with appointment data
     _titleController = TextEditingController(text: widget.appointment.title);
     _descriptionController = TextEditingController(
-      text: widget.appointment.description.isEmpty ? '' : widget.appointment.description,
+      text: widget.appointment.description.isEmpty
+          ? ''
+          : widget.appointment.description,
     );
     _notesController = TextEditingController(
       text: widget.appointment.notes.isEmpty ? '' : widget.appointment.notes,
@@ -71,13 +70,17 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
     // Initialize recurring settings
     isRecurring = widget.appointment.isRecurring;
 
-    if (isRecurring && widget.appointment.recurrenceSchedule != null) {
-      selectedRepeatUntilDate = widget.appointment.recurrenceSchedule!.until;
-      selectedRepeatUntilTime = TimeOfDay.fromDateTime(
-        widget.appointment.recurrenceSchedule!.until,
-      );
+    if (isRecurring && widget.appointment.recurringSchedule != null) {
+      var until = widget.appointment.recurringSchedule?.until;
+      if (until != null) {
+        selectedRepeatUntilDate = until;
+        selectedRepeatUntilTime = TimeOfDay.fromDateTime(until);
+      } else {
+        selectedRepeatUntilDate = DateTime.now();
+        selectedRepeatUntilTime = TimeOfDay.now();
+      }
       selectedFrequency = _getFrequencyString(
-        widget.appointment.recurrenceSchedule!.frequency,
+        widget.appointment.recurringSchedule!.frequency,
       );
     } else {
       selectedRepeatUntilDate = DateTime.now();
@@ -100,7 +103,8 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
   }
 
   // Convert frequency enum to string
-  String? _getFrequencyString(RecurrenceFrequency frequency) {
+  String? _getFrequencyString(RecurrenceFrequency? frequency) {
+    if (frequency == null) return null;
     switch (frequency) {
       case RecurrenceFrequency.daily:
         return 'Daily';
@@ -156,15 +160,15 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
         return;
       }
 
-      RecurrenceSchedule? recurrenceSchedule;
+      RecurringSchedule? recurringSchedule;
       if (isRecurring && selectedFrequency != null) {
         final repeatUntilDateTime = _combineDateTime(
-          selectedRepeatUntilDate,
+          selectedRepeatUntilDate!,
           selectedRepeatUntilTime,
         );
         final frequencyEnum = _getFrequencyEnum(selectedFrequency);
         if (frequencyEnum != null) {
-          recurrenceSchedule = RecurrenceSchedule(
+          recurringSchedule = RecurringSchedule(
             until: repeatUntilDateTime,
             frequency: frequencyEnum,
           );
@@ -186,7 +190,7 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
                 ? null
                 : _descriptionController.text,
             notes: _notesController.text.isEmpty ? null : _notesController.text,
-            recurrenceSchedule: recurrenceSchedule,
+            recurringSchedule: recurringSchedule,
           ),
         );
       }
@@ -228,7 +232,7 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
         // Auto-fix: If end date moved past repeat until date (only if recurring is enabled)
         if (isRecurring &&
             isEndDate &&
-            selectedEndDate.isAfter(selectedRepeatUntilDate)) {
+            selectedEndDate.isAfter(selectedRepeatUntilDate!)) {
           selectedRepeatUntilDate = selectedEndDate;
         }
       });
@@ -246,9 +250,9 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
         selectedStartDate.day == selectedEndDate.day;
 
     bool isRepeatUntilSameDayAsEnd =
-        selectedEndDate.year == selectedRepeatUntilDate.year &&
-        selectedEndDate.month == selectedRepeatUntilDate.month &&
-        selectedEndDate.day == selectedRepeatUntilDate.day;
+        selectedEndDate.year == selectedRepeatUntilDate?.year &&
+        selectedEndDate.month == selectedRepeatUntilDate?.month &&
+        selectedEndDate.day == selectedRepeatUntilDate?.day;
 
     // Determine if this is the repeat until time picker
     bool isRepeatUntilTime = identical(
@@ -474,9 +478,9 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
                       DateTimePickerCard(
                         title: 'Date',
                         icon: HugeIcons.strokeRoundedCalendar01,
-                        subtitle: formatWithSuffix(selectedRepeatUntilDate),
+                        subtitle: formatWithSuffix(selectedRepeatUntilDate!),
                         onTap: () => handleCalendarTap(
-                          selectedRepeatUntilDate,
+                          selectedRepeatUntilDate!,
                           false,
                           (v) => selectedRepeatUntilDate = v,
                         ),
@@ -572,4 +576,3 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
     );
   }
 }
-

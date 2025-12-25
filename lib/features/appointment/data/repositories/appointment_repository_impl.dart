@@ -21,7 +21,7 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     required String businessId,
     String? description,
     String? notes,
-    RecurrenceSchedule? recurrenceSchedule,
+    RecurringSchedule? recurringSchedule,
   }) async {
     AppointmentModel? appointmentModel = await appointmentRemoteDataSource
         .createAppointment(
@@ -90,7 +90,7 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     required String businessId,
     String? description,
     String? notes,
-    RecurrenceSchedule? recurrenceSchedule,
+    RecurringSchedule? recurringSchedule,
   }) async {
     AppointmentModel? appointmentModel = await appointmentRemoteDataSource
         .updateAppointment(

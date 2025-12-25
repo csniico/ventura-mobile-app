@@ -22,6 +22,9 @@ class CreateAppointment
       isRecurring: params.isRecurring,
       userId: params.userId,
       businessId: params.businessId,
+      notes: params.notes,
+      description: params.description,
+      recurringSchedule: params.recurringSchedule
     );
   }
 }
@@ -35,7 +38,7 @@ class CreateAppointmentParams {
   final String businessId;
   final String? description;
   final String? notes;
-  final RecurrenceSchedule? recurrenceSchedule;
+  final RecurringSchedule? recurringSchedule;
 
   CreateAppointmentParams({
     required this.title,
@@ -46,6 +49,6 @@ class CreateAppointmentParams {
     required this.businessId,
     this.description,
     this.notes,
-    this.recurrenceSchedule,
+    this.recurringSchedule,
   });
 }
