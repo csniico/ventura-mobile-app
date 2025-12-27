@@ -6,7 +6,9 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';
 import 'package:ventura/features/auth/presentation/widgets/profile_user_image.dart';
+import 'package:ventura/features/auth/presentation/widgets/submit_form_button.dart';
 
 class EditPersonalProfilePage extends StatefulWidget {
   const EditPersonalProfilePage({super.key});
@@ -17,10 +19,31 @@ class EditPersonalProfilePage extends StatefulWidget {
 }
 
 class _EditPersonalProfilePageState extends State<EditPersonalProfilePage> {
+  final _formKey = GlobalKey<FormState>();
+  final _fistNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+
   pickImage(File pickedFile, User user) {
     context.read<AuthBloc>().add(
       UserAvatarProfileChanged(file: pickedFile, user: user),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final user = context.read<AuthBloc>().state;
+    if (user is AuthSuccess) {
+      _fistNameController.text = user.user.firstName;
+      _lastNameController.text = user.user.lastName ?? '';
+    }
+  }
+
+  @override
+  void dispose() {
+    _fistNameController.dispose();
+    _lastNameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -86,6 +109,51 @@ class _EditPersonalProfilePageState extends State<EditPersonalProfilePage> {
                             ),
                           ),
                         ],
+                      ),
+                      SizedBox(height: 40),
+                      Form(
+                        key: _formKey,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              AuthField(
+                                controller: _fistNameController,
+                                hintText: state.user.firstName,
+                                onSaved: (value) {},
+                                title: 'First name',
+                              ),
+                              SizedBox(height: 40),
+                              AuthField(
+                                controller: _lastNameController,
+                                hintText: state.user.lastName ?? '',
+                                onSaved: (value) {},
+
+                                title: 'Last name',
+                              ),
+
+                              SizedBox(height: 80),
+
+                              SubmitFormButton(
+                                title: 'Save',
+                                onPressed: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    context.read<AuthBloc>().add(
+                                      EditUserProfileEvent(
+                                        user: state.user,
+                                        userId: state.user.id,
+                                        firstName: _fistNameController.text,
+                                        avatarUrl: state.user.avatarUrl,
+                                        lastName: _lastNameController.text,
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),

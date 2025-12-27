@@ -111,6 +111,20 @@ class UserAvatarProfileChanged extends AuthEvent {
   UserAvatarProfileChanged({required this.file, required this.user});
 }
 
+class UserFirstNameChanged extends AuthEvent {
+  final String firstName;
+  final User user;
+
+  UserFirstNameChanged({required this.firstName, required this.user});
+}
+
+class UserLastNameChanged extends AuthEvent {
+  final String lastName;
+  final User user;
+
+  UserLastNameChanged({required this.lastName, required this.user});
+}
+
 class UserProfileCreateSuccess extends AuthEvent {
   final User user;
   final Business business;

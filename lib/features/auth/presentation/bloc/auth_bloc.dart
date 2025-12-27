@@ -86,6 +86,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthForgotPassword>(_onForgotPassword);
     on<UserProfileCreateSuccess>(_onUserProfileCreateSuccess);
     on<UserAvatarProfileChanged>(_onUserAvatarProfileChanged);
+    on<UserFirstNameChanged>(_onUserFirstNameChanged);
+    on<UserLastNameChanged>(_onUserLastNameChanged);
     on<EditUserProfileEvent>(_onEditUserProfileEvent);
   }
 
@@ -267,6 +269,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final User user = event.user.copyWith(avatarUrl: imageUrl);
       emitAuthSuccess(user, emit);
     });
+  }
+
+  void _onUserFirstNameChanged(
+    UserFirstNameChanged event,
+    Emitter<AuthState> emit,
+  ) {
+    logger.info('first name changed to ${event.firstName}');
+    final User user = event.user.copyWith(firstName: event.firstName);
+    logger.info('Updated user first name to ${user.firstName}');
+    emitAuthSuccess(user, emit);
+  }
+
+  void _onUserLastNameChanged(
+    UserLastNameChanged event,
+    Emitter<AuthState> emit,
+  ) {
+    final User user = event.user.copyWith(lastName: event.lastName);
+    emitAuthSuccess(user, emit);
   }
 
   void _onEditUserProfileEvent(

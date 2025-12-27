@@ -41,7 +41,9 @@ void main() async {
           create: (_) => serviceLocator<AppointmentBloc>(),
         ),
       ],
-      child: App(),
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: App()),
     ),
   );
 }

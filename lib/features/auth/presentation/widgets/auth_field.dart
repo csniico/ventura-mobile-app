@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class AuthField extends StatelessWidget {
   const AuthField({
     super.key,
+    this.initialValue,
+    this.controller,
     required this.hintText,
     required this.onSaved,
     this.inputType,
@@ -12,6 +14,8 @@ class AuthField extends StatelessWidget {
     this.title,
   });
 
+  final TextEditingController? controller;
+  final String? initialValue;
   final String hintText;
   final String? title;
   final void Function(String)? onChanged;
@@ -35,6 +39,8 @@ class AuthField extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         TextFormField(
+          controller: controller,
+          initialValue: initialValue,
           decoration: InputDecoration(
             hintText: hintText,
             suffixIcon: suffixIcon,
