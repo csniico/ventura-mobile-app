@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:ventura/core/common/app_logger.dart';
-import 'package:ventura/core/common/server_routes.dart';
+import 'package:ventura/config/app_logger.dart';
+import 'package:ventura/config/server_routes.dart';
 import 'package:ventura/core/data/data_sources/remote/abstract_interfaces/user_remote_data_source.dart';
 import 'package:ventura/core/data/models/user_model.dart';
 

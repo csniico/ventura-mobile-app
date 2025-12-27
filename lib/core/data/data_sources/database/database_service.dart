@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:ventura/core/common/app_logger.dart';
+import 'package:ventura/config/app_logger.dart';
 import 'package:ventura/core/data/models/business_model.dart';
 import 'package:ventura/core/data/models/user_model.dart';
 

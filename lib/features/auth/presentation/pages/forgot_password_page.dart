@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ventura/core/common/routes.dart';
+import 'package:ventura/config/routes.dart';
 import 'package:ventura/features/auth/presentation/widgets/verify_email_form.dart';
 
 class ForgotPasswordPage extends StatefulWidget {

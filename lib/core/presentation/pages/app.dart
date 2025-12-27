@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.dart';
 import 'package:ventura/core/presentation/pages/main_screen.dart';
-import 'package:ventura/core/common/routes.dart';
+import 'package:ventura/config/routes.dart';
 import 'package:ventura/core/presentation/themes/app_theme.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/welcome/presentation/pages/welcome_page.dart';

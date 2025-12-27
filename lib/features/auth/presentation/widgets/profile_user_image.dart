@@ -16,7 +16,7 @@ class ProfileUserImage extends StatelessWidget {
       width: profileHeight,
       height: profileHeight,
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.primary),
+        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
         shape: BoxShape.circle,
         color: Theme.of(context).colorScheme.surfaceBright,
       ),

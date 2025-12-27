@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ventura/core/common/app_logger.dart';
+import 'package:ventura/config/app_logger.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';

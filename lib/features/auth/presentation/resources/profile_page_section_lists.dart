@@ -21,7 +21,7 @@ List<ProfilePageSectionLists> accountManagement = [
   ProfilePageSectionLists(
     title: 'Personal Information',
     icon: HugeIcons.strokeRoundedUser,
-    route: 'profile-info',
+    route: 'edit-profile-page',
   ),
   ProfilePageSectionLists(
     title: 'Business Details',

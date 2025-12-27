@@ -21,7 +21,7 @@ class ProfileSection extends StatelessWidget {
     if (item.label == 'logout') {
       _logout(context);
     } else if (item.route != null) {
-      Navigator.of(context).pushNamed(item.route!);
+      Navigator.of(context).pushNamed('/${item.route}');
     }
   }
 

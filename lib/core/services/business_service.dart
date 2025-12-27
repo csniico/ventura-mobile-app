@@ -1,4 +1,4 @@
-import 'package:ventura/core/common/app_logger.dart';
+import 'package:ventura/config/app_logger.dart';
 import 'package:ventura/core/data/data_sources/database/database_service.dart';
 import 'package:ventura/core/data/models/business_model.dart';
 

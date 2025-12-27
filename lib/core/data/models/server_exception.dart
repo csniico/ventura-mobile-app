@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:ventura/core/common/app_logger.dart';
+import 'package:ventura/config/app_logger.dart';
 
 class ServerException implements Exception {
   final logger = AppLogger('ServerException');

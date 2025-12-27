@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:ventura/core/common/app_logger.dart';
-import 'package:ventura/core/common/server_routes.dart';
+import 'package:flutter/material.dart';
+import 'package:ventura/config/app_logger.dart';
+import 'package:ventura/config/server_routes.dart';
 import 'package:ventura/features/appointment/data/data_sources/remote/abstract_interfaces/appointment_remote_data_source.dart';
 import 'package:ventura/features/appointment/data/models/appointment_model.dart';
 import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';

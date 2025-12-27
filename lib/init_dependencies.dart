@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:ventura/core/common/network_module.dart';
+import 'package:ventura/config/network_module.dart';
 import 'package:ventura/core/data/data_sources/local/abstract_interfaces/business_local_data_source.dart';
 import 'package:ventura/core/data/data_sources/local/abstract_interfaces/user_local_data_source.dart';
 import 'package:ventura/core/data/data_sources/local/implementations/business_local_data_source_impl.dart';

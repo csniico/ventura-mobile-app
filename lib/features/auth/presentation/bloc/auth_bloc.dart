@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ventura/core/common/app_logger.dart';
+import 'package:ventura/config/app_logger.dart';
 import 'package:ventura/core/domain/entities/business_entity.dart';
 import 'package:ventura/core/domain/use_cases/local_get_user.dart';
 import 'package:ventura/core/domain/use_cases/local_save_user.dart';
