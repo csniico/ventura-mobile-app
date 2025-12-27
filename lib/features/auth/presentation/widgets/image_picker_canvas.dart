@@ -48,6 +48,42 @@ class ImagePickerCanvas extends StatelessWidget {
                       width: double.infinity,
                       height: 200,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: onTap,
+                                iconSize: 48,
+                                icon: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primary.withValues(
+                                      alpha: isDark ? 0.2 : 0.1,
+                                    ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.add_photo_alternate_outlined,
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                label ?? 'Tap to add a logo',
+                                style: TextStyle(
+                                  color: colorScheme.onSurface.withValues(
+                                    alpha: 0.7,
+                                  ),
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
                   // Close button overlay

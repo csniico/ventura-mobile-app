@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/features/auth/presentation/cubit/business_creation_cubit.dart';
 import 'package:ventura/features/auth/presentation/widgets/step_progress_indicator.dart';
 
 class CreateBusinessContactPage extends StatefulWidget {
   final PageController pageController;
+  final User user;
 
-  const CreateBusinessContactPage({super.key, required this.pageController});
+  const CreateBusinessContactPage({
+    super.key,
+    required this.pageController,
+    required this.user,
+  });
 
   @override
   State<CreateBusinessContactPage> createState() =>
@@ -48,7 +54,10 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                   ),
                   const SizedBox(height: 40),
                   _textInputField(
-                    initialValue: state.draft.address ?? '',
+                    initialValue:
+                        state.draft.address ??
+                        widget.user.business?.address ??
+                        '',
                     title: 'Address *',
                     hint: 'eg. Madina, near post office',
                     onChanged: (value) {
@@ -69,7 +78,10 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                     },
                   ),
                   _textInputField(
-                    initialValue: state.draft.country ?? '',
+                    initialValue:
+                        state.draft.country ??
+                        widget.user.business?.country ??
+                        '',
                     title: 'Country',
                     hint: 'eg. Ghana',
                     onChanged: (value) {
@@ -90,7 +102,8 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                     },
                   ),
                   _textInputField(
-                    initialValue: state.draft.state ?? '',
+                    initialValue:
+                        state.draft.state ?? widget.user.business?.state ?? '',
                     title: 'State/Region',
                     hint: 'eg. Greater Accra',
                     onChanged: (value) {
@@ -111,7 +124,8 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                     },
                   ),
                   _textInputField(
-                    initialValue: state.draft.city ?? '',
+                    initialValue:
+                        state.draft.city ?? widget.user.business?.city ?? '',
                     title: 'City',
                     hint: 'eg. Accra',
                     onChanged: (value) {
@@ -132,7 +146,8 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                     },
                   ),
                   _textInputField(
-                    initialValue: state.draft.email ?? '',
+                    initialValue:
+                        state.draft.email ?? widget.user.business?.email ?? '',
                     title: 'Business Email (optional',
                     hint: 'eg. user@ventura.com',
                     onChanged: (value) {
@@ -150,7 +165,8 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                     },
                   ),
                   _textInputField(
-                    initialValue: state.draft.phone ?? '',
+                    initialValue:
+                        state.draft.phone ?? widget.user.business?.phone ?? '',
                     title: 'Business Phone Number',
                     hint: 'eg. +233 24 000 0000',
                     onChanged: (value) {

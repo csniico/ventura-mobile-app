@@ -16,7 +16,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(),
       body: SafeArea(child: VerifyEmailForm()),
     );
   }

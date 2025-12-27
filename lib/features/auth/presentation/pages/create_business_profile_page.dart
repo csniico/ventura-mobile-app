@@ -78,9 +78,18 @@ class _CreateBusinessProfilePageState extends State<CreateBusinessProfilePage> {
                     ],
                   ),
                 ),
-                CreateBusinessName(pageController: controller),
-                CreateBusinessContactPage(pageController: controller),
-                CreateBusinessDetails(pageController: controller),
+                CreateBusinessName(
+                  pageController: controller,
+                  user: widget.user,
+                ),
+                CreateBusinessContactPage(
+                  pageController: controller,
+                  user: widget.user,
+                ),
+                CreateBusinessDetails(
+                  pageController: controller,
+                  user: widget.user,
+                ),
               ],
             ),
           ),

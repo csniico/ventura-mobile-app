@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/data/models/business_type.dart';
+import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/features/auth/presentation/cubit/business_creation_cubit.dart';
 import 'package:ventura/features/auth/presentation/widgets/step_progress_indicator.dart';
 
 class CreateBusinessName extends StatefulWidget {
   final PageController pageController;
+  final User user;
 
-  const CreateBusinessName({super.key, required this.pageController});
+  const CreateBusinessName({
+    super.key,
+    required this.pageController,
+    required this.user,
+  });
 
   @override
   State<CreateBusinessName> createState() => _CreateBusinessNameState();
@@ -60,7 +66,8 @@ class _CreateBusinessNameState extends State<CreateBusinessName> {
               BlocBuilder<BusinessCreationCubit, BusinessCreationState>(
                 builder: (context, state) {
                   return TextFormField(
-                    initialValue: state.draft.name,
+                    initialValue:
+                        state.draft.name ?? widget.user.business?.name,
                     onChanged: (value) {
                       context.read<BusinessCreationCubit>().businessNameChanged(
                         value,
@@ -118,7 +125,9 @@ class _CreateBusinessNameState extends State<CreateBusinessName> {
       builder: (context, state) {
         final currentCategory = state.draft.categories?.isNotEmpty == true
             ? BusinessType.fromLabel(state.draft.categories!.first)
-            : BusinessType.retail;
+            : widget.user.business?.categories.isNotEmpty == true
+            ? BusinessType.fromLabel(widget.user.business!.categories.first)
+            : null;
 
         return FormField<BusinessType>(
           initialValue: currentCategory,

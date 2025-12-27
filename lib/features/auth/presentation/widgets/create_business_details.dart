@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/core/presentation/pages/main_screen.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
@@ -12,8 +13,13 @@ import 'package:ventura/features/auth/presentation/widgets/step_progress_indicat
 
 class CreateBusinessDetails extends StatefulWidget {
   final PageController pageController;
+  final User user;
 
-  const CreateBusinessDetails({super.key, required this.pageController});
+  const CreateBusinessDetails({
+    super.key,
+    required this.pageController,
+    required this.user,
+  });
 
   @override
   State<CreateBusinessDetails> createState() => _CreateBusinessDetailsState();
@@ -37,7 +43,12 @@ class _CreateBusinessDetailsState extends State<CreateBusinessDetails> {
             break;
           case BusinessCreateSuccess():
             ToastService.showSuccess('Business profile created successfully');
-            context.read<AuthBloc>().add(UserProfileCreateSuccess(user: state.user, business: state.business));
+            context.read<AuthBloc>().add(
+              UserProfileCreateSuccess(
+                user: state.user,
+                business: state.business,
+              ),
+            );
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => MainScreen()),
               (_) => false,
@@ -84,22 +95,19 @@ class _CreateBusinessDetailsState extends State<CreateBusinessDetails> {
                       ),
                       const SizedBox(height: 5),
                       TextFormField(
-                        initialValue: state.draft.tagLine,
+                        initialValue:
+                            state.draft.tagLine ??
+                            widget.user.business?.tagLine ??
+                            '',
                         onChanged: (value) {
                           context
                               .read<BusinessCreationCubit>()
                               .businessTagLineChanged(value);
                         },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your business tag line';
-                          }
-                          return null;
-                        },
                         onSaved: (value) {
                           context
                               .read<BusinessCreationCubit>()
-                              .businessTagLineChanged(value!);
+                              .businessTagLineChanged(value ?? '');
                         },
                         decoration: const InputDecoration(
                           hintText: "eg. Zoey's - Empowering Your Business",
@@ -111,22 +119,19 @@ class _CreateBusinessDetailsState extends State<CreateBusinessDetails> {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       TextFormField(
-                        initialValue: state.draft.description,
+                        initialValue:
+                            state.draft.description ??
+                            widget.user.business?.description ??
+                            '',
                         onChanged: (value) {
                           context
                               .read<BusinessCreationCubit>()
                               .businessDescriptionChanged(value);
                         },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your business description';
-                          }
-                          return null;
-                        },
                         onSaved: (value) {
                           context
                               .read<BusinessCreationCubit>()
-                              .businessDescriptionChanged(value!);
+                              .businessDescriptionChanged(value ?? '');
                         },
                         maxLines: null,
                         minLines: 4,
@@ -166,7 +171,9 @@ class _CreateBusinessDetailsState extends State<CreateBusinessDetails> {
                                   .read<BusinessCreationCubit>()
                                   .businessLogoChanged(null);
                             },
-                            imagePath: state.draft.logo,
+                            imagePath: state.draft.logo != null
+                                ? state.draft.logo!
+                                : widget.user.business?.logo,
                             isLoading: state.isLoading == true,
                           );
                         },
@@ -176,15 +183,26 @@ class _CreateBusinessDetailsState extends State<CreateBusinessDetails> {
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size.fromHeight(50),
                         ),
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            _formKey.currentState!.save();
-                            context
-                                .read<BusinessCreationCubit>()
-                                .createBusinessProfile();
-                          }
-                        },
-                        child: const Text('Finish'),
+                        onPressed: state.isLoading == true
+                            ? null
+                            : () {
+                                _formKey.currentState!.save();
+                                context
+                                    .read<BusinessCreationCubit>()
+                                    .createBusinessProfile();
+                              },
+                        child: state.isLoading == true
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                                ),
+                              )
+                            : const Text('Finish'),
                       ),
                     ],
                   ),

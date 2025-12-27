@@ -159,7 +159,9 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
       final businessModel = BusinessModel.fromEntity(business);
       final response = await dio.post(
         '${routes.serverUrl}${routes.createBusiness}',
-        data: businessModel.toJson(),
+        data: Map.from(businessModel.toJson())
+          ..remove('id')
+          ..remove('shortId'),
       );
       logger.info(response.data.toString());
       return BusinessModel.fromJson(response.data);

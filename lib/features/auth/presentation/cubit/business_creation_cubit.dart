@@ -68,7 +68,7 @@ class BusinessCreationCubit extends Cubit<BusinessCreationState> {
       state: state.draft.state,
       country: state.draft.country,
       tagLine: state.draft.tagLine,
-      logo: state.draft.logo,
+      logo: state.draft.logo ?? state.user.business?.logo,
       id: '',
       shortId: '',
       ownerId: state.user.id,
@@ -183,9 +183,7 @@ class BusinessCreationCubit extends Cubit<BusinessCreationState> {
 
   void businessLogoChanged(File? logo) async {
     if (logo == null) {
-      final updatedDraft = state.draft.copyWith(
-        logo: Optional(null),
-      );
+      final updatedDraft = state.draft.copyWith(logo: Optional(null));
       emit(BusinessCreationState(draft: updatedDraft, user: state.user));
       return;
     }

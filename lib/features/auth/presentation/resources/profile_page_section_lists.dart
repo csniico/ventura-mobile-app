@@ -26,12 +26,12 @@ List<ProfilePageSectionLists> accountManagement = [
   ProfilePageSectionLists(
     title: 'Business Details',
     icon: HugeIcons.strokeRoundedNewOffice,
-    route: 'business-details',
+    route: 'edit-business-page',
   ),
   ProfilePageSectionLists(
     title: 'Change Password',
     icon: HugeIcons.strokeRoundedSquareLock01,
-    route: 'change-password',
+    route: 'forgot-password',
   ),
 ];
 
@@ -69,6 +69,6 @@ List<ProfilePageSectionLists> supportAndLegal = [
     icon: HugeIcons.strokeRoundedLogout02,
     route: null,
     label: 'logout',
-    color: Colors.red
+    color: Colors.red,
   ),
 ];

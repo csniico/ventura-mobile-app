@@ -4,6 +4,7 @@ import 'package:ventura/core/presentation/pages/not_found.dart';
 import 'package:ventura/features/appointment/domain/entities/appointment_entity.dart';
 import 'package:ventura/features/appointment/presentation/pages/create_appointment_page.dart';
 import 'package:ventura/features/appointment/presentation/pages/edit_appointment_page.dart';
+import 'package:ventura/features/auth/presentation/pages/edit_business_profile_page.dart';
 import 'package:ventura/features/auth/presentation/pages/edit_personal_profile_page.dart';
 import 'package:ventura/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:ventura/features/auth/presentation/pages/sign_in_page.dart';
@@ -29,6 +30,7 @@ class AppRoutes {
   final String createAppointment = '/create-appointment';
   final String editAppointment = '/edit-appointment';
   final String editProfilePage = '/edit-profile-page';
+  final String editBusinessPage = '/edit-business-page';
 
   static final Map<String, WidgetBuilder> routes = {
     '/welcome': (_) => const WelcomePage(),
@@ -41,6 +43,7 @@ class AppRoutes {
     '/search': (_) => const SearchPage(),
     '/create-appointment': (_) => const CreateAppointmentPage(),
     '/edit-profile-page': (_) => const EditPersonalProfilePage(),
+    '/edit-business-page': (_) => const EditBusinessProfilePage(),
   };
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {

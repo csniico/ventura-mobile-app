@@ -252,7 +252,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     UserProfileCreateSuccess event,
     Emitter<AuthState> emit,
   ) {
-    emitAuthSuccess(event.user, emit);
+    final User user = event.user.copyWith(
+      businessId: event.business.id,
+      business: event.business,
+    );
+    emitAuthSuccess(user, emit);
   }
 
   void _onUserAvatarProfileChanged(
