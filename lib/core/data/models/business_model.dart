@@ -63,23 +63,22 @@ class BusinessModel extends Business {
     );
   }
 
-  // from map
   factory BusinessModel.fromMap(
-    Map<String, dynamic> map, {
-    bool fromDatabase = false,
-  }) {
+      Map<String, dynamic> map, {
+        bool fromDatabase = false,
+      }) {
     return BusinessModel(
-      id: map['id'] as String,
-      shortId: map['shortId'] as String,
-      ownerId: map['ownerId'] as String,
+      id: map['id']?.toString() ?? '',
+      shortId: map['shortId']?.toString() ?? '',
+      ownerId: map['ownerId']?.toString() ?? '',
       email: map['email'] as String?,
       phone: map['phone'] as String?,
-      name: map['name'] as String,
+      name: map['name']?.toString() ?? 'Unknown Business',
       description: map['description'] as String?,
       tagLine: map['tagLine'] as String?,
       categories: fromDatabase
-          ? (map['categories'] as String?)?.split(',') ??[]
-          : List<String>.from((map['categories'] as List?) ?? []),
+          ? (map['categories'] as String?)?.split(',') ?? []
+          : List<String>.from(map['categories'] ?? []),
       logo: map['logo'] as String?,
       city: map['city'] as String?,
       state: map['state'] as String?,

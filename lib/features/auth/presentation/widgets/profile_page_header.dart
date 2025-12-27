@@ -3,12 +3,19 @@ import 'package:ventura/features/auth/presentation/widgets/profile_cover_image.d
 import 'package:ventura/features/auth/presentation/widgets/profile_user_image.dart';
 
 class ProfilePageHeader extends StatelessWidget {
-  const ProfilePageHeader({super.key});
+  const ProfilePageHeader({
+    super.key,
+    required this.businessAvatarUrl,
+    required this.userAvatarUrl,
+  });
+
+  final String? userAvatarUrl;
+  final String? businessAvatarUrl;
 
   @override
   Widget build(BuildContext context) {
     final double profileHeight = 144;
-    final double coverHeight = 280;
+    final double coverHeight = 240;
     final double profileTopSpacing = coverHeight - (profileHeight / 2);
 
     return Container(
@@ -17,10 +24,16 @@ class ProfilePageHeader extends StatelessWidget {
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
         children: [
-          ProfileCoverImage(coverHeight: coverHeight),
+          ProfileCoverImage(
+            coverHeight: coverHeight,
+            businessAvatarUrl: businessAvatarUrl,
+          ),
           Positioned(
             top: profileTopSpacing,
-            child: ProfileUserImage(profileHeight: profileHeight),
+            child: ProfileUserImage(
+              profileHeight: profileHeight,
+              imageUrl: userAvatarUrl,
+            ),
           ),
         ],
       ),

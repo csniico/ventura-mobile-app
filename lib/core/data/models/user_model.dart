@@ -1,3 +1,4 @@
+import 'package:ventura/core/data/models/business_model.dart';
 import 'package:ventura/core/domain/entities/user_entity.dart';
 
 class UserModel extends User {
@@ -13,6 +14,7 @@ class UserModel extends User {
     required super.businessId,
     super.lastName,
     super.avatarUrl,
+    super.business,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> map) {
@@ -26,8 +28,14 @@ class UserModel extends User {
       avatarUrl: map['avatarUrl'] ?? '',
       isSystem: map['isSystem'] == 0 || map['isSystem'] == false ? false : true,
       isActive: map['isActive'] == 0 || map['isActive'] == false ? false : true,
-      isEmailVerified: map['isEmailVerified'] == 0 || map['isEmailVerified'] == false ? false : true,
+      isEmailVerified:
+          map['isEmailVerified'] == 0 || map['isEmailVerified'] == false
+          ? false
+          : true,
       businessId: map['businessId'] ?? '',
+      business: map['business'] != null
+          ? BusinessModel.fromMap(map['business'])
+          : null,
     );
   }
 
@@ -42,6 +50,7 @@ class UserModel extends User {
       isActive: user.isActive,
       isEmailVerified: user.isEmailVerified,
       businessId: user.businessId,
+      business: user.business,
     );
   }
 
@@ -56,8 +65,14 @@ class UserModel extends User {
       avatarUrl: map['avatarUrl'] ?? '',
       isSystem: map['isSystem'] == 0 || map['isSystem'] == false ? false : true,
       isActive: map['isActive'] == 0 || map['isActive'] == false ? false : true,
-      isEmailVerified: map['isEmailVerified'] == 0 || map['isEmailVerified'] == false ? false : true,
+      isEmailVerified:
+          map['isEmailVerified'] == 0 || map['isEmailVerified'] == false
+          ? false
+          : true,
       businessId: map['businessId'] ?? '',
+      business: map['business'] != null
+          ? BusinessModel.fromMap(map['business'])
+          : null,
     );
   }
 
@@ -74,6 +89,7 @@ class UserModel extends User {
       isActive: isActive,
       isEmailVerified: isEmailVerified,
       isSystem: isSystem,
+      business: business,
     );
   }
 
@@ -90,6 +106,9 @@ class UserModel extends User {
       'isActive': isActive ? 1 : 0,
       'isEmailVerified': isEmailVerified ? 1 : 0,
       'businessId': businessId,
+      'business': business != null
+          ? BusinessModel.fromEntity(business!).toMap()
+          : null,
     };
   }
 
@@ -106,6 +125,9 @@ class UserModel extends User {
       'isActive': isActive ? 1 : 0,
       'isEmailVerified': isEmailVerified ? 1 : 0,
       'businessId': businessId,
+      'business': business != null
+          ? BusinessModel.fromEntity(business!).toMap()
+          : null,
     };
   }
 }

@@ -1,3 +1,5 @@
+import 'package:ventura/core/domain/entities/business_entity.dart';
+
 class User {
   final String id;
   final String googleId;
@@ -10,6 +12,7 @@ class User {
   final bool isActive;
   final bool isEmailVerified;
   final String businessId;
+  final Business? business;
 
   User({
     required this.id,
@@ -23,6 +26,7 @@ class User {
     required this.businessId,
     this.lastName,
     this.avatarUrl,
+    this.business
   });
 
   User copyWith({
@@ -35,6 +39,9 @@ class User {
     bool? isActive,
     bool? isEmailVerified,
     String? businessId,
+    String? lastName,
+    String? avatarUrl,
+    Business? business,
   }) {
     return User(
       id: id ?? this.id,
@@ -46,6 +53,9 @@ class User {
       isActive: isActive ?? this.isActive,
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
       businessId: businessId ?? this.businessId,
+      lastName: lastName ?? this.lastName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      business: business ?? this.business,
     );
   }
 }

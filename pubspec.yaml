@@ -33,6 +33,7 @@ dependencies:
   table_calendar: ^3.2.0
   flutter_slidable: ^4.0.3
   connectivity_plus: ^7.0.0
+  package_info_plus: ^9.0.0
 
 
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hugeicons/hugeicons.dart';
-import 'package:ventura/core/presentation/widgets/text_component.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ventura/features/auth/presentation/resources/profile_page_section_lists.dart';
 import 'package:ventura/features/auth/presentation/widgets/profile_page_header.dart';
+import 'package:ventura/features/auth/presentation/widgets/profile_section.dart';
+import 'package:ventura/features/auth/presentation/widgets/profile_user_name.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -13,54 +15,13 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  Future<void> _logout() async {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: TextComponent(
-          text: "Are you sure you want to sign out?",
-          type: "title",
-          size: 16,
-        ),
-        content: TextComponent(
-          type: "body",
-          text:
-              "Your current session will expire and you will lose data that has not been synced. Make sure you sync all data before proceeding.",
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("Cancel", style: TextStyle(fontSize: 16)),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    context.read<AuthBloc>().add(AuthSignOut());
-                  },
-                  child: Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.red, fontSize: 16),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      barrierDismissible: true,
-    );
+  Future<String> getAppVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    return 'v${info.version}';
   }
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: BlocConsumer<AuthBloc, AuthState>(
@@ -72,49 +33,78 @@ class _ProfileState extends State<Profile> {
           }
         },
         builder: (context, state) {
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                ProfilePageHeader(),
-                _logoutButton(),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
+          if (state is AuthSuccess) {
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  ProfilePageHeader(
+                    businessAvatarUrl: state.user.business!.logo,
+                    userAvatarUrl: state.user.avatarUrl,
+                  ),
+                  // user name and business name
+                  ProfileUserName(
+                    businessName: state.user.business!.name,
+                    userName: '${state.user.firstName} ${state.user.lastName}',
+                  ),
+                  SizedBox(height: 40),
+                  Padding(
+                    padding: EdgeInsetsGeometry.symmetric(horizontal: 16),
+                    child: Column(
+                      children: [
+                        // account management
+                        ProfileSection(
+                          key: ValueKey('accountManagement'),
+                          items: accountManagement,
+                          sectionName: 'Account Management',
+                        ),
+                        SizedBox(height: 40),
 
-  Widget _logoutButton() {
-    return TextButton(
-      onPressed: _logout,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Theme.of(context).colorScheme.primary,
-          border: Border.all(color: const Color(0xFF4285F4), width: 1.5),
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            HugeIcon(
-              icon: HugeIcons.strokeRoundedDoor01,
-              size: 20,
-              strokeWidth: 3,
-              color: Colors.white,
-            ),
-            SizedBox(width: 8),
-            TextComponent(
-              text: 'Sign out',
-              type: 'title',
-              size: 14,
-              color: Colors.white,
-            ),
-          ],
-        ),
+                        // app settings
+                        ProfileSection(
+                          key: ValueKey('appSettings'),
+                          items: appSettings,
+                          sectionName: 'Settings',
+                        ),
+                        SizedBox(height: 40),
+
+                        // support and legal
+                        ProfileSection(
+                          key: ValueKey('supportAndLegal'),
+                          items: supportAndLegal,
+                          sectionName: 'Support & Legal',
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 40),
+                  Padding(
+                    padding: EdgeInsetsGeometry.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        FutureBuilder<String>(
+                          future: getAppVersion(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) return const SizedBox();
+                            return Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                snapshot.data!,
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          return Center(child: Text('Loading...'));
+        },
       ),
     );
   }
