@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:ventura/core/presentation/widgets/secondary_app_bar.dart';
 import 'package:ventura/core/presentation/widgets/text_component.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ventura/features/auth/presentation/widgets/profile_page_header.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -59,9 +59,10 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: SecondaryAppBar(title: "Profile"),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is UnAuthenticated) {
@@ -71,11 +72,10 @@ class _ProfileState extends State<Profile> {
           }
         },
         builder: (context, state) {
-          return SafeArea(
+          return SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Center(child: Text("Profile")),
+                ProfilePageHeader(),
                 _logoutButton(),
               ],
             ),
