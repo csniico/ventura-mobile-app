@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ventura/config/app_logger.dart';
 import 'package:ventura/core/domain/entities/business_entity.dart';
+import 'package:ventura/core/domain/use_cases/asset_upload_image.dart';
 import 'package:ventura/core/domain/use_cases/local_get_user.dart';
 import 'package:ventura/core/domain/use_cases/local_save_user.dart';
 import 'package:ventura/core/domain/use_cases/local_sign_out.dart';
 import 'package:ventura/core/domain/use_cases/remote_get_user.dart';
+import 'package:ventura/core/domain/use_cases/remote_update_user_profile.dart';
 import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.dart';
 import 'package:ventura/core/domain/use_cases/use_case.dart';
 import 'package:ventura/core/services/internet_service.dart';
@@ -34,6 +38,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final UserSignInWithGoogle _userSignInWithGoogle;
   final ConfirmVerificationCode _confirmVerificationCode;
   final ResetPassword _resetPassword;
+  final RemoteUpdateUserProfile _remoteUpdateUserProfile;
+  final AssetUploadImage _assetUploadImage;
   final AppUserCubit _appUserCubit;
 
   AuthBloc({
@@ -48,6 +54,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required ResetPassword resetPassword,
     required AppUserCubit appUserCubit,
     required RemoteGetUser remoteGetUser,
+    required RemoteUpdateUserProfile remoteUpdateUserProfile,
+    required AssetUploadImage assetUploadImage,
   }) : _appUserCubit = appUserCubit,
        _userSignIn = userSignIn,
        _userSignUp = userSignUp,
@@ -59,6 +67,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _confirmVerificationCode = confirmVerificationCode,
        _resetPassword = resetPassword,
        _remoteGetUser = remoteGetUser,
+       _remoteUpdateUserProfile = remoteUpdateUserProfile,
+       _assetUploadImage = assetUploadImage,
        super(AuthInitial()) {
     on<AuthResetState>((event, emit) => emit(AuthInitial()));
     on<AuthEvent>((_, emit) => emit(AuthLoading()));
@@ -75,6 +85,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthResetPassword>(_onAuthResetPassword);
     on<AuthForgotPassword>(_onForgotPassword);
     on<UserProfileCreateSuccess>(_onUserProfileCreateSuccess);
+    on<UserAvatarProfileChanged>(_onUserAvatarProfileChanged);
+    on<EditUserProfileEvent>(_onEditUserProfileEvent);
   }
 
   void _onAuthSignOut(AuthEvent event, Emitter<AuthState> emit) async {
@@ -239,6 +251,41 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) {
     emitAuthSuccess(event.user, emit);
+  }
+
+  void _onUserAvatarProfileChanged(
+    UserAvatarProfileChanged event,
+    Emitter<AuthState> emit,
+  ) async {
+    final File? file = event.file;
+    if (file == null) {
+      emitAuthSuccess(event.user, emit);
+      return;
+    }
+    final res = await _assetUploadImage(AssetUploadImageParams(file: file));
+    res.fold((failure) => emitAuthSuccess(event.user, emit), (imageUrl) {
+      final User user = event.user.copyWith(avatarUrl: imageUrl);
+      emitAuthSuccess(user, emit);
+    });
+  }
+
+  void _onEditUserProfileEvent(
+    EditUserProfileEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    final res = await _remoteUpdateUserProfile(
+      RemoteUpdateUserProfileParams(
+        firstName: event.firstName,
+        userId: event.userId,
+        lastName: event.lastName,
+        avatarUrl: event.avatarUrl,
+      ),
+    );
+
+    res.fold(
+      (failure) => emitAuthSuccess(event.user, emit),
+      (user) => emitAuthSuccess(user, emit),
+    );
   }
 
   void emitAuthSuccess(User user, Emitter<AuthState> emit) {

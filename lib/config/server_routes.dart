@@ -28,4 +28,5 @@ class ServerRoutes {
       '/appointments/$appointmentId';
 
   String getUserById(String userId) => '/users/$userId';
+  String updateUserProfile(String userId) => '/users/profile/$userId';
 }

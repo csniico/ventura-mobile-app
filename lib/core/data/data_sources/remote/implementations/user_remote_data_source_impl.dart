@@ -27,4 +27,34 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
       return null;
     }
   }
+
+  @override
+  Future<UserModel?> updateUserProfile({
+    required String userId,
+    required String firstName,
+    String? lastName,
+    String? avatarUrl,
+  }) async {
+    try {
+      final response = await dio.patch(
+        '${routes.serverUrl}${routes.updateUserProfile(userId)}',
+        data: {
+          'firstName': firstName,
+          'lastName': lastName,
+          'avatarUrl': avatarUrl,
+        },
+      );
+      if (response.statusCode != 200) {
+        logger.error(response.data.toString());
+        return null;
+      }
+      return UserModel.fromJson(response.data);
+    } on DioException catch (e) {
+      logger.error(e.response!.data.toString());
+      return null;
+    } catch (e) {
+      logger.error(e.toString());
+      return null;
+    }
+  }
 }

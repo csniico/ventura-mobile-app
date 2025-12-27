@@ -22,6 +22,7 @@ import 'package:ventura/core/domain/use_cases/local_save_business.dart';
 import 'package:ventura/core/domain/use_cases/local_save_user.dart';
 import 'package:ventura/core/domain/use_cases/local_sign_out.dart';
 import 'package:ventura/core/domain/use_cases/remote_get_user.dart';
+import 'package:ventura/core/domain/use_cases/remote_update_user_profile.dart';
 import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.dart';
 import 'package:ventura/core/services/business_service.dart';
 import 'package:ventura/features/appointment/data/data_sources/remote/abstract_interfaces/appointment_remote_data_source.dart';
@@ -129,6 +130,9 @@ void _initAuthDependencies() {
     ..registerFactory(
       () => CreateBusinessProfile(authRepository: serviceLocator()),
     )
+    ..registerFactory(
+      () => RemoteUpdateUserProfile(userRepository: serviceLocator()),
+    )
     // BLOC
     ..registerFactory(() => AppUserCubit())
     ..registerFactory(
@@ -152,6 +156,8 @@ void _initAuthDependencies() {
         resetPassword: serviceLocator(),
         appUserCubit: serviceLocator(),
         remoteGetUser: serviceLocator(),
+        assetUploadImage: serviceLocator(),
+        remoteUpdateUserProfile: serviceLocator(),
       ),
     );
 }

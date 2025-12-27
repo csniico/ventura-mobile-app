@@ -185,7 +185,7 @@ class BusinessCreationCubit extends Cubit<BusinessCreationState> {
     if (logo == null) {
       final updatedDraft = state.draft.copyWith(
         logo: Optional(null),
-      ); // ✅ Wrap null
+      );
       emit(BusinessCreationState(draft: updatedDraft, user: state.user));
       return;
     }

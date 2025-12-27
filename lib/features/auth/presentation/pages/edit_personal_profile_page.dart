@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ventura/core/domain/entities/user_entity.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/widgets/profile_user_image.dart';
 
@@ -16,8 +17,10 @@ class EditPersonalProfilePage extends StatefulWidget {
 }
 
 class _EditPersonalProfilePageState extends State<EditPersonalProfilePage> {
-  pickImage(File pickedFile) {
-    debugPrint('pickedFile: $pickedFile');
+  pickImage(File pickedFile, User user) {
+    context.read<AuthBloc>().add(
+      UserAvatarProfileChanged(file: pickedFile, user: user),
+    );
   }
 
   @override
@@ -55,7 +58,7 @@ class _EditPersonalProfilePageState extends State<EditPersonalProfilePage> {
                                 final XFile? pickedFile = await ImagePicker()
                                     .pickImage(source: ImageSource.gallery);
                                 if (pickedFile != null) {
-                                  pickImage(File(pickedFile.path));
+                                  pickImage(File(pickedFile.path), state.user);
                                 }
                               },
                               child: Container(

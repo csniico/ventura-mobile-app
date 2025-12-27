@@ -73,4 +73,28 @@ class UserRepositoryImpl implements UserRepository {
       return left(Failure('An error occurred retrieving remote user data'));
     }
   }
+
+  @override
+  Future<Either<Failure, User>> updateUserProfile({
+    required String userId,
+    required String firstName,
+    String? lastName,
+    String? avatarUrl,
+  }) async {
+    try {
+      final res = await userRemoteDataSource.updateUserProfile(
+        userId: userId,
+        firstName: firstName,
+        lastName: lastName,
+        avatarUrl: avatarUrl,
+      );
+      if (res == null) {
+        return left(Failure('Failed to update user profile.'));
+      }
+      return right(res.toEntity());
+    } catch (e) {
+      logger.error(e.toString());
+      return left(Failure('An error occurred updating user profile'));
+    }
+  }
 }

@@ -76,3 +76,22 @@ class AuthBusinessNotRegistered extends AuthState {
 
   AuthBusinessNotRegistered({required this.user});
 }
+
+class UserProfileUpdateSuccess extends AuthState {
+  final User user;
+
+  UserProfileUpdateSuccess({required this.user});
+}
+
+class UserProfileUpdateFail extends AuthState {
+  final String message;
+
+  UserProfileUpdateFail({required this.message});
+}
+
+class UserProfileImageUploadSuccess extends AuthState {
+  final String? imageUrl;
+  final String? errorMessage;
+
+  UserProfileImageUploadSuccess({required this.imageUrl, this.errorMessage});
+}

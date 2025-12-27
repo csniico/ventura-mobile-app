@@ -104,9 +104,38 @@ class AuthResetPassword extends AuthEvent {
   });
 }
 
+class UserAvatarProfileChanged extends AuthEvent {
+  final File? file;
+  final User user;
+
+  UserAvatarProfileChanged({required this.file, required this.user});
+}
+
 class UserProfileCreateSuccess extends AuthEvent {
   final User user;
   final Business business;
 
   UserProfileCreateSuccess({required this.user, required this.business});
+}
+
+class EditUserProfileEvent extends AuthEvent {
+  final User user;
+  final String userId;
+  final String firstName;
+  final String? lastName;
+  final String? avatarUrl;
+
+  EditUserProfileEvent({
+    required this.user,
+    required this.userId,
+    required this.firstName,
+    this.lastName,
+    this.avatarUrl,
+  });
+}
+
+class UserProfileUpdated extends AuthEvent {
+  final User user;
+
+  UserProfileUpdated({required this.user});
 }
