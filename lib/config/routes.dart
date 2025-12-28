@@ -4,11 +4,16 @@ import 'package:ventura/core/presentation/pages/not_found.dart';
 import 'package:ventura/features/appointment/domain/entities/appointment_entity.dart';
 import 'package:ventura/features/appointment/presentation/pages/create_appointment_page.dart';
 import 'package:ventura/features/appointment/presentation/pages/edit_appointment_page.dart';
+import 'package:ventura/features/auth/presentation/pages/data_and_backup_page.dart';
 import 'package:ventura/features/auth/presentation/pages/edit_business_profile_page.dart';
 import 'package:ventura/features/auth/presentation/pages/edit_personal_profile_page.dart';
 import 'package:ventura/features/auth/presentation/pages/forgot_password_page.dart';
+import 'package:ventura/features/auth/presentation/pages/help_center_page.dart';
+import 'package:ventura/features/auth/presentation/pages/privacy_policy_page.dart';
+import 'package:ventura/features/auth/presentation/pages/security_page.dart';
 import 'package:ventura/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:ventura/features/auth/presentation/pages/sign_up_page.dart';
+import 'package:ventura/features/auth/presentation/pages/terms_of_service_page.dart';
 import 'package:ventura/features/auth/presentation/pages/verify_code_page.dart';
 import 'package:ventura/features/auth/presentation/pages/profile.dart';
 import 'package:ventura/features/search/presentation/pages/search_page.dart';
@@ -31,6 +36,11 @@ class AppRoutes {
   final String editAppointment = '/edit-appointment';
   final String editProfilePage = '/edit-profile-page';
   final String editBusinessPage = '/edit-business-page';
+  final String security = '/profile-security';
+  final String helpCenter = '/help-center';
+  final String termsOfService = '/terms-of-service';
+  final String privacyPolicy = '/privacy-policy';
+  final String dataAndBackup = '/data-backup';
 
   static final Map<String, WidgetBuilder> routes = {
     '/welcome': (_) => const WelcomePage(),
@@ -44,6 +54,11 @@ class AppRoutes {
     '/create-appointment': (_) => const CreateAppointmentPage(),
     '/edit-profile-page': (_) => const EditPersonalProfilePage(),
     '/edit-business-page': (_) => const EditBusinessProfilePage(),
+    '/profile-security': (_) => const SecurityPage(),
+    '/help-center': (_) => const HelpCenterPage(),
+    '/terms-of-service': (_) => const TermsOfServicePage(),
+    '/privacy-policy': (_) => const PrivacyPolicyPage(),
+    '/data-backup': (_) => const DataAndBackupPage(),
   };
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
