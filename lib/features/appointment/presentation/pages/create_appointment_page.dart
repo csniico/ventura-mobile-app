@@ -4,7 +4,6 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/common/utils/date_time_util.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
-import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';
 import 'package:ventura/features/appointment/presentation/bloc/appointment_bloc.dart';
 import 'package:ventura/features/appointment/presentation/widgets/calendar_widget.dart';
 import 'package:ventura/features/appointment/presentation/widgets/date_time_picker_card.dart';
@@ -56,21 +55,22 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
 
-  // Convert frequency string to enum
-  RecurrenceFrequency? _getFrequencyEnum(String? frequency) {
+  // Convert UI frequency string to backend format
+  String? _getBackendFrequency(String? frequency) {
     if (frequency == null) return null;
     switch (frequency) {
       case 'Daily':
-        return RecurrenceFrequency.daily;
+        return 'daily';
       case 'Weekly':
-        return RecurrenceFrequency.weekly;
+        return 'weekly';
       case 'Bi-Weekly':
+        return 'bi-weekly';
       case 'Monthly':
+        return 'monthly';
       case 'Bi-Monthly':
-      case 'Quarterly':
-        return RecurrenceFrequency.monthly;
+        return 'bi-monthly';
       case 'Yearly':
-        return RecurrenceFrequency.yearly;
+        return 'yearly';
       default:
         return null;
     }
@@ -95,19 +95,14 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
         return;
       }
 
-      RecurringSchedule? recurringSchedule;
+      DateTime? recurringUntil;
+      String? recurringFrequency;
       if (isRecurring && selectedFrequency != null) {
-        final repeatUntilDateTime = _combineDateTime(
+        recurringUntil = _combineDateTime(
           selectedRepeatUntilDate,
           selectedRepeatUntilTime,
         );
-        final frequencyEnum = _getFrequencyEnum(selectedFrequency);
-        if (frequencyEnum != null) {
-          recurringSchedule = RecurringSchedule(
-            until: repeatUntilDateTime,
-            frequency: frequencyEnum,
-          );
-        }
+        recurringFrequency = _getBackendFrequency(selectedFrequency);
       }
 
       // Dispatch event to BLoC
@@ -124,7 +119,8 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
                 ? null
                 : _descriptionController.text,
             notes: _notesController.text.isEmpty ? null : _notesController.text,
-            recurringSchedule: recurringSchedule,
+            recurringUntil: recurringUntil,
+            recurringFrequency: recurringFrequency,
           ),
         );
       }

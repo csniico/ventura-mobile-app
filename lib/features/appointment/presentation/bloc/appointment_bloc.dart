@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ventura/features/appointment/domain/entities/appointment_entity.dart';
-import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';
 import 'package:ventura/features/appointment/domain/use_cases/create_appointment.dart';
 import 'package:ventura/features/appointment/domain/use_cases/delete_appointment.dart';
 import 'package:ventura/features/appointment/domain/use_cases/get_user_appointment.dart';
@@ -53,7 +52,8 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
         businessId: event.businessId,
         description: event.description,
         notes: event.notes,
-        recurringSchedule: event.recurringSchedule,
+        recurringUntil: event.recurringUntil,
+        recurringFrequency: event.recurringFrequency,
       ),
     );
     res.fold(
@@ -76,6 +76,10 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
         isRecurring: event.isRecurring,
         userId: event.userId,
         businessId: event.businessId,
+        description: event.description,
+        notes: event.notes,
+        recurringUntil: event.recurringUntil,
+        recurringFrequency: event.recurringFrequency,
       ),
     );
 

@@ -1,7 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:ventura/core/data/models/failure.dart';
 import 'package:ventura/features/appointment/domain/entities/appointment_entity.dart';
-import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';
 
 abstract interface class AppointmentRepository {
   Future<Either<Failure, Appointment>> createAppointment({
@@ -13,7 +12,8 @@ abstract interface class AppointmentRepository {
     required String businessId,
     String? description,
     String? notes,
-    RecurringSchedule? recurringSchedule,
+    DateTime? recurringUntil,
+    String? recurringFrequency,
   });
 
   Future<Either<Failure, Appointment>> updateGoogleEventId({
@@ -33,7 +33,8 @@ abstract interface class AppointmentRepository {
     required String businessId,
     String? description,
     String? notes,
-    RecurringSchedule? recurringSchedule,
+    DateTime? recurringUntil,
+    String? recurringFrequency,
   });
 
   Future<Either<Failure, List<Appointment>>> getUserAppointments({

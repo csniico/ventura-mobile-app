@@ -1,4 +1,3 @@
-import 'package:ventura/features/appointment/data/models/recurrence_schedule_model.dart';
 import 'package:ventura/features/appointment/domain/entities/appointment_entity.dart';
 
 class AppointmentModel extends Appointment {
@@ -6,14 +5,15 @@ class AppointmentModel extends Appointment {
     required super.id,
     required super.userId,
     required super.businessId,
-    required super.googleEventId,
+    super.googleEventId,
     required super.title,
     required super.startTime,
     required super.endTime,
-    required super.description,
-    required super.notes,
+    super.description,
+    super.notes,
     required super.isRecurring,
-    required super.recurringSchedule,
+    super.recurringFrequency,
+    super.recurringUntil,
   });
 
   factory AppointmentModel.empty() {
@@ -28,7 +28,8 @@ class AppointmentModel extends Appointment {
       description: '',
       notes: '',
       isRecurring: false,
-      recurringSchedule: null,
+      recurringFrequency: null,
+      recurringUntil: null,
     );
   }
 
@@ -44,8 +45,9 @@ class AppointmentModel extends Appointment {
       description: json['description'] ?? '',
       notes: json['notes'] ?? '',
       isRecurring: json['isRecurring'] ?? false,
-      recurringSchedule: json['recurringSchedule'] != null
-          ? RecurringScheduleModel.fromJson(json['recurringSchedule'] as Map<String, dynamic>)
+      recurringFrequency: json['recurringFrequency'],
+      recurringUntil: json['recurringUntil'] != null
+          ? DateTime.parse(json['recurringUntil'])
           : null,
     );
   }
@@ -62,7 +64,8 @@ class AppointmentModel extends Appointment {
       description: appointment.description,
       notes: appointment.notes,
       isRecurring: appointment.isRecurring,
-      recurringSchedule: appointment.recurringSchedule,
+      recurringFrequency: appointment.recurringFrequency,
+      recurringUntil: appointment.recurringUntil,
     );
   }
 
@@ -78,7 +81,10 @@ class AppointmentModel extends Appointment {
       description: map['description'] ?? '',
       notes: map['notes'] ?? '',
       isRecurring: map['isRecurring'] ?? false,
-      recurringSchedule: map['recurringSchedule'],
+      recurringFrequency: map['recurringFrequency'],
+      recurringUntil: map['recurringUntil'] != null
+          ? DateTime.parse(map['recurringUntil'])
+          : null,
     );
   }
 
@@ -94,7 +100,8 @@ class AppointmentModel extends Appointment {
       'description': description,
       'notes': notes,
       'isRecurring': isRecurring,
-      'recurringSchedule': recurringSchedule,
+      'recurringFrequency': recurringFrequency,
+      'recurringUntil': recurringUntil?.toIso8601String(),
     };
   }
 
@@ -110,7 +117,8 @@ class AppointmentModel extends Appointment {
       'description': description,
       'notes': notes,
       'isRecurring': isRecurring,
-      'recurringSchedule': recurringSchedule,
+      'recurringFrequency': recurringFrequency,
+      'recurringUntil': recurringUntil?.toIso8601String(),
     };
   }
 
@@ -126,7 +134,8 @@ class AppointmentModel extends Appointment {
       description: description,
       notes: notes,
       isRecurring: isRecurring,
-      recurringSchedule: recurringSchedule,
+      recurringFrequency: recurringFrequency,
+      recurringUntil: recurringUntil,
     );
   }
 }

@@ -4,7 +4,6 @@ import 'package:ventura/config/app_logger.dart';
 import 'package:ventura/config/server_routes.dart';
 import 'package:ventura/features/appointment/data/data_sources/remote/abstract_interfaces/appointment_remote_data_source.dart';
 import 'package:ventura/features/appointment/data/models/appointment_model.dart';
-import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';
 
 class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
   final Dio dio;
@@ -23,8 +22,11 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
     required String businessId,
     String? description,
     String? notes,
-    RecurringSchedule? recurringSchedule,
+    DateTime? recurringUntil,
+    String? recurringFrequency,
   }) async {
+    logger.info(recurringUntil.toString());
+    logger.info(recurringFrequency.toString());
     try {
       final response = await dio.post(
         '${routes.serverUrl}${routes.createAppointment}',
@@ -37,10 +39,55 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
           'businessId': businessId,
           'description': description,
           'notes': notes,
-          if (isRecurring) 'recurringSchedule': recurringSchedule,
+          if (isRecurring) ...{
+            'recurringUntil': recurringUntil?.toIso8601String(),
+            'recurringFrequency': recurringFrequency,
+          },
         },
       );
       logger.info(response.toString());
+      return AppointmentModel.fromJson(response.data);
+    } on DioException catch (e) {
+      logger.error(e.response.toString());
+      return null;
+    }
+  }
+
+  @override
+  Future<AppointmentModel?> updateAppointment({
+    required String appointmentId,
+    required String title,
+    required DateTime startTime,
+    required DateTime endTime,
+    required bool isRecurring,
+    required String userId,
+    required String businessId,
+    String? description,
+    String? notes,
+    DateTime? recurringUntil,
+    String? recurringFrequency,
+  }) async {
+    logger.info(recurringUntil.toString());
+    logger.info(recurringFrequency.toString());
+    try {
+      final response = await dio.put(
+        '${routes.serverUrl}${routes.updateAppointment(appointmentId)}',
+        data: {
+          'title': title,
+          'startTime': startTime.toIso8601String(),
+          'endTime': endTime.toIso8601String(),
+          'isRecurring': isRecurring,
+          'userId': userId,
+          'businessId': businessId,
+          'description': description,
+          'notes': notes,
+          if (isRecurring) ...{
+            'recurringUntil': recurringUntil?.toIso8601String(),
+            'recurringFrequency': recurringFrequency,
+          },
+        },
+      );
+      logger.info(response.data.toString());
       return AppointmentModel.fromJson(response.data);
     } on DioException catch (e) {
       logger.error(e.response.toString());
@@ -81,7 +128,7 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
       );
       logger.info(response.data.toString());
       return List<AppointmentModel>.from(
-          response.data.map((e) => AppointmentModel.fromJson(e))
+        response.data.map((e) => AppointmentModel.fromJson(e)),
       );
     } on DioException catch (e) {
       logger.error(e.response.toString());
@@ -99,7 +146,7 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
         data: {'userId': userId},
       );
       final appointments = List<AppointmentModel>.from(
-          response.data.map((e) => AppointmentModel.fromJson(e))
+        response.data.map((e) => AppointmentModel.fromJson(e)),
       ).toList();
       return appointments;
     } on DioException catch (e) {
@@ -107,42 +154,6 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
       return null;
     } catch (e) {
       debugPrint(e.toString());
-      return null;
-    }
-  }
-
-  @override
-  Future<AppointmentModel?> updateAppointment({
-    required String appointmentId,
-    required String title,
-    required DateTime startTime,
-    required DateTime endTime,
-    required bool isRecurring,
-    required String userId,
-    required String businessId,
-    String? description,
-    String? notes,
-    RecurringSchedule? recurringSchedule,
-  }) async {
-    try {
-      final response = await dio.put(
-        '${routes.serverUrl}${routes.updateAppointment(appointmentId)}',
-        data: {
-          'title': title,
-          'startTime': startTime.toIso8601String(),
-          'endTime': endTime.toIso8601String(),
-          'isRecurring': isRecurring,
-          'userId': userId,
-          'businessId': businessId,
-          'description': description,
-          'notes': notes,
-          if (isRecurring) 'recurringSchedule': recurringSchedule,
-        },
-      );
-      logger.info(response.data.toString());
-      return AppointmentModel.fromJson(response.data);
-    } on DioException catch (e) {
-      logger.error(e.response.toString());
       return null;
     }
   }

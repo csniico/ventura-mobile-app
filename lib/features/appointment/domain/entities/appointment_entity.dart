@@ -1,30 +1,30 @@
-import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';
-
 class Appointment {
   final String id;
   final String userId;
   final String businessId;
-  final String googleEventId;
+  final String? googleEventId;
   final String title;
   final DateTime startTime;
   final DateTime endTime;
-  final String description;
-  final String notes;
+  final String? description;
+  final String? notes;
   final bool isRecurring;
-  RecurringSchedule? recurringSchedule;
+  final String? recurringFrequency;
+  final DateTime? recurringUntil;
 
   Appointment({
     required this.id,
     required this.userId,
     required this.businessId,
-    required this.googleEventId,
+    this.googleEventId,
     required this.title,
     required this.startTime,
     required this.endTime,
-    required this.description,
-    required this.notes,
+    this.description,
+    this.notes,
     required this.isRecurring,
-    this.recurringSchedule,
+    this.recurringFrequency,
+    this.recurringUntil,
   });
 
   Appointment copyWith({
@@ -38,7 +38,8 @@ class Appointment {
     String? description,
     String? notes,
     bool? isRecurring,
-    RecurringSchedule? recurringSchedule,
+    String? recurringFrequency,
+    DateTime? recurringUntil,
   }) {
     return Appointment(
       id: id ?? this.id,
@@ -51,7 +52,8 @@ class Appointment {
       description: description ?? this.description,
       notes: notes ?? this.notes,
       isRecurring: isRecurring ?? this.isRecurring,
-      recurringSchedule: recurringSchedule ?? this.recurringSchedule,
+      recurringFrequency: recurringFrequency ?? this.recurringFrequency,
+      recurringUntil: recurringUntil ?? this.recurringUntil,
     );
   }
 }

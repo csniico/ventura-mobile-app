@@ -5,7 +5,6 @@ import 'package:ventura/core/common/utils/date_time_util.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/appointment/domain/entities/appointment_entity.dart';
-import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';
 import 'package:ventura/features/appointment/presentation/bloc/appointment_bloc.dart';
 import 'package:ventura/features/appointment/presentation/widgets/calendar_widget.dart';
 import 'package:ventura/features/appointment/presentation/widgets/date_time_picker_card.dart';
@@ -53,12 +52,10 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
     // Initialize with appointment data
     _titleController = TextEditingController(text: widget.appointment.title);
     _descriptionController = TextEditingController(
-      text: widget.appointment.description.isEmpty
-          ? ''
-          : widget.appointment.description,
+      text: widget.appointment.description ?? '',
     );
     _notesController = TextEditingController(
-      text: widget.appointment.notes.isEmpty ? '' : widget.appointment.notes,
+      text: widget.appointment.notes ?? '',
     );
 
     // Initialize dates and times
@@ -70,17 +67,13 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
     // Initialize recurring settings
     isRecurring = widget.appointment.isRecurring;
 
-    if (isRecurring && widget.appointment.recurringSchedule != null) {
-      var until = widget.appointment.recurringSchedule?.until;
-      if (until != null) {
-        selectedRepeatUntilDate = until;
-        selectedRepeatUntilTime = TimeOfDay.fromDateTime(until);
-      } else {
-        selectedRepeatUntilDate = DateTime.now();
-        selectedRepeatUntilTime = TimeOfDay.now();
-      }
-      selectedFrequency = _getFrequencyString(
-        widget.appointment.recurringSchedule!.frequency,
+    if (isRecurring && widget.appointment.recurringUntil != null) {
+      selectedRepeatUntilDate = widget.appointment.recurringUntil!;
+      selectedRepeatUntilTime = TimeOfDay.fromDateTime(
+        widget.appointment.recurringUntil!,
+      );
+      selectedFrequency = _getUIFrequency(
+        widget.appointment.recurringFrequency,
       );
     } else {
       selectedRepeatUntilDate = DateTime.now();
@@ -102,36 +95,43 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
 
-  // Convert frequency enum to string
-  String? _getFrequencyString(RecurrenceFrequency? frequency) {
+  // Convert backend frequency to UI string
+  String? _getUIFrequency(String? frequency) {
     if (frequency == null) return null;
     switch (frequency) {
-      case RecurrenceFrequency.daily:
+      case 'daily':
         return 'Daily';
-      case RecurrenceFrequency.weekly:
+      case 'weekly':
         return 'Weekly';
-      case RecurrenceFrequency.monthly:
+      case 'bi-weekly':
+        return 'Bi-Weekly';
+      case 'monthly':
         return 'Monthly';
-      case RecurrenceFrequency.yearly:
+      case 'bi-monthly':
+        return 'Bi-Monthly';
+      case 'yearly':
         return 'Yearly';
+      default:
+        return null;
     }
   }
 
-  // Convert frequency string to enum
-  RecurrenceFrequency? _getFrequencyEnum(String? frequency) {
+  // Convert UI frequency string to backend format
+  String? _getBackendFrequency(String? frequency) {
     if (frequency == null) return null;
     switch (frequency) {
       case 'Daily':
-        return RecurrenceFrequency.daily;
+        return 'daily';
       case 'Weekly':
-        return RecurrenceFrequency.weekly;
+        return 'weekly';
       case 'Bi-Weekly':
+        return 'bi-weekly';
       case 'Monthly':
+        return 'monthly';
       case 'Bi-Monthly':
-      case 'Quarterly':
-        return RecurrenceFrequency.monthly;
+        return 'bi-monthly';
       case 'Yearly':
-        return RecurrenceFrequency.yearly;
+        return 'yearly';
       default:
         return null;
     }
@@ -160,19 +160,14 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
         return;
       }
 
-      RecurringSchedule? recurringSchedule;
+      DateTime? recurringUntil;
+      String? recurringFrequency;
       if (isRecurring && selectedFrequency != null) {
-        final repeatUntilDateTime = _combineDateTime(
+        recurringUntil = _combineDateTime(
           selectedRepeatUntilDate!,
           selectedRepeatUntilTime,
         );
-        final frequencyEnum = _getFrequencyEnum(selectedFrequency);
-        if (frequencyEnum != null) {
-          recurringSchedule = RecurringSchedule(
-            until: repeatUntilDateTime,
-            frequency: frequencyEnum,
-          );
-        }
+        recurringFrequency = _getBackendFrequency(selectedFrequency);
       }
 
       // Dispatch event to BLoC
@@ -190,7 +185,8 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
                 ? null
                 : _descriptionController.text,
             notes: _notesController.text.isEmpty ? null : _notesController.text,
-            recurringSchedule: recurringSchedule,
+            recurringUntil: recurringUntil,
+            recurringFrequency: recurringFrequency,
           ),
         );
       }
@@ -529,7 +525,6 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
                                   'Bi-Weekly',
                                   'Monthly',
                                   'Bi-Monthly',
-                                  'Quarterly',
                                   'Yearly',
                                 ].map((String frequency) {
                                   return DropdownMenuItem<String>(

@@ -2,7 +2,6 @@ import 'package:fpdart/fpdart.dart';
 import 'package:ventura/core/data/models/failure.dart';
 import 'package:ventura/core/domain/use_cases/use_case.dart';
 import 'package:ventura/features/appointment/domain/entities/appointment_entity.dart';
-import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';
 import 'package:ventura/features/appointment/domain/repositories/appointment_repository.dart';
 
 class CreateAppointment
@@ -24,7 +23,8 @@ class CreateAppointment
       businessId: params.businessId,
       notes: params.notes,
       description: params.description,
-      recurringSchedule: params.recurringSchedule
+      recurringFrequency: params.recurringFrequency,
+      recurringUntil: params.recurringUntil,
     );
   }
 }
@@ -38,7 +38,8 @@ class CreateAppointmentParams {
   final String businessId;
   final String? description;
   final String? notes;
-  final RecurringSchedule? recurringSchedule;
+  final DateTime? recurringUntil;
+  final String? recurringFrequency;
 
   CreateAppointmentParams({
     required this.title,
@@ -49,6 +50,7 @@ class CreateAppointmentParams {
     required this.businessId,
     this.description,
     this.notes,
-    this.recurringSchedule,
+    this.recurringUntil,
+    this.recurringFrequency,
   });
 }

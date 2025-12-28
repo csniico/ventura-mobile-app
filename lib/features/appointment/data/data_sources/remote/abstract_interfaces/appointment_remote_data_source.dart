@@ -1,5 +1,4 @@
 import 'package:ventura/features/appointment/data/models/appointment_model.dart';
-import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';
 
 abstract interface class AppointmentRemoteDataSource {
   Future<AppointmentModel?> createAppointment({
@@ -11,7 +10,8 @@ abstract interface class AppointmentRemoteDataSource {
     required String businessId,
     String? description,
     String? notes,
-    RecurringSchedule? recurringSchedule,
+    DateTime? recurringUntil,
+    String? recurringFrequency,
   });
 
   Future<AppointmentModel?> updateGoogleEventId({
@@ -31,7 +31,8 @@ abstract interface class AppointmentRemoteDataSource {
     required String businessId,
     String? description,
     String? notes,
-    RecurringSchedule? recurringSchedule,
+    DateTime? recurringUntil,
+    String? recurringFrequency,
   });
 
   Future<List<AppointmentModel>?> getUserAppointments({required String userId});

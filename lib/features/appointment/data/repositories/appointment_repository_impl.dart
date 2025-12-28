@@ -3,7 +3,6 @@ import 'package:ventura/core/data/models/failure.dart';
 import 'package:ventura/features/appointment/data/data_sources/remote/abstract_interfaces/appointment_remote_data_source.dart';
 import 'package:ventura/features/appointment/data/models/appointment_model.dart';
 import 'package:ventura/features/appointment/domain/entities/appointment_entity.dart';
-import 'package:ventura/features/appointment/domain/entities/recurrence_schedule_entity.dart';
 import 'package:ventura/features/appointment/domain/repositories/appointment_repository.dart';
 
 class AppointmentRepositoryImpl implements AppointmentRepository {
@@ -21,7 +20,8 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     required String businessId,
     String? description,
     String? notes,
-    RecurringSchedule? recurringSchedule,
+    DateTime? recurringUntil,
+    String? recurringFrequency,
   }) async {
     AppointmentModel? appointmentModel = await appointmentRemoteDataSource
         .createAppointment(
@@ -31,9 +31,47 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
           isRecurring: isRecurring,
           userId: userId,
           businessId: businessId,
+          description: description,
+          notes: notes,
+          recurringUntil: recurringUntil,
+          recurringFrequency: recurringFrequency,
         );
     if (appointmentModel == null) {
       return left(Failure('Failed to create appointment'));
+    }
+    return right(appointmentModel.toEntity());
+  }
+
+  @override
+  Future<Either<Failure, Appointment>> updateAppointment({
+    required String appointmentId,
+    required String title,
+    required DateTime startTime,
+    required DateTime endTime,
+    required bool isRecurring,
+    required String userId,
+    required String businessId,
+    String? description,
+    String? notes,
+    DateTime? recurringUntil,
+    String? recurringFrequency,
+  }) async {
+    AppointmentModel? appointmentModel = await appointmentRemoteDataSource
+        .updateAppointment(
+          appointmentId: appointmentId,
+          title: title,
+          startTime: startTime,
+          endTime: endTime,
+          isRecurring: isRecurring,
+          userId: userId,
+          businessId: businessId,
+          description: description,
+          notes: notes,
+          recurringUntil: recurringUntil,
+          recurringFrequency: recurringFrequency,
+        );
+    if (appointmentModel == null) {
+      return left(Failure('Failed to update appointment'));
     }
     return right(appointmentModel.toEntity());
   }
@@ -77,35 +115,6 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
       return left(Failure('Failed to get appointments'));
     }
     return right(appointmentModel.map((e) => e.toEntity()).toList());
-  }
-
-  @override
-  Future<Either<Failure, Appointment>> updateAppointment({
-    required String appointmentId,
-    required String title,
-    required DateTime startTime,
-    required DateTime endTime,
-    required bool isRecurring,
-    required String userId,
-    required String businessId,
-    String? description,
-    String? notes,
-    RecurringSchedule? recurringSchedule,
-  }) async {
-    AppointmentModel? appointmentModel = await appointmentRemoteDataSource
-        .updateAppointment(
-          appointmentId: appointmentId,
-          title: title,
-          startTime: startTime,
-          endTime: endTime,
-          isRecurring: isRecurring,
-          userId: userId,
-          businessId: businessId,
-        );
-    if (appointmentModel == null) {
-      return left(Failure('Failed to update appointment'));
-    }
-    return right(appointmentModel.toEntity());
   }
 
   @override
