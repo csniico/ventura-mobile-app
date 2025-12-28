@@ -21,6 +21,7 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
 
   final GoogleSignIn signIn = GoogleSignIn.instance;
   bool isLoading = false;
+  bool _isInitialized = false;
 
   String? serverUrl = dotenv.env['SERVER_URL'];
   String? clientId = dotenv.env['GOOGLE_CLIENT_ID'];
@@ -29,16 +30,26 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
   @override
   void initState() {
     super.initState();
+    _initializeGoogleSignIn();
+  }
 
-    unawaited(
-      signIn
-          .initialize(clientId: clientId, serverClientId: serverClientId)
-          .then((_) {
-            _authSubscription = signIn.authenticationEvents.listen(
-              _handleAuthEvent,
-            );
-          }),
-    );
+  Future<void> _initializeGoogleSignIn() async {
+    try {
+      await signIn.initialize(
+        clientId: clientId,
+        serverClientId: serverClientId,
+      );
+
+      _authSubscription = signIn.authenticationEvents.listen(_handleAuthEvent);
+
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+        });
+      }
+    } catch (e) {
+      debugPrint("Google Sign-In initialization error: $e");
+    }
   }
 
   @override
@@ -86,6 +97,11 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
   }
 
   Future<void> continueWithGoogle() async {
+    if (!_isInitialized) {
+      debugPrint("Google Sign-In not yet initialized");
+      return;
+    }
+
     if (mounted) {
       setState(() {
         isLoading = true;
@@ -94,6 +110,10 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
     try {
       await signIn.authenticate(scopeHint: ['email', 'profile']);
     } on GoogleSignInException catch (e) {
+      debugPrint(
+        "GoogleSignInException: code=${e.code}, description=${e.description}",
+      );
+
       // Handle cancellation silently
       if (e.code == GoogleSignInExceptionCode.canceled) {
         debugPrint("User cancelled Google Sign-in");
@@ -104,7 +124,7 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Sign-in failed: ${e.toString()}'),
+            content: Text('Sign-in failed: ${e.description ?? e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -144,7 +164,7 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
           ),
           splashFactory: NoSplash.splashFactory,
         ),
-        onPressed: isLoading || widget.state == AuthLoading()
+        onPressed: isLoading || !_isInitialized || widget.state == AuthLoading()
             ? null
             : continueWithGoogle,
         child: Row(
