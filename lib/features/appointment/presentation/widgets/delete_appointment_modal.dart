@@ -50,51 +50,17 @@ class DeleteAppointmentModal extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 24),
-
-          // Delete icon
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: Colors.red.shade50,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.delete_outline,
-              size: 32,
-              color: Colors.red,
-            ),
-          ),
           const SizedBox(height: 20),
 
-          // Title
-          Text(
-            'Delete Appointment',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[900],
-            ),
-          ),
-          const SizedBox(height: 12),
-
           // Appointment name
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
+          Text(
+            appointmentTitle,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary,
             ),
-            child: Text(
-              appointmentTitle,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[800],
-              ),
-              textAlign: TextAlign.center,
-            ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
 
@@ -124,7 +90,7 @@ class DeleteAppointmentModal extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Cancel',
+                    'No, Cancel',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -150,7 +116,7 @@ class DeleteAppointmentModal extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'Delete',
+                    'Yes, Delete',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),

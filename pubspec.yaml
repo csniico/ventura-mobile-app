@@ -2,7 +2,7 @@ name: ventura
 description: "Ventura BI mobile app"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 0.0.2+2
+version: 0.0.3+3
 
 environment:
   sdk: ^3.8.1
@@ -35,6 +35,7 @@ dependencies:
   connectivity_plus: ^7.0.0
   package_info_plus: ^9.0.0
   url_launcher: ^6.3.2
+  cached_network_image: ^3.4.1
 
 
 

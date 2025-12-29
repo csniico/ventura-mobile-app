@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ProfileCoverImage extends StatelessWidget {
@@ -25,23 +26,18 @@ class ProfileCoverImage extends StatelessWidget {
             ),
           ),
         ),
-        child: Image.network(
-          businessAvatarUrl!,
+        child: CachedNetworkImage(
+          imageUrl: businessAvatarUrl!,
           width: double.infinity,
           fit: BoxFit.cover,
           height: coverHeight,
           // This handles network failures or 404s
-          errorBuilder: (context, error, stackTrace) {
-            return _buildPlaceholder();
-          },
+          errorWidget: (context, url, error) => _buildPlaceholder(),
           // Show a loading spinner while the image downloads
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return SizedBox(
-              height: coverHeight,
-              child: const Center(child: CircularProgressIndicator()),
-            );
-          },
+          placeholder: (context, url) => SizedBox(
+            height: coverHeight,
+            child: const Center(child: CircularProgressIndicator()),
+          ),
         ),
       );
     }
