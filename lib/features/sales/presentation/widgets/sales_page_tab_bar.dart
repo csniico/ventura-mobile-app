@@ -1,3 +1,4 @@
+import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
 import 'package:flutter/material.dart';
 
 class SalesPageTabBar extends StatelessWidget {
@@ -5,31 +6,24 @@ class SalesPageTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TabBar(
-      labelPadding: const EdgeInsets.symmetric(horizontal: 20),
-      indicatorSize: TabBarIndicatorSize.tab,
-      indicator: UnderlineTabIndicator(
-        borderSide: BorderSide(
-          width: 2,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        insets: const EdgeInsets.symmetric(horizontal: 16),
+    return SegmentedTabControl(
+      barDecoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
       ),
-      labelColor: Theme.of(context).colorScheme.primary,
-      unselectedLabelColor: Colors.grey,
-      labelStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
+      indicatorPadding: EdgeInsets.all(4),
+      indicatorDecoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary,
+        borderRadius: BorderRadius.circular(12),
       ),
-      unselectedLabelStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-      ),
-      dividerColor: Colors.grey[400],
-      tabs: const [
-        Tab(text: 'Invoices'),
-        Tab(text: 'Orders'),
-        Tab(text: 'Inventory'),
+      tabTextColor: Theme.of(context).colorScheme.onSurfaceVariant,
+      selectedTabTextColor: Theme.of(context).colorScheme.onPrimary,
+      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      tabs: [
+        SegmentTab(label: 'Invoices'),
+        SegmentTab(label: 'Orders'),
+        SegmentTab(label: 'Products'),
+        SegmentTab(label: 'Customers'),
       ],
     );
   }

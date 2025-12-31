@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -20,15 +21,13 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
   Widget build(BuildContext context) {
     final darkGrey = Theme.brightnessOf(context) == Brightness.light
         ? Colors.black54
-        : Colors.white54;
+        : Colors.white24;
     final lightGrey = Theme.brightnessOf(context) == Brightness.light
         ? Colors.black12
-        : Colors.white12;
+        : Colors.white10;
 
     return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
-        // TODO: implement listener
-      },
+      listener: (context, state) {},
       builder: (context, state) {
         if (state is AuthSuccess) {
           return Padding(
@@ -39,19 +38,39 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          'Hi, ${state.user.firstName}!',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          formatWithSuffix(DateTime.now()),
-                          style: TextStyle(color: darkGrey),
+                        state.user.avatarUrl == null ||
+                                state.user.avatarUrl!.isEmpty
+                            ? _buildPlaceholder()
+                            : ClipOval(
+                                child: CachedNetworkImage(
+                                  width: 50,
+                                  height: 50,
+                                  imageUrl: state.user.avatarUrl!,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      _buildPlaceholder(),
+                                ),
+                              ),
+                        SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              state.user.firstName,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(state.user.business?.name ?? 'No Business'),
+                          ],
                         ),
                       ],
                     ),
@@ -61,13 +80,14 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: lightGrey,
+                          color: Colors.white.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         padding: EdgeInsets.all(12),
                         child: HugeIcon(
                           icon: HugeIcons.strokeRoundedSearch01,
-                          size: 24,
+                          size: 30,
+                          strokeWidth: 2,
                           color: Theme.brightnessOf(context) == Brightness.light
                               ? Colors.grey[700]
                               : Colors.grey[400],
@@ -96,5 +116,9 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
         return const Center(child: NotSignedInPage());
       },
     );
+  }
+
+  Widget _buildPlaceholder() {
+    return Image.asset('assets/images/icon.png', fit: BoxFit.cover);
   }
 }
