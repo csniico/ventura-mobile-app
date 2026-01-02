@@ -77,21 +77,21 @@ class ViewPersonalProfilePage extends StatelessWidget {
                     _buildProfileItem(
                       context,
                       icon: HugeIcons.strokeRoundedComputer,
-                      title: 'System User',
-                      value: state.user.isSystem ? 'Yes' : 'No',
+                      title: 'Profile Type',
+                      value: state.user.isSystem ? 'Owner' : 'Team Member',
                     ),
                     const SizedBox(height: 8),
                     _buildProfileItem(
                       context,
                       icon: HugeIcons.strokeRoundedCheckmarkBadge01,
-                      title: 'Active Status',
+                      title: 'Account Status',
                       value: state.user.isActive ? 'Active' : 'Inactive',
                     ),
                     const SizedBox(height: 8),
                     _buildProfileItem(
                       context,
                       icon: HugeIcons.strokeRoundedMailValidation01,
-                      title: 'Email Verified',
+                      title: 'Email Status',
                       value: state.user.isEmailVerified
                           ? 'Verified'
                           : 'Unverified',
