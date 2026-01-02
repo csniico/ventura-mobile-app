@@ -16,6 +16,8 @@ import 'package:ventura/features/auth/presentation/pages/sign_up_page.dart';
 import 'package:ventura/features/auth/presentation/pages/terms_of_service_page.dart';
 import 'package:ventura/features/auth/presentation/pages/verify_code_page.dart';
 import 'package:ventura/features/auth/presentation/pages/profile.dart';
+import 'package:ventura/features/auth/presentation/pages/view_business_profile_page.dart';
+import 'package:ventura/features/auth/presentation/pages/view_personal_profile_page.dart';
 import 'package:ventura/features/search/presentation/pages/search_page.dart';
 import 'package:ventura/features/welcome/presentation/pages/welcome_page.dart';
 
@@ -34,7 +36,9 @@ class AppRoutes {
   final String search = '/search';
   final String createAppointment = '/create-appointment';
   final String editAppointment = '/edit-appointment';
+  final String viewProfilePage = '/view-profile-page';
   final String editProfilePage = '/edit-profile-page';
+  final String viewBusinessPage = '/view-business-page';
   final String editBusinessPage = '/edit-business-page';
   final String security = '/profile-security';
   final String helpCenter = '/help-center';
@@ -53,6 +57,8 @@ class AppRoutes {
     '/search': (_) => const SearchPage(),
     '/create-appointment': (_) => const CreateAppointmentPage(),
     '/edit-profile-page': (_) => const EditPersonalProfilePage(),
+    '/view-profile-page': (_) => const ViewPersonalProfilePage(),
+    '/view-business-page': (_) => const ViewBusinessProfilePage(),
     '/edit-business-page': (_) => const EditBusinessProfilePage(),
     '/profile-security': (_) => const SecurityPage(),
     '/help-center': (_) => const HelpCenterPage(),

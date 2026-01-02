@@ -14,8 +14,8 @@ class ProfilePageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double profileHeight = 144;
-    final double coverHeight = 240;
+    final double profileHeight = 104;
+    final double coverHeight = 160;
     final double profileTopSpacing = coverHeight - (profileHeight / 2);
 
     return Container(

@@ -43,7 +43,8 @@ void main() async {
       ],
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: App()),
+        child: App(),
+      ),
     ),
   );
 }

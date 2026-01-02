@@ -61,7 +61,13 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            Text(state.user.business?.name ?? 'No Business'),
+                            if (state.user.business?.name != null) ...[
+                              state.user.business!.name.length > 30
+                                  ? Text(
+                                      '${state.user.business!.name.substring(0, 20)}...',
+                                    )
+                                  : Text(state.user.business!.name),
+                            ],
                           ],
                         ),
                       ],

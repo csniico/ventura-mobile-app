@@ -19,8 +19,12 @@ class PrivacyPolicyPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   RichText(
-                    text: const TextSpan(
-                      style: TextStyle(fontSize: 16, height: 1.5),
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1.5,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                       children: [
                         TextSpan(text: 'At '),
                         TextSpan(
@@ -33,7 +37,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 32),

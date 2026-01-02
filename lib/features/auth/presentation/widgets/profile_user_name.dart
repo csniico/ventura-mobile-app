@@ -31,10 +31,9 @@ class ProfileUserName extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
               ),
               SizedBox(width: 5),
-              Text(
-                businessName,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-              ),
+              businessName.length > 30
+                  ? Text('${businessName.substring(0, 30)}...')
+                  : Text(businessName),
             ],
           ),
         ],

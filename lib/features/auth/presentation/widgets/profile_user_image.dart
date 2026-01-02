@@ -17,7 +17,10 @@ class ProfileUserImage extends StatelessWidget {
       width: profileHeight,
       height: profileHeight,
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onPrimary,
+          width: 2,
+        ),
         shape: BoxShape.circle,
         color: Theme.of(context).colorScheme.surfaceBright,
       ),
@@ -26,9 +29,8 @@ class ProfileUserImage extends StatelessWidget {
             ? CachedNetworkImage(
                 imageUrl: imageUrl!,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => _buildPlaceholder(),
               )
             : _buildPlaceholder(),

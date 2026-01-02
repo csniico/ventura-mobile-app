@@ -21,12 +21,12 @@ List<ProfilePageSectionLists> accountManagement = [
   ProfilePageSectionLists(
     title: 'Personal Information',
     icon: HugeIcons.strokeRoundedUser,
-    route: 'edit-profile-page',
+    route: 'view-profile-page',
   ),
   ProfilePageSectionLists(
     title: 'Business Details',
     icon: HugeIcons.strokeRoundedNewOffice,
-    route: 'edit-business-page',
+    route: 'view-business-page',
   ),
   ProfilePageSectionLists(
     title: 'Change Password',

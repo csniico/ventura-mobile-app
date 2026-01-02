@@ -28,44 +28,43 @@ class ProfileSection extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
     showDialog(
       context: context,
-      builder: (_) =>
-          AlertDialog(
-            title: TextComponent(
-              text: "Are you sure you want to sign out?",
-              type: "title",
-              size: 16,
-            ),
-            content: TextComponent(
-              type: "body",
-              text:
+      builder: (_) => AlertDialog(
+        title: TextComponent(
+          text: "Are you sure you want to sign out?",
+          type: "title",
+          size: 16,
+        ),
+        content: TextComponent(
+          type: "body",
+          text:
               "Your current session will expire and you will lose data that has not been synced. Make sure you sync all data before proceeding.",
-            ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text("Cancel", style: TextStyle(fontSize: 16)),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        context.read<AuthBloc>().add(AuthSignOut());
-                      },
-                      child: Text(
-                        "Logout",
-                        style: TextStyle(color: Colors.red, fontSize: 16),
-                      ),
-                    ),
-                  ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Cancel", style: TextStyle(fontSize: 16)),
                 ),
-              ),
-            ],
+                TextButton(
+                  onPressed: () async {
+                    context.read<AuthBloc>().add(AuthSignOut());
+                  },
+                  child: Text(
+                    "Logout",
+                    style: TextStyle(color: Colors.red, fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
           ),
+        ],
+      ),
       barrierDismissible: true,
     );
   }
@@ -88,32 +87,32 @@ class ProfileSection extends StatelessWidget {
           ),
         ),
         Card(
+          elevation: 0,
           child: ListView.builder(
             padding: EdgeInsets.symmetric(horizontal: 8),
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: items.length,
-            itemBuilder: (_, index) =>
-                ListTile(
-                  onTap: () => handleOnTap(items[index], context),
-                  contentPadding: EdgeInsets.all(8),
-                  title: Text(
-                    items[index].title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: items[index].label == 'logout' ? Colors.red : null,
-                    ),
-                  ),
-                  leading: HugeIcon(
-                    icon: items[index].icon,
-                    color: items[index].label == 'logout' ? Colors.red : null,
-                  ),
-                  trailing: HugeIcon(
-                    icon: HugeIcons.strokeRoundedArrowRight01,
-                    color: items[index].label == 'logout' ? Colors.red : null,
-                  ),
+            itemBuilder: (_, index) => ListTile(
+              onTap: () => handleOnTap(items[index], context),
+              contentPadding: EdgeInsets.all(8),
+              title: Text(
+                items[index].title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: items[index].label == 'logout' ? Colors.red : null,
                 ),
+              ),
+              leading: HugeIcon(
+                icon: items[index].icon,
+                color: items[index].label == 'logout' ? Colors.red : null,
+              ),
+              trailing: HugeIcon(
+                icon: HugeIcons.strokeRoundedArrowRight01,
+                color: items[index].label == 'logout' ? Colors.red : null,
+              ),
+            ),
           ),
         ),
       ],
