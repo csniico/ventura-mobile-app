@@ -5,7 +5,6 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/config/routes.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/home/presentation/pages/not_signed_in_page.dart';
-import 'package:ventura/core/common/utils/date_time_util.dart';
 
 class HomeDashboardPage extends StatefulWidget {
   const HomeDashboardPage({super.key});
@@ -19,13 +18,6 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    final darkGrey = Theme.brightnessOf(context) == Brightness.light
-        ? Colors.black54
-        : Colors.white24;
-    final lightGrey = Theme.brightnessOf(context) == Brightness.light
-        ? Colors.black12
-        : Colors.white10;
-
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {},
       builder: (context, state) {
