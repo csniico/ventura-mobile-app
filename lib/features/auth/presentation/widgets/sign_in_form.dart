@@ -74,8 +74,6 @@ class _SignInFormState extends State<SignInForm> {
             break;
           case AuthSuccess():
             resetButtonState();
-
-            ToastService.showSuccess('Login successful!');
             Navigator.of(context).pushReplacementNamed(routes.main);
             break;
           case AuthUserForgotPassword():
