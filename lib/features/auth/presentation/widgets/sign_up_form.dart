@@ -73,12 +73,12 @@ class _SignUpFormState extends State<SignUpForm> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         switch (state) {
-          case AuthLoading():
+          case Authenticating():
             setState(() {
               _isDisabled = true;
             });
             break;
-          case AuthSignUpSuccess():
+          case SignupAwaitingEmailVerification():
             resetButtonState();
             Navigator.of(context).pushNamed(
               routes.verifyCode,

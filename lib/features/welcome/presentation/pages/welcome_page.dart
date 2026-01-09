@@ -18,7 +18,7 @@ class _WelcomeState extends State<WelcomePage> {
       body: SafeArea(
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
-            if (state is AuthLoading) {
+            if (state is Authenticating) {
               return Center(child: CircularProgressIndicator());
             }
             return Column(

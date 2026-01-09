@@ -71,7 +71,7 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
               resetButtonState();
               ToastService.showError(state.message);
               break;
-            case AuthSuccess():
+            case Authenticated():
               resetButtonState();
               ToastService.showSuccess('Password reset successfully');
               Navigator.of(context).pushAndRemoveUntil(

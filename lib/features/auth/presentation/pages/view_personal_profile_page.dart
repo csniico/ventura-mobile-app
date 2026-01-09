@@ -26,7 +26,7 @@ class ViewPersonalProfilePage extends StatelessWidget {
       ),
       body: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
-          if (state is AuthSuccess) {
+          if (state is Authenticated) {
             return SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),

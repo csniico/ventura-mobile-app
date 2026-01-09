@@ -21,7 +21,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {},
       builder: (context, state) {
-        if (state is AuthSuccess) {
+        if (state is Authenticated) {
           return Padding(
             padding: const EdgeInsets.all(14.0),
             child: Column(

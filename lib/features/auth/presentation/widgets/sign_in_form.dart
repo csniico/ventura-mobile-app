@@ -62,7 +62,7 @@ class _SignInFormState extends State<SignInForm> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         switch (state) {
-          case AuthLoading():
+          case Authenticating():
             setState(() {
               _isDisabled = true;
             });
@@ -72,16 +72,11 @@ class _SignInFormState extends State<SignInForm> {
 
             ToastService.showError(state.message);
             break;
-          case AuthSuccess():
+          case Authenticated():
             resetButtonState();
             Navigator.of(context).pushReplacementNamed(routes.main);
             break;
-          case AuthUserForgotPassword():
-            resetButtonState();
-
-            Navigator.of(context).pushNamed(routes.forgotPassword);
-            break;
-          case AuthSignUpSuccess():
+          case SignupAwaitingEmailVerification():
             resetButtonState();
             ToastService.showInfo('You need to verify your email');
             Navigator.of(context).pushNamed(

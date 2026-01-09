@@ -33,7 +33,7 @@ class _EditPersonalProfilePageState extends State<EditPersonalProfilePage> {
   void initState() {
     super.initState();
     final user = context.read<AuthBloc>().state;
-    if (user is AuthSuccess) {
+    if (user is Authenticated) {
       _fistNameController.text = user.user.firstName;
       _lastNameController.text = user.user.lastName ?? '';
     }
@@ -57,7 +57,7 @@ class _EditPersonalProfilePageState extends State<EditPersonalProfilePage> {
             // TODO: implement listener
           },
           builder: (context, state) {
-            if (state is AuthSuccess) {
+            if (state is Authenticated) {
               return Column(
                 children: [
                   //   image

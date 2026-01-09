@@ -33,7 +33,7 @@ class _ProfileState extends State<Profile> {
           }
         },
         builder: (context, state) {
-          if (state is AuthSuccess) {
+          if (state is Authenticated) {
             return SingleChildScrollView(
               child: Column(
                 children: [

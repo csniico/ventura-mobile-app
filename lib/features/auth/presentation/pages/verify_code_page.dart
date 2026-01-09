@@ -82,7 +82,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
               resetButtonState();
               ToastService.showError(state.message);
               break;
-            case AuthSuccess():
+            case Authenticated():
               resetButtonState();
               ToastService.showSuccess('Email verified successfully!');
               break;
@@ -90,9 +90,8 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
               ToastService.showSuccess('Email verified successfully');
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => CreateBusinessProfilePage(
-                    user: state.user,
-                  ),
+                  builder: (context) =>
+                      CreateBusinessProfilePage(user: state.user),
                 ),
               );
               break;
