@@ -45,7 +45,7 @@ class _CreateCustomersState extends State<CreateCustomers> {
     super.dispose();
   }
 
-  void _submitForm() {
+  void _submitForm(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       context.read<CustomerBloc>().add(
         CustomerCreateEvent(
@@ -198,7 +198,7 @@ class _CreateCustomersState extends State<CreateCustomers> {
                     ),
                     const SizedBox(height: 32),
                     ElevatedButton(
-                      onPressed: isLoading ? null : _submitForm,
+                      onPressed: isLoading ? null : () => _submitForm(context),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(

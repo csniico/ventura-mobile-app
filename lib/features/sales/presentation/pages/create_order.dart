@@ -64,7 +64,7 @@ class _CreateOrderState extends State<CreateOrder> {
     );
   }
 
-  void _submitForm() {
+  void _submitForm(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       if (_selectedCustomer == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -331,7 +331,7 @@ class _CreateOrderState extends State<CreateOrder> {
 
                     // Create Order Button
                     ElevatedButton(
-                      onPressed: isLoading ? null : _submitForm,
+                      onPressed: isLoading ? null : () => _submitForm(context),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(

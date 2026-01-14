@@ -1,73 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
-import 'package:ventura/features/sales/presentation/pages/create_invoice.dart';
 import 'package:ventura/features/sales/presentation/pages/edit_invoice.dart';
 import 'package:ventura/features/sales/presentation/pages/view_invoice.dart';
-import 'package:ventura/init_dependencies.dart';
 
-class ListInvoices extends StatefulWidget {
+class ListInvoices extends StatelessWidget {
   const ListInvoices({super.key});
 
   @override
-  State<ListInvoices> createState() => _ListInvoicesState();
-}
-
-class _ListInvoicesState extends State<ListInvoices> {
-  late String _businessId;
-
-  @override
-  void initState() {
-    super.initState();
-    _businessId = '';
-    _loadBusinessId();
-  }
-
-  Future<void> _loadBusinessId() async {
-    final user = await UserService().getUser();
-    if (user != null) {
-      setState(() {
-        _businessId = user.businessId;
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          serviceLocator<InvoiceBloc>()
-            ..add(InvoiceGetListEvent(businessId: _businessId)),
-      child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: AppBar(
-          title: const Text('Invoices'),
-          actions: [
-            IconButton(
-              icon: HugeIcon(
-                icon: HugeIcons.strokeRoundedFile01,
-                color: Theme.of(context).iconTheme.color,
-              ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const CreateInvoice(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-        body: BlocBuilder<InvoiceBloc, InvoiceState>(
-          builder: (context, state) {
-            if (state is InvoiceLoadingState) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is InvoiceListLoadedState) {
-              final invoices = state.invoices;
-              if (invoices.isEmpty) {
-                return Center(
+    return BlocBuilder<InvoiceBloc, InvoiceState>(
+      builder: (context, state) {
+        if (state is InvoiceLoadingState) {
+          return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: const [
+              SizedBox(height: 200),
+              Center(child: CircularProgressIndicator()),
+            ],
+          );
+        } else if (state is InvoiceListLoadedState) {
+          final invoices = state.invoices;
+          if (invoices.isEmpty) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                const SizedBox(height: 100),
+                Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -91,63 +51,67 @@ class _ListInvoicesState extends State<ListInvoices> {
                       ),
                     ],
                   ),
-                );
-              }
-              return ListView.builder(
-                itemCount: invoices.length,
-                itemBuilder: (context, index) {
-                  final invoice = invoices[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                ),
+              ],
+            );
+          }
+          return ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: invoices.length,
+            itemBuilder: (context, index) {
+              final invoice = invoices[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: ListTile(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ViewInvoice(invoiceId: invoice.id),
+                      ),
+                    );
+                  },
+                  leading: CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: HugeIcon(
+                      icon: HugeIcons.strokeRoundedFile01,
+                      color: Colors.white,
+                      size: 20,
                     ),
-                    child: ListTile(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ViewInvoice(invoiceId: invoice.id),
-                          ),
-                        );
-                      },
-                      leading: CircleAvatar(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        child: HugeIcon(
-                          icon: HugeIcons.strokeRoundedFile01,
-                          color: Colors.white,
-                          size: 20,
+                  ),
+                  title: Text('Invoice #${invoice.invoiceNumber}'),
+                  subtitle: Text(
+                    '\$${invoice.totalAmount.toStringAsFixed(2)} • ${invoice.status.name}',
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: HugeIcon(
+                          icon: HugeIcons.strokeRoundedPencilEdit02,
+                          color: Theme.of(context).iconTheme.color,
                         ),
-                      ),
-                      title: Text('Invoice #${invoice.invoiceNumber}'),
-                      subtitle: Text(
-                        '\$${invoice.totalAmount.toStringAsFixed(2)} • ${invoice.status.name}',
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: HugeIcon(
-                              icon: HugeIcons.strokeRoundedPencilEdit02,
-                              color: Theme.of(context).iconTheme.color,
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  EditInvoice(invoiceId: invoice.id),
                             ),
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditInvoice(invoiceId: invoice.id),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    ),
-                  );
-                },
+                    ],
+                  ),
+                ),
               );
-            } else if (state is InvoiceErrorState) {
-              return Center(
+            },
+          );
+        } else if (state is InvoiceErrorState) {
+          return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              const SizedBox(height: 100),
+              Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -164,30 +128,38 @@ class _ListInvoicesState extends State<ListInvoices> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      state.message,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).disabledColor,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: Text(
+                        state.message,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).disabledColor,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<InvoiceBloc>().add(
-                          InvoiceGetListEvent(businessId: _businessId),
-                        );
-                      },
-                      child: const Text('Retry'),
+                    Text(
+                      'Pull to refresh',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).disabledColor,
+                      ),
                     ),
                   ],
                 ),
-              );
-            }
-            return const SizedBox.shrink();
-          },
-        ),
-      ),
+              ),
+            ],
+          );
+        }
+        // Initial state - show empty scrollable for pull to refresh
+        return ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: const [
+            SizedBox(height: 200),
+            Center(child: CircularProgressIndicator()),
+          ],
+        );
+      },
     );
   }
 }

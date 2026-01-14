@@ -31,7 +31,7 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
         },
       );
       logger.info(response.data.toString());
-      return InvoiceModel.fromJson(response.data);
+      return InvoiceModel.fromJson(response.data['data']);
     } on DioException catch (e) {
       logger.error(e.response.toString());
       return null;
@@ -59,7 +59,7 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
       );
       logger.info(response.data.toString());
       return List<InvoiceModel>.from(
-        response.data.map((e) => InvoiceModel.fromJson(e)),
+        response.data['data'].map((e) => InvoiceModel.fromJson(e)),
       );
     } on DioException catch (e) {
       logger.error(e.response.toString());
@@ -85,7 +85,7 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
       );
       logger.info(response.data.toString());
       return List<InvoiceModel>.from(
-        response.data.map((e) => InvoiceModel.fromJson(e)),
+        response.data['data'].map((e) => InvoiceModel.fromJson(e)),
       );
     } on DioException catch (e) {
       logger.error(e.response.toString());
@@ -104,7 +104,7 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
         queryParameters: {'businessId': businessId},
       );
       logger.info(response.data.toString());
-      return InvoiceModel.fromJson(response.data);
+      return InvoiceModel.fromJson(response.data['data']);
     } on DioException catch (e) {
       logger.error(e.response.toString());
       return null;
@@ -130,7 +130,7 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
         },
       );
       logger.info(response.data.toString());
-      return InvoiceModel.fromJson(response.data);
+      return InvoiceModel.fromJson(response.data['data']);
     } on DioException catch (e) {
       logger.error(e.response.toString());
       return null;
@@ -150,7 +150,7 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
         data: {'status': status},
       );
       logger.info(response.data.toString());
-      return InvoiceModel.fromJson(response.data);
+      return InvoiceModel.fromJson(response.data['data']);
     } on DioException catch (e) {
       logger.error(e.response.toString());
       return null;

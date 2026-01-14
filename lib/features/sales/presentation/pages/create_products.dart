@@ -49,7 +49,7 @@ class _CreateProductsState extends State<CreateProducts> {
     super.dispose();
   }
 
-  void _submitForm() {
+  void _submitForm(BuildContext context) {
     if (_formKey.currentState?.validate() ?? false) {
       final name = _nameController.text.trim();
       final price = double.tryParse(_priceController.text.trim()) ?? 0.0;
@@ -93,7 +93,7 @@ class _CreateProductsState extends State<CreateProducts> {
                     icon: HugeIcons.strokeRoundedTick02,
                     color: Theme.of(context).iconTheme.color,
                   ),
-                  onPressed: _submitForm,
+                  onPressed: () => _submitForm(context),
                 );
               },
             ),

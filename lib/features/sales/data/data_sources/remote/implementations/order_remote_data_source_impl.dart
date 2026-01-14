@@ -54,8 +54,9 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
         },
       );
       logger.info(response.data.toString());
+      final ordersData = response.data['data'] as List;
       return List<OrderModel>.from(
-        response.data.map((e) => OrderModel.fromJson(e)),
+        ordersData.map((e) => OrderModel.fromJson(e)),
       );
     } on DioException catch (e) {
       logger.error(e.response.toString());

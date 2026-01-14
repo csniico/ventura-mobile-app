@@ -51,6 +51,58 @@ import 'package:ventura/features/auth/domain/use_cases/user_sign_in_with_google.
 import 'package:ventura/features/auth/domain/use_cases/user_sign_up.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/cubit/business_creation_cubit.dart';
+import 'package:ventura/features/sales/data/data_sources/remote/abstract_interfaces/customer_remote_data_source.dart';
+import 'package:ventura/features/sales/data/data_sources/remote/abstract_interfaces/invoice_remote_data_source.dart';
+import 'package:ventura/features/sales/data/data_sources/remote/abstract_interfaces/order_remote_data_source.dart';
+import 'package:ventura/features/sales/data/data_sources/remote/abstract_interfaces/product_remote_data_source.dart';
+import 'package:ventura/features/sales/data/data_sources/remote/abstract_interfaces/service_remote_data_source.dart';
+import 'package:ventura/features/sales/data/data_sources/remote/implementations/customer_remote_data_source_impl.dart';
+import 'package:ventura/features/sales/data/data_sources/remote/implementations/invoice_remote_data_source_impl.dart';
+import 'package:ventura/features/sales/data/data_sources/remote/implementations/order_remote_data_source_impl.dart';
+import 'package:ventura/features/sales/data/data_sources/remote/implementations/product_remote_data_source_impl.dart';
+import 'package:ventura/features/sales/data/data_sources/remote/implementations/service_remote_data_source_impl.dart';
+import 'package:ventura/features/sales/data/repositories/customer_repository_impl.dart';
+import 'package:ventura/features/sales/data/repositories/invoice_repository_impl.dart';
+import 'package:ventura/features/sales/data/repositories/order_repository_impl.dart';
+import 'package:ventura/features/sales/data/repositories/product_repository_impl.dart';
+import 'package:ventura/features/sales/data/repositories/service_repository_impl.dart';
+import 'package:ventura/features/sales/domain/repositories/customer_repository.dart';
+import 'package:ventura/features/sales/domain/repositories/invoice_repository.dart';
+import 'package:ventura/features/sales/domain/repositories/order_repository.dart';
+import 'package:ventura/features/sales/domain/repositories/product_repository.dart';
+import 'package:ventura/features/sales/domain/repositories/service_repository.dart';
+import 'package:ventura/features/sales/domain/use_cases/create_customer.dart';
+import 'package:ventura/features/sales/domain/use_cases/create_invoice.dart';
+import 'package:ventura/features/sales/domain/use_cases/create_order.dart';
+import 'package:ventura/features/sales/domain/use_cases/create_product.dart';
+import 'package:ventura/features/sales/domain/use_cases/create_service.dart';
+import 'package:ventura/features/sales/domain/use_cases/delete_customer.dart';
+import 'package:ventura/features/sales/domain/use_cases/delete_product.dart';
+import 'package:ventura/features/sales/domain/use_cases/delete_service.dart';
+import 'package:ventura/features/sales/domain/use_cases/get_customer_by_id.dart';
+import 'package:ventura/features/sales/domain/use_cases/get_customer_invoices.dart';
+import 'package:ventura/features/sales/domain/use_cases/get_customer_orders.dart';
+import 'package:ventura/features/sales/domain/use_cases/get_customers.dart';
+import 'package:ventura/features/sales/domain/use_cases/get_invoice_by_id.dart';
+import 'package:ventura/features/sales/domain/use_cases/get_invoices.dart';
+import 'package:ventura/features/sales/domain/use_cases/get_order_by_id.dart';
+import 'package:ventura/features/sales/domain/use_cases/get_order_stats.dart';
+import 'package:ventura/features/sales/domain/use_cases/get_orders.dart';
+import 'package:ventura/features/sales/domain/use_cases/get_product_by_id.dart';
+import 'package:ventura/features/sales/domain/use_cases/get_service_by_id.dart';
+import 'package:ventura/features/sales/domain/use_cases/search_orders.dart';
+import 'package:ventura/features/sales/domain/use_cases/search_resources.dart';
+import 'package:ventura/features/sales/domain/use_cases/update_customer.dart';
+import 'package:ventura/features/sales/domain/use_cases/update_invoice_payment.dart';
+import 'package:ventura/features/sales/domain/use_cases/update_invoice_status.dart';
+import 'package:ventura/features/sales/domain/use_cases/update_order_status.dart';
+import 'package:ventura/features/sales/domain/use_cases/update_product.dart';
+import 'package:ventura/features/sales/domain/use_cases/update_service.dart';
+import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
+import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
+import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
+import 'package:ventura/features/sales/presentation/bloc/product_bloc.dart';
+import 'package:ventura/features/sales/presentation/bloc/service_bloc.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -59,6 +111,7 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton<Dio>(() => NetworkModule.instance.dio);
   _initAuthDependencies();
   _initAppointmentDependencies();
+  _initSalesDependencies();
   serviceLocator.registerLazySingleton(() => UserService());
   serviceLocator.registerLazySingleton(() => BusinessService());
 }
@@ -198,6 +251,142 @@ void _initAppointmentDependencies() {
         updateGoogleEventId: serviceLocator(),
         getUserAppointment: serviceLocator(),
         deleteAppointment: serviceLocator(),
+      ),
+    );
+}
+
+void _initSalesDependencies() {
+  serviceLocator
+    // DATA SOURCES
+    ..registerFactory<CustomerRemoteDataSource>(
+      () => CustomerRemoteDataSourceImpl(dio: serviceLocator()),
+    )
+    ..registerFactory<InvoiceRemoteDataSource>(
+      () => InvoiceRemoteDataSourceImpl(dio: serviceLocator()),
+    )
+    ..registerFactory<OrderRemoteDataSource>(
+      () => OrderRemoteDataSourceImpl(dio: serviceLocator()),
+    )
+    ..registerFactory<ProductRemoteDataSource>(
+      () => ProductRemoteDataSourceImpl(dio: serviceLocator()),
+    )
+    ..registerFactory<ServiceRemoteDataSource>(
+      () => ServiceRemoteDataSourceImpl(dio: serviceLocator()),
+    )
+    // REPOSITORIES
+    ..registerFactory<CustomerRepository>(
+      () => CustomerRepositoryImpl(customerRemoteDataSource: serviceLocator()),
+    )
+    ..registerFactory<InvoiceRepository>(
+      () => InvoiceRepositoryImpl(invoiceRemoteDataSource: serviceLocator()),
+    )
+    ..registerFactory<OrderRepository>(
+      () => OrderRepositoryImpl(orderRemoteDataSource: serviceLocator()),
+    )
+    ..registerFactory<ProductRepository>(
+      () => ProductRepositoryImpl(productRemoteDataSource: serviceLocator()),
+    )
+    ..registerFactory<ServiceRepository>(
+      () => ServiceRepositoryImpl(serviceRemoteDataSource: serviceLocator()),
+    )
+    // USE CASES - Customer
+    ..registerFactory(() => GetCustomers(customerRepository: serviceLocator()))
+    ..registerFactory(
+      () => GetCustomerById(customerRepository: serviceLocator()),
+    )
+    ..registerFactory(
+      () => CreateCustomer(customerRepository: serviceLocator()),
+    )
+    ..registerFactory(
+      () => UpdateCustomer(customerRepository: serviceLocator()),
+    )
+    ..registerFactory(
+      () => DeleteCustomer(customerRepository: serviceLocator()),
+    )
+    // USE CASES - Invoice
+    ..registerFactory(() => CreateInvoice(invoiceRepository: serviceLocator()))
+    ..registerFactory(() => GetInvoices(invoiceRepository: serviceLocator()))
+    ..registerFactory(
+      () => GetCustomerInvoices(invoiceRepository: serviceLocator()),
+    )
+    ..registerFactory(() => GetInvoiceById(invoiceRepository: serviceLocator()))
+    ..registerFactory(
+      () => UpdateInvoicePayment(invoiceRepository: serviceLocator()),
+    )
+    ..registerFactory(
+      () => UpdateInvoiceStatus(invoiceRepository: serviceLocator()),
+    )
+    // USE CASES - Order
+    ..registerFactory(() => CreateOrder(orderRepository: serviceLocator()))
+    ..registerFactory(() => GetOrders(orderRepository: serviceLocator()))
+    ..registerFactory(() => SearchOrders(orderRepository: serviceLocator()))
+    ..registerFactory(() => GetOrderStats(orderRepository: serviceLocator()))
+    ..registerFactory(
+      () => GetCustomerOrders(orderRepository: serviceLocator()),
+    )
+    ..registerFactory(() => GetOrderById(orderRepository: serviceLocator()))
+    ..registerFactory(
+      () => UpdateOrderStatus(orderRepository: serviceLocator()),
+    )
+    // USE CASES - Product
+    ..registerFactory(
+      () => SearchResources(productRepository: serviceLocator()),
+    )
+    ..registerFactory(() => GetProductById(productRepository: serviceLocator()))
+    ..registerFactory(() => CreateProduct(productRepository: serviceLocator()))
+    ..registerFactory(() => UpdateProduct(productRepository: serviceLocator()))
+    ..registerFactory(() => DeleteProduct(productRepository: serviceLocator()))
+    // USE CASES - Service
+    ..registerFactory(() => GetServiceById(serviceRepository: serviceLocator()))
+    ..registerFactory(() => CreateService(serviceRepository: serviceLocator()))
+    ..registerFactory(() => UpdateService(serviceRepository: serviceLocator()))
+    ..registerFactory(() => DeleteService(serviceRepository: serviceLocator()))
+    // BLOCS
+    ..registerLazySingleton(
+      () => CustomerBloc(
+        getCustomers: serviceLocator(),
+        getCustomerById: serviceLocator(),
+        createCustomer: serviceLocator(),
+        updateCustomer: serviceLocator(),
+        deleteCustomer: serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => InvoiceBloc(
+        createInvoice: serviceLocator(),
+        getInvoices: serviceLocator(),
+        getCustomerInvoices: serviceLocator(),
+        getInvoiceById: serviceLocator(),
+        updateInvoicePayment: serviceLocator(),
+        updateInvoiceStatus: serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => OrderBloc(
+        createOrder: serviceLocator(),
+        getOrders: serviceLocator(),
+        searchOrders: serviceLocator(),
+        getOrderStats: serviceLocator(),
+        getCustomerOrders: serviceLocator(),
+        getOrderById: serviceLocator(),
+        updateOrderStatus: serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => ProductBloc(
+        searchResources: serviceLocator(),
+        getProductById: serviceLocator(),
+        createProduct: serviceLocator(),
+        updateProduct: serviceLocator(),
+        deleteProduct: serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => ServiceBloc(
+        getServiceById: serviceLocator(),
+        createService: serviceLocator(),
+        updateService: serviceLocator(),
+        deleteService: serviceLocator(),
       ),
     );
 }

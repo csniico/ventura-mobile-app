@@ -28,8 +28,9 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
         },
       );
       logger.info(response.data.toString());
+      final customersData = response.data['customers'] as List;
       return List<CustomerModel>.from(
-        response.data.map((e) => CustomerModel.fromJson(e)),
+        customersData.map((e) => CustomerModel.fromJson(e)),
       );
     } on DioException catch (e) {
       logger.error(e.response.toString());
