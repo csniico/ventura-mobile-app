@@ -33,18 +33,20 @@ class _ProfileState extends State<Profile> {
           }
         },
         builder: (context, state) {
-          if (state is AuthSuccess) {
+          if (state is Authenticated) {
             return SingleChildScrollView(
               child: Column(
                 children: [
                   ProfilePageHeader(
-                    businessAvatarUrl: state.user.business!.logo,
+                    businessAvatarUrl: state.user.business?.logo,
                     userAvatarUrl: state.user.avatarUrl,
                   ),
                   // user name and business name
                   ProfileUserName(
-                    businessName: state.user.business!.name,
-                    userName: '${state.user.firstName} ${state.user.lastName}',
+                    businessName: state.user.business?.name ?? '',
+                    userName:
+                        '${state.user.firstName} ${state.user.lastName ?? ''}'
+                            .trim(),
                   ),
                   SizedBox(height: 40),
                   Padding(

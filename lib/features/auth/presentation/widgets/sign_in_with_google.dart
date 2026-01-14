@@ -164,7 +164,8 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
           ),
           splashFactory: NoSplash.splashFactory,
         ),
-        onPressed: isLoading || !_isInitialized || widget.state == AuthLoading()
+        onPressed:
+            isLoading || !_isInitialized || widget.state == Authenticating()
             ? null
             : continueWithGoogle,
         child: Row(

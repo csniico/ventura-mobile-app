@@ -24,7 +24,7 @@ class App extends StatelessWidget {
       themeMode: ThemeMode.system,
       home: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthSuccess) {
+          if (state is Authenticated) {
             debugPrint('User is authenticated');
             context.read<AppUserCubit>().updateUser(state.user);
             navigatorKey.currentState?.pushNamedAndRemoveUntil(
@@ -37,7 +37,7 @@ class App extends StatelessWidget {
         },
         builder: (context, state) {
           switch (state) {
-            case AuthSuccess():
+            case Authenticated():
               return const MainScreen();
             default:
               return const WelcomePage();

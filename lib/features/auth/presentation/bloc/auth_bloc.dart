@@ -71,7 +71,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _assetUploadImage = assetUploadImage,
        super(AuthInitial()) {
     on<AuthResetState>((event, emit) => emit(AuthInitial()));
-    on<AuthEvent>((_, emit) => emit(AuthLoading()));
+    on<AuthEvent>((_, emit) => emit(Authenticating()));
     on<AppStarted>(_onAppStarted);
     on<AuthSignUp>(_onAuthSignUp);
     on<AuthSignIn>(_onAuthSignIn);
@@ -83,7 +83,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       _onAuthResetPasswordConfirmVerificationCode,
     );
     on<AuthResetPassword>(_onAuthResetPassword);
-    on<AuthForgotPassword>(_onForgotPassword);
     on<UserProfileCreateSuccess>(_onUserProfileCreateSuccess);
     on<UserAvatarProfileChanged>(_onUserAvatarProfileChanged);
     on<UserFirstNameChanged>(_onUserFirstNameChanged);
@@ -111,7 +110,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     res.fold((failure) => emit(AuthFailure(failure.message)), (user) {
       _localSaveUser(UserParams(user: user.user));
       _appUserCubit.updateUser(user.user);
-      emit(AuthSignUpSuccess(user));
+      emit(SignupAwaitingEmailVerification(user));
     });
   }
 
@@ -130,7 +129,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final bool connected = await InternetService().isUserConnected();
     if (!connected) {
       logger.info('user not connected to the internet, return local user');
-      emitAuthSuccess(user, emit);
+      emitAuthenticated(user, emit);
       return;
     }
 
@@ -141,7 +140,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     remoteRes.fold(
       (l) => emit(AuthFailure(l.message)),
-      (user) => emitAuthSuccess(user, emit),
+      (user) => emitAuthenticated(user, emit),
     );
   }
 
@@ -151,7 +150,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
     res.fold(
       (l) => emit(AuthFailure(l.message)),
-      (user) => emitAuthSuccess(user, emit),
+      (user) => emitAuthenticated(user, emit),
     );
   }
 
@@ -170,7 +169,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
     res.fold(
       (l) => emit(AuthFailure(l.message)),
-      (user) => emitAuthSuccess(user, emit),
+      (user) => emitAuthenticated(user, emit),
     );
   }
 
@@ -187,15 +186,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
     res.fold(
       (l) => emit(AuthFailure(l.message)),
-      (user) => emitAuthSuccess(user, emit),
+      (user) => emitAuthenticated(user, emit),
     );
-  }
-
-  void _onForgotPassword(
-    AuthForgotPassword event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(AuthUserForgotPassword());
   }
 
   void _onAuthVerifyEmail(
@@ -244,7 +236,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
     res.fold(
       (failure) => emit(AuthFailure(failure.message)),
-      (user) => emitAuthSuccess(user, emit),
+      (user) => emitAuthenticated(user, emit),
     );
   }
 
@@ -256,7 +248,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       businessId: event.business.id,
       business: event.business,
     );
-    emitAuthSuccess(user, emit);
+    emitAuthenticated(user, emit);
   }
 
   void _onUserAvatarProfileChanged(
@@ -265,13 +257,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     final File? file = event.file;
     if (file == null) {
-      emitAuthSuccess(event.user, emit);
+      emitAuthenticated(event.user, emit);
       return;
     }
     final res = await _assetUploadImage(AssetUploadImageParams(file: file));
-    res.fold((failure) => emitAuthSuccess(event.user, emit), (imageUrl) {
+    res.fold((failure) => emitAuthenticated(event.user, emit), (imageUrl) {
       final User user = event.user.copyWith(avatarUrl: imageUrl);
-      emitAuthSuccess(user, emit);
+      emitAuthenticated(user, emit);
     });
   }
 
@@ -282,7 +274,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     logger.info('first name changed to ${event.firstName}');
     final User user = event.user.copyWith(firstName: event.firstName);
     logger.info('Updated user first name to ${user.firstName}');
-    emitAuthSuccess(user, emit);
+    emitAuthenticated(user, emit);
   }
 
   void _onUserLastNameChanged(
@@ -290,7 +282,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) {
     final User user = event.user.copyWith(lastName: event.lastName);
-    emitAuthSuccess(user, emit);
+    emitAuthenticated(user, emit);
   }
 
   void _onEditUserProfileEvent(
@@ -307,18 +299,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     res.fold(
-      (failure) => emitAuthSuccess(event.user, emit),
-      (user) => emitAuthSuccess(user, emit),
+      (failure) => emitAuthenticated(event.user, emit),
+      (user) => emitAuthenticated(user, emit),
     );
   }
 
-  void emitAuthSuccess(User user, Emitter<AuthState> emit) {
+  void emitAuthenticated(User user, Emitter<AuthState> emit) {
     _localSaveUser(UserParams(user: user));
     _appUserCubit.updateUser(user);
     if (!user.isEmailVerified) {
       logger.error('Email is not verified for user ${user.email}');
       return emit(
-        AuthSignUpSuccess(ServerSignUp(user: user, shortToken: 'login')),
+        SignupAwaitingEmailVerification(
+          ServerSignUp(user: user, shortToken: 'login'),
+        ),
       );
     }
     if (user.businessId.isEmpty) {
@@ -326,6 +320,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       return emit(AuthBusinessNotRegistered(user: user));
     }
 
-    emit(AuthSuccess(user));
+    emit(Authenticated(user));
   }
 }

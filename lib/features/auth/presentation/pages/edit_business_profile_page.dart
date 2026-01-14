@@ -13,7 +13,7 @@ class EditBusinessProfilePage extends StatelessWidget {
       body: SafeArea(
         child: BlocConsumer<AuthBloc, AuthState>(
           builder: (_, state) {
-            if (state is AuthSuccess) {
+            if (state is Authenticated) {
               return CreateBusinessProfilePage(user: state.user);
             }
             return const Center(child: CircularProgressIndicator());

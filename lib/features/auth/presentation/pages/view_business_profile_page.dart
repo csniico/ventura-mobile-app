@@ -27,7 +27,7 @@ class ViewBusinessProfilePage extends StatelessWidget {
       body: SingleChildScrollView(
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
-            if (state is AuthSuccess) {
+            if (state is Authenticated) {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,

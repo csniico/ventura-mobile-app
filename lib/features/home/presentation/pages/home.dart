@@ -15,7 +15,7 @@ class Home extends StatelessWidget {
         debugPrint(state.toString());
       },
       builder: (context, state) {
-        if (state is AuthSuccess) {
+        if (state is Authenticated) {
           return HomeDashboardPage();
         }
         if (state is BusinessCreateSuccess) {
