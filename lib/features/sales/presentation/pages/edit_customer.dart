@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
+import 'package:ventura/features/sales/presentation/widgets/text_input_component.dart';
 import 'package:ventura/init_dependencies.dart';
 
 class EditCustomer extends StatefulWidget {
@@ -123,18 +124,11 @@ class _EditCustomerState extends State<EditCustomer> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TextFormField(
+                    TextInputComponent(
+                      title: 'Customer Name *',
+                      hintText: 'eg, Jane Doe',
                       controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText: 'Customer Name *',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedUser,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                      onSaved: (_) {},
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Customer name is required';
@@ -148,18 +142,11 @@ class _EditCustomerState extends State<EditCustomer> {
                       textInputAction: TextInputAction.next,
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    TextInputComponent(
+                      title: 'Email',
+                      hintText: 'example@example.com',
                       controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedMail01,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                      onSaved: (_) {},
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value != null && value.isNotEmpty) {
@@ -176,35 +163,21 @@ class _EditCustomerState extends State<EditCustomer> {
                       textInputAction: TextInputAction.next,
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    TextInputComponent(
+                      title: 'Phone',
+                      hintText: '0551234567',
                       controller: _phoneController,
-                      decoration: InputDecoration(
-                        labelText: 'Phone',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedCall,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                      onSaved: (_) {},
                       keyboardType: TextInputType.phone,
                       enabled: !isLoading,
                       textInputAction: TextInputAction.next,
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    TextInputComponent(
+                      title: 'Notes',
+                      hintText: 'eg. Preferred contact time...',
                       controller: _notesController,
-                      decoration: InputDecoration(
-                        labelText: 'Notes',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedNote,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                      onSaved: (_) {},
                       maxLines: 3,
                       enabled: !isLoading,
                       textInputAction: TextInputAction.done,
@@ -212,12 +185,6 @@ class _EditCustomerState extends State<EditCustomer> {
                     const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: isLoading ? null : _submitForm,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
                       child: isLoading
                           ? const SizedBox(
                               height: 20,

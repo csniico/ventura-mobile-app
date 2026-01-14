@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/edit_invoice.dart';
 import 'package:ventura/features/sales/presentation/pages/view_invoice.dart';
@@ -61,13 +62,13 @@ class ListInvoices extends StatelessWidget {
             itemBuilder: (context, index) {
               final invoice = invoices[index];
               return Card(
+                elevation: 0,
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) =>
-                            ViewInvoice(invoiceId: invoice.id),
+                        builder: (context) => ViewInvoice(invoice: invoice),
                       ),
                     );
                   },
@@ -82,25 +83,6 @@ class ListInvoices extends StatelessWidget {
                   title: Text('Invoice #${invoice.invoiceNumber}'),
                   subtitle: Text(
                     '\$${invoice.totalAmount.toStringAsFixed(2)} • ${invoice.status.name}',
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedPencilEdit02,
-                          color: Theme.of(context).iconTheme.color,
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  EditInvoice(invoiceId: invoice.id),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
                   ),
                 ),
               );

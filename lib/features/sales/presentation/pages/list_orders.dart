@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/domain/entities/order_status.dart';
 import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/view_order.dart';
@@ -109,6 +110,14 @@ class ListOrders extends StatelessWidget {
                               builder: (context) => const CreateOrder(),
                             ),
                           );
+                          if (context.mounted) {
+                            final businessId = UserService().businessId;
+                            if (businessId != null) {
+                              context.read<OrderBloc>().add(
+                                OrderGetListEvent(businessId: businessId),
+                              );
+                            }
+                          }
                         },
                         child: const Text('Create your first order'),
                       ),
@@ -121,19 +130,18 @@ class ListOrders extends StatelessWidget {
 
           return ListView.separated(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
             itemCount: state.orders.length,
             separatorBuilder: (context, index) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final order = state.orders[index];
 
               return Card(
-                elevation: 2,
+                elevation: 0,
                 child: ListTile(
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => ViewOrder(orderId: order.id),
+                        builder: (context) => ViewOrder(order: order),
                       ),
                     );
                   },
@@ -196,24 +204,6 @@ class ListOrders extends StatelessWidget {
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  trailing: PopupMenuButton<String>(
-                    icon: HugeIcon(
-                      icon: HugeIcons.strokeRoundedMoreVertical,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    onSelected: (value) async {
-                      if (value == 'edit') {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => EditOrder(orderId: order.id),
-                          ),
-                        );
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(value: 'edit', child: Text('Edit')),
                     ],
                   ),
                 ),

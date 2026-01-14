@@ -5,7 +5,6 @@ import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/view_customer.dart';
 import 'package:ventura/features/sales/presentation/pages/create_customers.dart';
-import 'package:ventura/features/sales/presentation/pages/edit_customer.dart';
 
 class ListCustomers extends StatelessWidget {
   const ListCustomers({super.key});
@@ -93,6 +92,14 @@ class ListCustomers extends StatelessWidget {
                               builder: (context) => const CreateCustomers(),
                             ),
                           );
+                          if (context.mounted) {
+                            final businessId = UserService().businessId;
+                            if (businessId != null) {
+                              context.read<CustomerBloc>().add(
+                                CustomerGetEvent(businessId: businessId),
+                              );
+                            }
+                          }
                         },
                         child: const Text('Create your first customer'),
                       ),
@@ -111,13 +118,12 @@ class ListCustomers extends StatelessWidget {
             itemBuilder: (context, index) {
               final customer = state.customers[index];
               return Card(
-                elevation: 2,
+                elevation: 0,
                 child: ListTile(
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) =>
-                            ViewCustomer(customerId: customer.id),
+                        builder: (context) => ViewCustomer(customer: customer),
                       ),
                     );
                   },
@@ -172,65 +178,6 @@ class ListCustomers extends StatelessWidget {
                           ],
                         ),
                       ],
-                    ],
-                  ),
-                  trailing: PopupMenuButton<String>(
-                    icon: HugeIcon(
-                      icon: HugeIcons.strokeRoundedMoreVertical,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    onSelected: (value) async {
-                      if (value == 'edit') {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                EditCustomer(customerId: customer.id),
-                          ),
-                        );
-                      } else if (value == 'delete') {
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Delete Customer'),
-                            content: Text(
-                              'Are you sure you want to delete ${customer.name}?',
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.error,
-                                ),
-                                child: const Text('Delete'),
-                              ),
-                            ],
-                          ),
-                        );
-                        if (confirm == true && context.mounted) {
-                          final user = await UserService().getUser();
-                          if (user != null && context.mounted) {
-                            context.read<CustomerBloc>().add(
-                              CustomerDeleteEvent(
-                                customerId: customer.id,
-                                businessId: user.businessId,
-                              ),
-                            );
-                          }
-                        }
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(value: 'edit', child: Text('Edit')),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Text('Delete'),
-                      ),
                     ],
                   ),
                 ),

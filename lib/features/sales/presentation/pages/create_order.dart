@@ -9,6 +9,7 @@ import 'package:ventura/features/sales/domain/entities/product_entity.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/product_bloc.dart';
+import 'package:ventura/features/sales/presentation/widgets/text_input_component.dart';
 import 'package:ventura/init_dependencies.dart';
 
 class CreateOrder extends StatefulWidget {
@@ -133,10 +134,6 @@ class _CreateOrderState extends State<CreateOrder> {
                             initialValue: _selectedCustomer,
                             decoration: InputDecoration(
                               labelText: 'Select Customer *',
-                              prefixIcon: HugeIcon(
-                                icon: HugeIcons.strokeRoundedUser,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -315,34 +312,43 @@ class _CreateOrderState extends State<CreateOrder> {
   }
 
   void _showAddItemDialog(BuildContext context) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (dialogContext) => BlocProvider.value(
         value: BlocProvider.of<ProductBloc>(context),
-        child: AddItemDialog(
-          businessId: _businessId,
-          onItemAdded: _addOrderItem,
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(dialogContext).viewInsets.bottom,
+          ),
+          child: AddItemBottomSheet(
+            businessId: _businessId,
+            onItemAdded: _addOrderItem,
+          ),
         ),
       ),
     );
   }
 }
 
-class AddItemDialog extends StatefulWidget {
+class AddItemBottomSheet extends StatefulWidget {
   final String businessId;
   final Function(Product, int) onItemAdded;
 
-  const AddItemDialog({
+  const AddItemBottomSheet({
     super.key,
     required this.businessId,
     required this.onItemAdded,
   });
 
   @override
-  State<AddItemDialog> createState() => _AddItemDialogState();
+  State<AddItemBottomSheet> createState() => _AddItemBottomSheetState();
 }
 
-class _AddItemDialogState extends State<AddItemDialog> {
+class _AddItemBottomSheetState extends State<AddItemBottomSheet> {
   Product? _selectedProduct;
   final _quantityController = TextEditingController(text: '1');
   final _formKey = GlobalKey<FormState>();
@@ -355,22 +361,41 @@ class _AddItemDialogState extends State<AddItemDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Add Item'),
-      content: Form(
+    return Container(
+      padding: const EdgeInsets.all(24),
+      child: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Add Item',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
             BlocBuilder<ProductBloc, ProductState>(
               builder: (context, productState) {
                 if (productState is ProductSearchResultState) {
                   final products = productState.products;
                   return DropdownButtonFormField<Product>(
                     initialValue: _selectedProduct,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Select Product',
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     items: products.map((product) {
                       return DropdownMenuItem<Product>(
@@ -407,14 +432,12 @@ class _AddItemDialogState extends State<AddItemDialog> {
               },
             ),
             const SizedBox(height: 16),
-            TextFormField(
+            TextInputComponent(
+              title: 'Quantity',
+              hintText: '1',
               controller: _quantityController,
-              decoration: const InputDecoration(
-                labelText: 'Quantity',
-                border: OutlineInputBorder(),
-              ),
+              onSaved: (_) {},
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter quantity';
@@ -426,25 +449,26 @@ class _AddItemDialogState extends State<AddItemDialog> {
                 return null;
               },
             ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate() &&
+                    _selectedProduct != null) {
+                  final quantity = int.parse(_quantityController.text);
+                  widget.onItemAdded(_selectedProduct!, quantity);
+                  Navigator.pop(context);
+                }
+              },
+
+              child: const Text(
+                'Add Item',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(height: 8),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate() && _selectedProduct != null) {
-              final quantity = int.parse(_quantityController.text);
-              widget.onItemAdded(_selectedProduct!, quantity);
-              Navigator.pop(context);
-            }
-          },
-          child: const Text('Add Item'),
-        ),
-      ],
     );
   }
 }
