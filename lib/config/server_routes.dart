@@ -12,6 +12,7 @@ class ServerRoutes {
   final String confirmEmail = '/auth/confirm-email';
   final String confirmVerificationCode = '/auth/verify-code';
   final String resetPassword = '/auth/reset-password';
+  final String refreshToken = '/auth/refresh-token';
   final String uploadImageAsset = '/assets/images';
   final String createBusiness = '/businesses';
   final String createAppointment = '/appointments';

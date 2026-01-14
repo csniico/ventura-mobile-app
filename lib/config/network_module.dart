@@ -2,6 +2,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:ventura/config/auth_interceptor.dart';
 
 class NetworkModule {
   static final NetworkModule _instance = NetworkModule._internal();
@@ -20,10 +21,15 @@ class NetworkModule {
     //   for persistent login (requires path_provider)
     //   Use .then() to handle the Future since constructors cannot be async
     getApplicationDocumentsDirectory().then((appDocDir) {
-      final cookieJar = PersistCookieJar(storage: FileStorage(("${appDocDir.path}/.cookies")));
+      final cookieJar = PersistCookieJar(
+        storage: FileStorage(("${appDocDir.path}/.cookies")),
+      );
 
-      //   add cookieManager interceptor
+      //   add cookieManager interceptor (must be before AuthInterceptor)
       dio.interceptors.add(CookieManager(cookieJar));
+
+      //   add auth interceptor for automatic token refresh
+      dio.interceptors.add(AuthInterceptor(dio));
     });
   }
 }
