@@ -6,7 +6,6 @@ import 'package:ventura/features/sales/domain/entities/order_status.dart';
 import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/view_order.dart';
 import 'package:ventura/features/sales/presentation/pages/create_order.dart';
-import 'package:ventura/features/sales/presentation/pages/edit_order.dart';
 
 class ListOrders extends StatelessWidget {
   const ListOrders({super.key});

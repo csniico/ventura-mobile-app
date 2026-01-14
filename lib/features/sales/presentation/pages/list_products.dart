@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/product_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/view_product.dart';
 
@@ -136,52 +135,6 @@ class ListProducts extends StatelessWidget {
           children: const [
             SizedBox(height: 200),
             Center(child: CircularProgressIndicator()),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showDeleteConfirmationDialog(
-    BuildContext context,
-    String productId,
-    String productName,
-  ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Delete Product'),
-          content: Text(
-            'Are you sure you want to delete "$productName"? This action cannot be undone.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                final user = await UserService().getUser();
-                if (user != null && context.mounted) {
-                  context.read<ProductBloc>().add(
-                    ProductDeleteEvent(
-                      productId: productId,
-                      businessId: user.businessId,
-                    ),
-                  );
-                }
-                if (dialogContext.mounted) {
-                  Navigator.of(dialogContext).pop();
-                }
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
-              child: const Text('Delete'),
-            ),
           ],
         );
       },
