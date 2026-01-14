@@ -29,4 +29,39 @@ class ServerRoutes {
 
   String getUserById(String userId) => '/users/$userId';
   String updateUserProfile(String userId) => '/users/profile/$userId';
+
+  // Customer routes
+  final String getCustomers = '/customers';
+  final String createCustomer = '/customers';
+  String updateCustomer(String customerId) => '/customers/$customerId';
+  String deleteCustomer(String customerId) => '/customers/$customerId';
+
+  // Resource routes (Products & Services)
+  final String searchResources = '/resources/search';
+  final String getResources = '/resources';
+  final String createProduct = '/resources/product';
+  final String createService = '/resources/service';
+  String updateProduct(String productId) => '/resources/product/$productId';
+  String updateService(String serviceId) => '/resources/service/$serviceId';
+  String deleteProduct(String productId) => '/resources/product/$productId';
+  String deleteService(String serviceId) => '/resources/service/$serviceId';
+
+  // Order routes
+  final String getOrders = '/orders';
+  final String createOrder = '/orders';
+  final String searchOrders = '/orders/search';
+  final String getOrderStats = '/orders/stats';
+  String getOrderById(String orderId) => '/orders/$orderId';
+  String getCustomerOrders(String customerId) => '/orders/customer/$customerId';
+  String updateOrderStatus(String orderId) => '/orders/$orderId/status';
+
+  // Invoice routes
+  final String getInvoices = '/invoices';
+  final String createInvoice = '/invoices';
+  String getInvoiceById(String invoiceId) => '/invoices/$invoiceId';
+  String getCustomerInvoices(String customerId) =>
+      '/invoices/customer/$customerId';
+  String updateInvoicePayment(String invoiceId) =>
+      '/invoices/$invoiceId/payment';
+  String updateInvoiceStatus(String invoiceId) => '/invoices/$invoiceId/status';
 }
