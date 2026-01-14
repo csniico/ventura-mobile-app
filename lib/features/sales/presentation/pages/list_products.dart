@@ -22,8 +22,7 @@ class ListProducts extends StatelessWidget {
             ],
           );
         } else if (state is ProductSearchResultState) {
-          final products =
-              state.searchResult['products'] as List<dynamic>? ?? [];
+          final products = state.products;
           if (products.isEmpty) {
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -81,10 +80,8 @@ class ListProducts extends StatelessWidget {
                       size: 20,
                     ),
                   ),
-                  title: Text(product.name ?? 'Unknown Product'),
-                  subtitle: Text(
-                    '\$${product.price?.toStringAsFixed(2) ?? '0.00'}',
-                  ),
+                  title: Text(product.name),
+                  subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -111,7 +108,7 @@ class ListProducts extends StatelessWidget {
                           _showDeleteConfirmationDialog(
                             context,
                             product.id,
-                            product.name ?? 'Unknown Product',
+                            product.name,
                           );
                         },
                       ),

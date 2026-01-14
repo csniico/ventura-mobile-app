@@ -153,9 +153,7 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
 
       if (user == null) {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('User not logged in')));
+          ToastService.showError('User not logged in');
         }
         return;
       }

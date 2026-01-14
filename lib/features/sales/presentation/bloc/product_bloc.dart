@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ventura/features/sales/data/models/product_model.dart';
 import 'package:ventura/features/sales/domain/entities/product_entity.dart';
 import 'package:ventura/features/sales/domain/use_cases/create_product.dart';
 import 'package:ventura/features/sales/domain/use_cases/delete_product.dart';
@@ -53,11 +54,17 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       ),
     );
 
-    res.fold(
-      (failure) => emit(ProductErrorState(message: failure.message)),
-      (searchResult) =>
-          emit(ProductSearchResultState(searchResult: searchResult)),
-    );
+    res.fold((failure) => emit(ProductErrorState(message: failure.message)), (
+      searchResult,
+    ) {
+      final products = (searchResult['products'] as List<dynamic>)
+          .map(
+            (productJson) =>
+                ProductModel.fromJson(productJson as Map<String, dynamic>),
+          )
+          .toList();
+      emit(ProductSearchResultState(products: products));
+    });
   }
 
   void _onProductGetByIdEvent(

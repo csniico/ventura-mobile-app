@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/product_bloc.dart';
 import 'package:ventura/init_dependencies.dart';
@@ -102,14 +103,10 @@ class _CreateProductsState extends State<CreateProducts> {
         body: BlocListener<ProductBloc, ProductState>(
           listener: (context, state) {
             if (state is ProductCreateSuccessState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Product created successfully')),
-              );
+              ToastService.showSuccess('Product created successfully');
               Navigator.of(context).pop();
             } else if (state is ProductErrorState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error: ${state.message}')),
-              );
+              ToastService.showError('Error: ${state.message}');
             }
           },
           child: SingleChildScrollView(

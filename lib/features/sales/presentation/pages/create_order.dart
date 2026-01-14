@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/domain/entities/customer_entity.dart';
 import 'package:ventura/features/sales/domain/entities/product_entity.dart';
@@ -43,10 +44,10 @@ class _CreateOrderState extends State<CreateOrder> {
     setState(() {
       _orderItems.add({
         'productId': product.id,
+        'itemType': 'product',
         'name': product.name,
         'price': product.price,
         'quantity': quantity,
-        'subTotal': product.price * quantity,
       });
     });
   }
@@ -57,32 +58,15 @@ class _CreateOrderState extends State<CreateOrder> {
     });
   }
 
-  double _calculateTotal() {
-    return _orderItems.fold(
-      0.0,
-      (sum, item) => sum + (item['subTotal'] as double),
-    );
-  }
-
   void _submitForm(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       if (_selectedCustomer == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select a customer'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ToastService.showError('Please select a customer');
         return;
       }
 
       if (_orderItems.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please add at least one item'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ToastService.showError('Please add at least one item');
         return;
       }
 
@@ -125,20 +109,10 @@ class _CreateOrderState extends State<CreateOrder> {
         body: BlocConsumer<OrderBloc, OrderState>(
           listener: (context, state) {
             if (state is OrderCreateSuccessState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Order created successfully'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              ToastService.showSuccess('Order created successfully');
               Navigator.pop(context);
             } else if (state is OrderErrorState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-              );
+              ToastService.showError(state.message);
             }
           },
           builder: (context, orderState) {
@@ -243,6 +217,9 @@ class _CreateOrderState extends State<CreateOrder> {
                           itemCount: _orderItems.length,
                           itemBuilder: (context, index) {
                             final item = _orderItems[index];
+                            final itemTotal =
+                                (item['price'] as double) *
+                                (item['quantity'] as int);
                             return ListTile(
                               title: Text(item['name']),
                               subtitle: Text(
@@ -252,7 +229,7 @@ class _CreateOrderState extends State<CreateOrder> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    '₵${item['subTotal'].toStringAsFixed(2)}',
+                                    '₵${itemTotal.toStringAsFixed(2)}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -270,36 +247,6 @@ class _CreateOrderState extends State<CreateOrder> {
                               ),
                             );
                           },
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Total Amount',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w600),
-                            ),
-                            Text(
-                              '₵${_calculateTotal().toStringAsFixed(2)}',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
-                                  ),
-                            ),
-                          ],
                         ),
                       ),
                     ] else ...[
@@ -418,9 +365,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
             BlocBuilder<ProductBloc, ProductState>(
               builder: (context, productState) {
                 if (productState is ProductSearchResultState) {
-                  final products =
-                      productState.searchResult['products'] as List<dynamic>? ??
-                      [];
+                  final products = productState.products;
                   return DropdownButtonFormField<Product>(
                     initialValue: _selectedProduct,
                     decoration: const InputDecoration(
@@ -429,7 +374,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
                     ),
                     items: products.map((product) {
                       return DropdownMenuItem<Product>(
-                        value: product as Product,
+                        value: product,
                         child: Text(
                           '${product.name} - ₵${product.price.toStringAsFixed(2)}',
                         ),

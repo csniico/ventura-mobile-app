@@ -44,7 +44,7 @@ class _SalesState extends State<Sales> {
     _orderBloc = serviceLocator<OrderBloc>()
       ..add(OrderGetListEvent(businessId: _businessId));
     _productBloc = serviceLocator<ProductBloc>()
-      ..add(ProductSearchEvent(businessId: _businessId, searchQuery: '*'));
+      ..add(ProductSearchEvent(businessId: _businessId, searchQuery: ''));
     _customerBloc = serviceLocator<CustomerBloc>()
       ..add(CustomerGetEvent(businessId: _businessId));
   }
@@ -59,7 +59,7 @@ class _SalesState extends State<Sales> {
 
   Future<void> _refreshProducts() async {
     _productBloc.add(
-      ProductSearchEvent(businessId: _businessId, searchQuery: '*'),
+      ProductSearchEvent(businessId: _businessId, searchQuery: ''),
     );
   }
 
@@ -69,6 +69,10 @@ class _SalesState extends State<Sales> {
 
   @override
   void dispose() {
+    _invoiceBloc.close();
+    _orderBloc.close();
+    _productBloc.close();
+    _customerBloc.close();
     super.dispose();
   }
 

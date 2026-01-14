@@ -8,9 +8,9 @@ final class ProductInitial extends ProductState {}
 final class ProductLoadingState extends ProductState {}
 
 final class ProductSearchResultState extends ProductState {
-  final Map<String, dynamic> searchResult;
+  final List<Product> products;
 
-  ProductSearchResultState({required this.searchResult});
+  ProductSearchResultState({required this.products});
 }
 
 final class ProductLoadedState extends ProductState {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
 import 'package:ventura/init_dependencies.dart';
@@ -104,20 +105,10 @@ class _EditCustomerState extends State<EditCustomer> {
         body: BlocConsumer<CustomerBloc, CustomerState>(
           listener: (context, state) {
             if (state is CustomerUpdateSuccessState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Customer updated successfully'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              ToastService.showSuccess('Customer updated successfully');
               Navigator.pop(context);
             } else if (state is CustomerErrorState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-              );
+              ToastService.showError(state.message);
             } else if (state is CustomerLoadedState) {
               _populateForm(state.customer);
             }

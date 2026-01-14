@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
 import 'package:ventura/init_dependencies.dart';
@@ -84,20 +85,10 @@ class _CreateCustomersState extends State<CreateCustomers> {
         body: BlocConsumer<CustomerBloc, CustomerState>(
           listener: (context, state) {
             if (state is CustomerCreateSuccessState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Customer created successfully'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-              Navigator.pop(context);
+              ToastService.showSuccess('Customer created successfully');
+              Navigator.of(context).pop();
             } else if (state is CustomerErrorState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-              );
+              ToastService.showError(state.message);
             }
           },
           builder: (context, state) {

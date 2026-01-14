@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 
 class SignInWithGoogle extends StatefulWidget {
@@ -122,22 +123,14 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
 
       // Show error for other exceptions
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Sign-in failed: ${e.description ?? e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
+        ToastService.showError(
+          'Sign-in failed: ${e.description ?? e.toString()}',
         );
       }
     } catch (e) {
       debugPrint("Google Sign-in Error: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('An unexpected error occurred'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ToastService.showError('An unexpected error occurred');
       }
     } finally {
       if (mounted) {

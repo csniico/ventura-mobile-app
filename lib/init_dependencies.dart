@@ -342,7 +342,7 @@ void _initSalesDependencies() {
     ..registerFactory(() => UpdateService(serviceRepository: serviceLocator()))
     ..registerFactory(() => DeleteService(serviceRepository: serviceLocator()))
     // BLOCS
-    ..registerLazySingleton(
+    ..registerFactory(
       () => CustomerBloc(
         getCustomers: serviceLocator(),
         getCustomerById: serviceLocator(),
@@ -351,7 +351,7 @@ void _initSalesDependencies() {
         deleteCustomer: serviceLocator(),
       ),
     )
-    ..registerLazySingleton(
+    ..registerFactory(
       () => InvoiceBloc(
         createInvoice: serviceLocator(),
         getInvoices: serviceLocator(),
@@ -361,7 +361,7 @@ void _initSalesDependencies() {
         updateInvoiceStatus: serviceLocator(),
       ),
     )
-    ..registerLazySingleton(
+    ..registerFactory(
       () => OrderBloc(
         createOrder: serviceLocator(),
         getOrders: serviceLocator(),
@@ -372,7 +372,7 @@ void _initSalesDependencies() {
         updateOrderStatus: serviceLocator(),
       ),
     )
-    ..registerLazySingleton(
+    ..registerFactory(
       () => ProductBloc(
         searchResources: serviceLocator(),
         getProductById: serviceLocator(),
@@ -381,7 +381,7 @@ void _initSalesDependencies() {
         deleteProduct: serviceLocator(),
       ),
     )
-    ..registerLazySingleton(
+    ..registerFactory(
       () => ServiceBloc(
         getServiceById: serviceLocator(),
         createService: serviceLocator(),

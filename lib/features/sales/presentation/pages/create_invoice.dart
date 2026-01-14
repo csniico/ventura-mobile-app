@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/domain/entities/customer_entity.dart';
 import 'package:ventura/features/sales/domain/entities/order_entity.dart';
@@ -71,12 +72,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   void _submitForm(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       if (_selectedCustomer == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select a customer'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ToastService.showError('Please select a customer');
         return;
       }
 
@@ -139,20 +135,10 @@ class _CreateInvoiceState extends State<CreateInvoice> {
         body: BlocConsumer<InvoiceBloc, InvoiceState>(
           listener: (context, state) {
             if (state is InvoiceCreateSuccessState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Invoice created successfully'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              ToastService.showSuccess('Invoice created successfully');
               Navigator.pop(context);
             } else if (state is InvoiceErrorState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-              );
+              ToastService.showError(state.message);
             }
           },
           builder: (context, invoiceState) {
