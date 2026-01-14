@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class EditInvoice extends StatelessWidget {
   const EditInvoice({super.key, required this.invoiceId});
-  final int invoiceId;
+  final String invoiceId;
 
   @override
   Widget build(BuildContext context) {

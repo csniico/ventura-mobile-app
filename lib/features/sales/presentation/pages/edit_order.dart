@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class EditOrder extends StatelessWidget {
   const EditOrder({super.key, required this.orderId});
-  final int orderId;
+  final String orderId;
 
   @override
   Widget build(BuildContext context) {
