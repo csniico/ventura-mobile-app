@@ -7,6 +7,7 @@ class SalesPageTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SegmentedTabControl(
+      height: 50,
       barDecoration: BoxDecoration(
         color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),

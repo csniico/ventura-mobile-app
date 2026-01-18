@@ -119,12 +119,10 @@ class ListCustomers extends StatelessWidget {
               final customer = state.customers[index];
               return Card(
                 elevation: 0,
-                elevation: 0,
                 child: ListTile(
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => ViewCustomer(customer: customer),
                         builder: (context) => ViewCustomer(customer: customer),
                       ),
                     );
