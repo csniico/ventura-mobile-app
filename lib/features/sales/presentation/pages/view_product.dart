@@ -1,46 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:ventura/core/services/user_service.dart';
-import 'package:ventura/features/sales/presentation/bloc/product_bloc.dart';
+import 'package:ventura/features/sales/domain/entities/product_entity.dart';
 import 'package:ventura/features/sales/presentation/pages/edit_product.dart';
-import 'package:ventura/init_dependencies.dart';
 
-class ViewProduct extends StatefulWidget {
-  const ViewProduct({super.key, required this.productId});
-  final String productId;
-
-  @override
-  State<ViewProduct> createState() => _ViewProductState();
-}
-
-class _ViewProductState extends State<ViewProduct> {
-  late String _businessId;
-
-  @override
-  void initState() {
-    super.initState();
-    _businessId = '';
-    _loadBusinessId();
-  }
-
-  Future<void> _loadBusinessId() async {
-    final user = await UserService().getUser();
-    if (user != null) {
-      setState(() {
-        _businessId = user.businessId;
-      });
-      // Load product data after getting business ID
-      if (mounted) {
-        context.read<ProductBloc>().add(
-          ProductGetByIdEvent(
-            productId: widget.productId,
-            businessId: _businessId,
-          ),
-        );
-      }
-    }
-  }
+class ViewProduct extends StatelessWidget {
+  const ViewProduct({super.key, required this.product});
+  final Product product;
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
@@ -84,100 +49,82 @@ class _ViewProductState extends State<ViewProduct> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => serviceLocator<ProductBloc>(),
-      child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: AppBar(
-          title: const Text('Product Details'),
-          actions: [
-            BlocBuilder<ProductBloc, ProductState>(
-              builder: (context, state) {
-                if (state is ProductLoadedState) {
-                  return IconButton(
-                    icon: HugeIcon(
-                      icon: HugeIcons.strokeRoundedPencilEdit02,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              EditProduct(productId: widget.productId),
-                        ),
-                      );
-                    },
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-          ],
-        ),
-        body: BlocBuilder<ProductBloc, ProductState>(
-          builder: (context, state) {
-            if (state is ProductLoadedState) {
-              final product = state.product;
-
-              return SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Product Details'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => EditProduct(productId: product.id),
+                ),
+              );
+            },
+            child: const Text('Edit'),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Card
+            Card(
+              elevation: 2,
+              child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    // Header Card
-                    Card(
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundColor: Theme.of(
-                                context,
-                              ).colorScheme.primary,
-                              radius: 32,
-                              child: HugeIcon(
-                                icon: HugeIcons.strokeRoundedShoppingBag01,
-                                color: Colors.white,
-                                size: 32,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    product.name,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Product ID: ${product.id}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: Theme.of(
-                                            context,
-                                          ).disabledColor,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                    CircleAvatar(
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primary,
+                      radius: 32,
+                      child: HugeIcon(
+                        icon: HugeIcons.strokeRoundedShoppingBag01,
+                        color: Colors.white,
+                        size: 32,
                       ),
                     ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product.name,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Product ID: ${product.id}',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).disabledColor,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
-                    const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-                    // Product Information Card
-                    Card(
+            // Product Information Card
+            Card(
                       elevation: 2,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
@@ -274,54 +221,7 @@ class _ViewProductState extends State<ViewProduct> {
                         ),
                       ),
                     ],
-                  ],
-                ),
-              );
-            } else if (state is ProductLoadingState) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ProductErrorState) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    HugeIcon(
-                      icon: HugeIcons.strokeRoundedAlert01,
-                      color: Theme.of(context).colorScheme.error,
-                      size: 64,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error loading product',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      state.message,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).disabledColor,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<ProductBloc>().add(
-                          ProductGetByIdEvent(
-                            productId: widget.productId,
-                            businessId: _businessId,
-                          ),
-                        );
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              );
-            }
-            return const Center(child: CircularProgressIndicator());
-          },
+          ],
         ),
       ),
     );

@@ -5,6 +5,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/product_bloc.dart';
+import 'package:ventura/features/sales/presentation/widgets/text_input_component.dart';
 import 'package:ventura/init_dependencies.dart';
 
 class CreateProducts extends StatefulWidget {
@@ -117,20 +118,11 @@ class _CreateProductsState extends State<CreateProducts> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Product Name
-                  TextFormField(
+                  TextInputComponent(
+                    title: 'Product Name *',
+                    hintText: 'eg. Blue T-Shirt',
                     controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Product Name *',
-                      prefixIcon: HugeIcon(
-                        icon: HugeIcons.strokeRoundedShoppingBag01,
-                        color: Theme.of(
-                          context,
-                        ).inputDecorationTheme.prefixIconColor,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                    onSaved: (_) {},
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Product name is required';
@@ -141,28 +133,14 @@ class _CreateProductsState extends State<CreateProducts> {
                   const SizedBox(height: 16),
 
                   // Price
-                  TextFormField(
+                  TextInputComponent(
+                    title: 'Price *',
+                    hintText: '0.00',
                     controller: _priceController,
-                    decoration: InputDecoration(
-                      labelText: 'Price *',
-                      prefixIcon: HugeIcon(
-                        icon: HugeIcons.strokeRoundedDollar01,
-                        color: Theme.of(
-                          context,
-                        ).inputDecorationTheme.prefixIconColor,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                    onSaved: (_) {},
                     keyboardType: TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d+\.?\d{0,2}'),
-                      ),
-                    ],
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Price is required';
@@ -177,22 +155,12 @@ class _CreateProductsState extends State<CreateProducts> {
                   const SizedBox(height: 16),
 
                   // Quantity
-                  TextFormField(
+                  TextInputComponent(
+                    title: 'Available Quantity *',
+                    hintText: '0',
                     controller: _quantityController,
-                    decoration: InputDecoration(
-                      labelText: 'Available Quantity *',
-                      prefixIcon: HugeIcon(
-                        icon: HugeIcons.strokeRoundedPackage,
-                        color: Theme.of(
-                          context,
-                        ).inputDecorationTheme.prefixIconColor,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                    onSaved: (_) {},
                     keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Quantity is required';
@@ -207,39 +175,21 @@ class _CreateProductsState extends State<CreateProducts> {
                   const SizedBox(height: 16),
 
                   // Description
-                  TextFormField(
+                  TextInputComponent(
+                    title: 'Description',
+                    hintText: 'Product description...',
                     controller: _descriptionController,
-                    decoration: InputDecoration(
-                      labelText: 'Description',
-                      prefixIcon: HugeIcon(
-                        icon: HugeIcons.strokeRoundedText,
-                        color: Theme.of(
-                          context,
-                        ).inputDecorationTheme.prefixIconColor,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                    onSaved: (_) {},
                     maxLines: 3,
                   ),
                   const SizedBox(height: 16),
 
                   // Notes
-                  TextFormField(
+                  TextInputComponent(
+                    title: 'Notes',
+                    hintText: 'Additional notes...',
                     controller: _notesController,
-                    decoration: InputDecoration(
-                      labelText: 'Notes',
-                      prefixIcon: HugeIcon(
-                        icon: HugeIcons.strokeRoundedNote01,
-                        color: Theme.of(
-                          context,
-                        ).inputDecorationTheme.prefixIconColor,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                    onSaved: (_) {},
                     maxLines: 2,
                   ),
                 ],

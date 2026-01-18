@@ -30,10 +30,36 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
           if (notes != null) 'notes': notes,
         },
       );
-      logger.info(response.data.toString());
-      return InvoiceModel.fromJson(response.data['data']);
+
+      logger.info('Full response: ${response.data}');
+      logger.info('Response type: ${response.data.runtimeType}');
+      logger.info('Status code: ${response.statusCode}');
+
+      // Check if response.data is null
+      if (response.data == null) {
+        logger.error('Response data is null');
+        return null;
+      }
+
+      // Check if the response has a 'data' field
+      if (response.data is Map && response.data['data'] != null) {
+        return InvoiceModel.fromJson(response.data['data']);
+      }
+
+      // If response.data is directly the invoice object (no 'data' wrapper)
+      if (response.data is Map) {
+        return InvoiceModel.fromJson(response.data);
+      }
+
+      logger.error('Unexpected response structure');
+      return null;
     } on DioException catch (e) {
-      logger.error(e.response.toString());
+      logger.error('DioException: ${e.message}');
+      logger.error('Response status: ${e.response?.statusCode}');
+      logger.error('Response data: ${e.response?.data}');
+      return null;
+    } catch (e) {
+      logger.error('Unexpected error: $e');
       return null;
     }
   }

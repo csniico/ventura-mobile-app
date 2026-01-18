@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/features/sales/domain/entities/customer_entity.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/edit_customer.dart';
-import 'package:ventura/init_dependencies.dart';
 
 class ViewCustomer extends StatefulWidget {
   const ViewCustomer({super.key, required this.customer});

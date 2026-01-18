@@ -87,6 +87,14 @@ class _SalesState extends State<Sales> {
       ],
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
+        appBar: AppBar(
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: HugeIcon(icon: HugeIcons.strokeRoundedSearch02),
+            ),
+          ],
+        ),
         body: DefaultTabController(
           length: 4,
           child: Column(

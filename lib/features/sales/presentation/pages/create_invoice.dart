@@ -8,6 +8,8 @@ import 'package:ventura/features/sales/domain/entities/order_entity.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
+import 'package:ventura/features/sales/presentation/widgets/date_picker_component.dart';
+import 'package:ventura/features/sales/presentation/widgets/text_input_component.dart';
 import 'package:ventura/init_dependencies.dart';
 
 class CreateInvoice extends StatefulWidget {
@@ -56,12 +58,13 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   }
 
   Future<void> _selectDueDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now().add(const Duration(days: 30)),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
+    final DateTime? picked =
+        await DatePickerComponent.showDatePickerBottomSheet(
+          context: context,
+          initialDate: _dueDate ?? DateTime.now().add(const Duration(days: 30)),
+          firstDay: DateTime.now(),
+          lastDay: DateTime.now().add(const Duration(days: 365)),
+        );
     if (picked != null && picked != _dueDate) {
       setState(() {
         _dueDate = picked;
@@ -77,12 +80,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       }
 
       if (_selectedOrderIds.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select at least one order'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ToastService.showError('Please select at least one order');
         return;
       }
 
@@ -158,11 +156,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                           return DropdownButtonFormField<Customer>(
                             initialValue: _selectedCustomer,
                             decoration: InputDecoration(
-                              labelText: 'Select Customer *',
-                              prefixIcon: HugeIcon(
-                                icon: HugeIcons.strokeRoundedUser,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                              labelText: 'Customer',
+                              hintText: 'Select customer',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -386,47 +381,21 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                     const SizedBox(height: 24),
 
                     // Due Date
-                    InkWell(
+                    DatePickerComponent(
+                      title: 'Due Date',
+                      hintText: 'Select due date',
+                      selectedDate: _dueDate,
                       onTap: isLoading ? null : () => _selectDueDate(context),
-                      child: InputDecorator(
-                        decoration: InputDecoration(
-                          labelText: 'Due Date (Optional)',
-                          prefixIcon: HugeIcon(
-                            icon: HugeIcons.strokeRoundedCalendar01,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          _dueDate != null
-                              ? '${_dueDate!.day}/${_dueDate!.month}/${_dueDate!.year}'
-                              : 'Select due date',
-                          style: TextStyle(
-                            color: _dueDate != null
-                                ? Theme.of(context).textTheme.bodyLarge?.color
-                                : Colors.grey,
-                          ),
-                        ),
-                      ),
                     ),
 
                     const SizedBox(height: 16),
 
                     // Notes
-                    TextFormField(
+                    TextInputComponent(
+                      title: 'Notes (Optional)',
+                      hintText: 'Additional notes...',
                       controller: _notesController,
-                      decoration: InputDecoration(
-                        labelText: 'Notes (Optional)',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedNote,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                      onSaved: (_) {},
                       maxLines: 3,
                       enabled: !isLoading,
                       textInputAction: TextInputAction.done,

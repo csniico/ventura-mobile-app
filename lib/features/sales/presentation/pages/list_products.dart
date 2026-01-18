@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/product_bloc.dart';
-import 'package:ventura/features/sales/presentation/pages/edit_product.dart';
 import 'package:ventura/features/sales/presentation/pages/view_product.dart';
 
 class ListProducts extends StatelessWidget {
@@ -62,13 +60,13 @@ class ListProducts extends StatelessWidget {
             itemBuilder: (context, index) {
               final product = products[index];
               return Card(
+                elevation: 0,
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) =>
-                            ViewProduct(productId: product.id),
+                        builder: (context) => ViewProduct(product: product),
                       ),
                     );
                   },
@@ -82,38 +80,6 @@ class ListProducts extends StatelessWidget {
                   ),
                   title: Text(product.name),
                   subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedPencilEdit02,
-                          color: Theme.of(context).iconTheme.color,
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  EditProduct(productId: product.id),
-                            ),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedDelete02,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                        onPressed: () {
-                          _showDeleteConfirmationDialog(
-                            context,
-                            product.id,
-                            product.name,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
                 ),
               );
             },
@@ -169,52 +135,6 @@ class ListProducts extends StatelessWidget {
           children: const [
             SizedBox(height: 200),
             Center(child: CircularProgressIndicator()),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showDeleteConfirmationDialog(
-    BuildContext context,
-    String productId,
-    String productName,
-  ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Delete Product'),
-          content: Text(
-            'Are you sure you want to delete "$productName"? This action cannot be undone.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                final user = await UserService().getUser();
-                if (user != null && context.mounted) {
-                  context.read<ProductBloc>().add(
-                    ProductDeleteEvent(
-                      productId: productId,
-                      businessId: user.businessId,
-                    ),
-                  );
-                }
-                if (dialogContext.mounted) {
-                  Navigator.of(dialogContext).pop();
-                }
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
-              child: const Text('Delete'),
-            ),
           ],
         );
       },

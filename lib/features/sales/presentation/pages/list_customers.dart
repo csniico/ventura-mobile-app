@@ -5,7 +5,6 @@ import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/view_customer.dart';
 import 'package:ventura/features/sales/presentation/pages/create_customers.dart';
-import 'package:ventura/features/sales/presentation/pages/edit_customer.dart';
 
 class ListCustomers extends StatelessWidget {
   const ListCustomers({super.key});
@@ -93,6 +92,14 @@ class ListCustomers extends StatelessWidget {
                               builder: (context) => const CreateCustomers(),
                             ),
                           );
+                          if (context.mounted) {
+                            final businessId = UserService().businessId;
+                            if (businessId != null) {
+                              context.read<CustomerBloc>().add(
+                                CustomerGetEvent(businessId: businessId),
+                              );
+                            }
+                          }
                         },
                         child: const Text('Create your first customer'),
                       ),
@@ -112,10 +119,12 @@ class ListCustomers extends StatelessWidget {
               final customer = state.customers[index];
               return Card(
                 elevation: 0,
+                elevation: 0,
                 child: ListTile(
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
+                        builder: (context) => ViewCustomer(customer: customer),
                         builder: (context) => ViewCustomer(customer: customer),
                       ),
                     );
