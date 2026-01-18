@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
+import 'package:ventura/features/sales/domain/entities/customer_entity.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
+import 'package:ventura/features/sales/presentation/widgets/sales_text_input_field.dart';
 import 'package:ventura/init_dependencies.dart';
 
 class EditCustomer extends StatefulWidget {
-  const EditCustomer({super.key, required this.customerId});
-  final String customerId;
+  const EditCustomer({super.key, required this.customer});
+  final Customer customer;
 
   @override
   State<EditCustomer> createState() => _EditCustomerState();
@@ -20,13 +22,16 @@ class _EditCustomerState extends State<EditCustomer> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _notesController = TextEditingController();
-
   late String _businessId;
 
   @override
   void initState() {
     super.initState();
     _loadBusinessId();
+    _nameController.text = widget.customer.name;
+    _emailController.text = widget.customer.email ?? '';
+    _phoneController.text = widget.customer.phone ?? '';
+    _notesController.text = widget.customer.notes ?? '';
   }
 
   Future<void> _loadBusinessId() async {
@@ -35,15 +40,6 @@ class _EditCustomerState extends State<EditCustomer> {
       setState(() {
         _businessId = user.businessId;
       });
-      // Load customer data after getting business ID
-      if (mounted) {
-        context.read<CustomerBloc>().add(
-          CustomerGetByIdEvent(
-            customerId: widget.customerId,
-            businessId: _businessId,
-          ),
-        );
-      }
     }
   }
 
@@ -56,22 +52,13 @@ class _EditCustomerState extends State<EditCustomer> {
     super.dispose();
   }
 
-  void _populateForm(customer) {
-    _nameController.text = customer.name ?? '';
-    _emailController.text = customer.email ?? '';
-    _phoneController.text = customer.phone ?? '';
-    _notesController.text = customer.notes ?? '';
-  }
-
-  void _submitForm() {
+  void _submitForm(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       context.read<CustomerBloc>().add(
         CustomerUpdateEvent(
-          customerId: widget.customerId,
           businessId: _businessId,
-          name: _nameController.text.trim().isEmpty
-              ? null
-              : _nameController.text.trim(),
+          customerId: widget.customer.id,
+          name: _nameController.text.trim(),
           email: _emailController.text.trim().isEmpty
               ? null
               : _emailController.text.trim(),
@@ -93,11 +80,23 @@ class _EditCustomerState extends State<EditCustomer> {
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          title: const Text('Edit Customer'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(8.0),
+            child: const SizedBox(height: 8.0),
+          ),
+          title: Text(
+            'Update Customer',
+            style: TextStyle(
+              fontSize: 20,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
           leading: IconButton(
             icon: HugeIcon(
               icon: HugeIcons.strokeRoundedArrowLeft01,
-              color: Theme.of(context).iconTheme.color,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 30,
             ),
             onPressed: () => Navigator.pop(context),
           ),
@@ -106,11 +105,9 @@ class _EditCustomerState extends State<EditCustomer> {
           listener: (context, state) {
             if (state is CustomerUpdateSuccessState) {
               ToastService.showSuccess('Customer updated successfully');
-              Navigator.pop(context);
+              Navigator.of(context).pop();
             } else if (state is CustomerErrorState) {
               ToastService.showError(state.message);
-            } else if (state is CustomerLoadedState) {
-              _populateForm(state.customer);
             }
           },
           builder: (context, state) {
@@ -123,100 +120,51 @@ class _EditCustomerState extends State<EditCustomer> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TextFormField(
+                    // Existing form starts here
+                    SalesTextInputField(
                       controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText: 'Customer Name *',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedUser,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Customer name is required';
-                        }
-                        if (value.trim().length < 2) {
-                          return 'Name must be at least 2 characters';
-                        }
-                        return null;
-                      },
-                      enabled: !isLoading,
-                      textInputAction: TextInputAction.next,
+                      title: 'Customer Name *',
+                      hintText: _nameController.text.isEmpty
+                          ? 'eg. Kofi Agyeman'
+                          : _nameController.text,
+                      shouldValidate: true,
+                      onSaved: (value) {},
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    SalesTextInputField(
                       controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedMail01,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value != null && value.isNotEmpty) {
-                          final emailRegex = RegExp(
-                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                          );
-                          if (!emailRegex.hasMatch(value)) {
-                            return 'Please enter a valid email address';
-                          }
-                        }
-                        return null;
-                      },
-                      enabled: !isLoading,
-                      textInputAction: TextInputAction.next,
+                      title: 'Email (optional)',
+                      hintText: _emailController.text.isEmpty
+                          ? 'eg. kofi.agyeman@example.com'
+                          : _emailController.text,
+                      inputType: TextInputType.emailAddress,
+                      onSaved: (value) {},
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    SalesTextInputField(
                       controller: _phoneController,
-                      decoration: InputDecoration(
-                        labelText: 'Phone',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedCall,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      keyboardType: TextInputType.phone,
-                      enabled: !isLoading,
-                      textInputAction: TextInputAction.next,
+                      title: 'Phone (optional)',
+                      hintText: _phoneController.text.isEmpty
+                          ? '0241234567'
+                          : _phoneController.text,
+                      inputType: TextInputType.phone,
+                      onSaved: (value) {},
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    SalesTextInputField(
                       controller: _notesController,
-                      decoration: InputDecoration(
-                        labelText: 'Notes',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedNote,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      maxLines: 3,
-                      enabled: !isLoading,
-                      textInputAction: TextInputAction.done,
+                      title: 'Notes (optional)',
+                      min: 5,
+                      hintText: _notesController.text.isEmpty
+                          ? 'e.g. Likes extra spicy food, allergic to peanuts, met at the networking event...'
+                          : _notesController.text,
+                      onSaved: (value) {},
                     ),
                     const SizedBox(height: 32),
                     ElevatedButton(
-                      onPressed: isLoading ? null : _submitForm,
+                      onPressed: isLoading ? null : () => _submitForm(context),
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 18),
                       ),
                       child: isLoading
                           ? const SizedBox(

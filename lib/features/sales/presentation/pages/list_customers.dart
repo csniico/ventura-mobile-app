@@ -105,19 +105,18 @@ class ListCustomers extends StatelessWidget {
 
           return ListView.separated(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(vertical: 12),
             itemCount: state.customers.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 8),
+            separatorBuilder: (context, index) => const SizedBox(height: 2),
             itemBuilder: (context, index) {
               final customer = state.customers[index];
               return Card(
-                elevation: 2,
+                elevation: 0,
                 child: ListTile(
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) =>
-                            ViewCustomer(customerId: customer.id),
+                        builder: (context) => ViewCustomer(customer: customer),
                       ),
                     );
                   },
@@ -133,105 +132,22 @@ class ListCustomers extends StatelessWidget {
                     customer.name,
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 4),
-                      if (customer.email != null)
-                        Row(
-                          children: [
-                            HugeIcon(
-                              icon: HugeIcons.strokeRoundedMail01,
-                              color: Colors.grey,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                customer.email!,
-                                style: const TextStyle(fontSize: 12),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      if (customer.phone != null) ...[
-                        const SizedBox(height: 2),
-                        Row(
-                          children: [
-                            HugeIcon(
-                              icon: HugeIcons.strokeRoundedCall,
-                              color: Colors.grey,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              customer.phone!,
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ],
-                  ),
-                  trailing: PopupMenuButton<String>(
-                    icon: HugeIcon(
-                      icon: HugeIcons.strokeRoundedMoreVertical,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    onSelected: (value) async {
-                      if (value == 'edit') {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                EditCustomer(customerId: customer.id),
-                          ),
-                        );
-                      } else if (value == 'delete') {
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Delete Customer'),
-                            content: Text(
-                              'Are you sure you want to delete ${customer.name}?',
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.error,
-                                ),
-                                child: const Text('Delete'),
-                              ),
-                            ],
-                          ),
-                        );
-                        if (confirm == true && context.mounted) {
-                          final user = await UserService().getUser();
-                          if (user != null && context.mounted) {
-                            context.read<CustomerBloc>().add(
-                              CustomerDeleteEvent(
-                                customerId: customer.id,
-                                businessId: user.businessId,
-                              ),
-                            );
-                          }
-                        }
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(value: 'edit', child: Text('Edit')),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Text('Delete'),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      customer.phone ?? customer.email ?? 'No contact info',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
-                    ],
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  trailing: HugeIcon(
+                    icon: HugeIcons.strokeRoundedArrowRight01,
+                    size: 20,
                   ),
                 ),
               );

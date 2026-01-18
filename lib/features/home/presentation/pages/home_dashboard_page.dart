@@ -24,106 +24,11 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
         if (state is Authenticated) {
           return Padding(
             padding: const EdgeInsets.all(14.0),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        state.user.avatarUrl == null ||
-                                state.user.avatarUrl!.isEmpty
-                            ? _buildPlaceholder()
-                            : ClipOval(
-                                child: CachedNetworkImage(
-                                  width: 50,
-                                  height: 50,
-                                  imageUrl: state.user.avatarUrl!,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      _buildPlaceholder(),
-                                ),
-                              ),
-                        SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              state.user.firstName,
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            if (state.user.business?.name != null) ...[
-                              state.user.business!.name.length > 30
-                                  ? Text(
-                                      '${state.user.business!.name.substring(0, 20)}...',
-                                    )
-                                  : Text(state.user.business!.name),
-                            ],
-                          ],
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pushNamed(routes.search);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        padding: EdgeInsets.all(12),
-                        child: HugeIcon(
-                          icon: HugeIcons.strokeRoundedSearch01,
-                          size: 30,
-                          strokeWidth: 2,
-                          color: Theme.brightnessOf(context) == Brightness.light
-                              ? Colors.grey[700]
-                              : Colors.grey[400],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 40),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/details');
-                  },
-                  child: Row(
-                    children: [
-                      HugeIcon(icon: HugeIcons.strokeRoundedTissuePaper),
-                      Text("Go to Details"),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            child: Column(children: []),
           );
         }
         return const Center(child: NotSignedInPage());
       },
-    );
-  }
-
-  Widget _buildPlaceholder() {
-    return ClipOval(
-      child: Image.asset(
-        'assets/images/icon.png',
-        fit: BoxFit.cover,
-        width: 50,
-        height: 50,
-      ),
     );
   }
 }

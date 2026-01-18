@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
+import 'package:ventura/features/sales/presentation/widgets/sales_text_input_field.dart';
 import 'package:ventura/init_dependencies.dart';
 
 class CreateCustomers extends StatefulWidget {
@@ -73,11 +74,23 @@ class _CreateCustomersState extends State<CreateCustomers> {
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          title: const Text('Create Customer'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(8.0),
+            child: const SizedBox(height: 8.0),
+          ),
+          title: Text(
+            'Create Customer',
+            style: TextStyle(
+              fontSize: 20,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
           leading: IconButton(
             icon: HugeIcon(
               icon: HugeIcons.strokeRoundedArrowLeft01,
-              color: Theme.of(context).iconTheme.color,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 30,
             ),
             onPressed: () => Navigator.pop(context),
           ),
@@ -101,100 +114,92 @@ class _CreateCustomersState extends State<CreateCustomers> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TextFormField(
+                    // New Info Card
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              HugeIcon(
+                                icon: HugeIcons.strokeRoundedIdea01,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                "Why add a customer?",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Customer profiles let you track purchase history, speed up appointment booking, and keep personal notes to build client loyalty.",
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 1.5,
+                              fontWeight: FontWeight.w400,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Existing form starts here
+                    SalesTextInputField(
                       controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText: 'Customer Name *',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedUser,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Customer name is required';
-                        }
-                        if (value.trim().length < 2) {
-                          return 'Name must be at least 2 characters';
-                        }
-                        return null;
-                      },
-                      enabled: !isLoading,
-                      textInputAction: TextInputAction.next,
+                      title: 'Customer Name *',
+                      hintText: 'eg. Kofi Agyeman',
+                      shouldValidate: true,
+                      onSaved: (value) {},
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    SalesTextInputField(
                       controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedMail01,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value != null && value.isNotEmpty) {
-                          final emailRegex = RegExp(
-                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                          );
-                          if (!emailRegex.hasMatch(value)) {
-                            return 'Please enter a valid email address';
-                          }
-                        }
-                        return null;
-                      },
-                      enabled: !isLoading,
-                      textInputAction: TextInputAction.next,
+                      title: 'Email (optional)',
+                      hintText: 'eg. kofi.agyeman@example.com',
+                      inputType: TextInputType.emailAddress,
+                      onSaved: (value) {},
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    SalesTextInputField(
                       controller: _phoneController,
-                      decoration: InputDecoration(
-                        labelText: 'Phone',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedCall,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      keyboardType: TextInputType.phone,
-                      enabled: !isLoading,
-                      textInputAction: TextInputAction.next,
+                      title: 'Phone (optional)',
+                      hintText: '0241234567',
+                      inputType: TextInputType.phone,
+                      onSaved: (value) {},
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    SalesTextInputField(
                       controller: _notesController,
-                      decoration: InputDecoration(
-                        labelText: 'Notes',
-                        prefixIcon: HugeIcon(
-                          icon: HugeIcons.strokeRoundedNote,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      maxLines: 3,
-                      enabled: !isLoading,
-                      textInputAction: TextInputAction.done,
+                      title: 'Notes (optional)',
+                      min: 5,
+                      hintText:
+                          'e.g. Likes extra spicy food, allergic to peanuts, met at the networking event...',
+                      onSaved: (value) {},
                     ),
                     const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: isLoading ? null : () => _submitForm(context),
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 18),
                       ),
                       child: isLoading
                           ? const SizedBox(
