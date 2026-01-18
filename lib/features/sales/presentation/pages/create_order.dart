@@ -320,13 +320,15 @@ class _CreateOrderState extends State<CreateOrder> {
       ),
       builder: (dialogContext) => BlocProvider.value(
         value: BlocProvider.of<ProductBloc>(context),
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(dialogContext).viewInsets.bottom,
-          ),
-          child: AddItemBottomSheet(
-            businessId: _businessId,
-            onItemAdded: _addOrderItem,
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(dialogContext).viewInsets.bottom,
+            ),
+            child: AddItemBottomSheet(
+              businessId: _businessId,
+              onItemAdded: _addOrderItem,
+            ),
           ),
         ),
       ),

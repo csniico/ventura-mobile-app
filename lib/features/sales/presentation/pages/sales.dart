@@ -124,8 +124,8 @@ class _SalesState extends State<Sales> {
           animatedIcon: AnimatedIcons.menu_close,
           children: [
             SpeedDialChild(
-              child: HugeIcon(icon: HugeIcons.strokeRoundedInvoice01),
-              label: 'New Invoice',
+              child: HugeIcon(icon: HugeIcons.strokeRoundedDocumentValidation),
+              label: 'Invoice',
               onTap: () async {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
@@ -138,8 +138,8 @@ class _SalesState extends State<Sales> {
               },
             ),
             SpeedDialChild(
-              child: HugeIcon(icon: HugeIcons.strokeRoundedShoppingCart01),
-              label: 'New Order',
+              child: HugeIcon(icon: HugeIcons.strokeRoundedPackage),
+              label: 'Order',
               onTap: () async {
                 await Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const CreateOrder()),
@@ -151,7 +151,7 @@ class _SalesState extends State<Sales> {
             ),
             SpeedDialChild(
               child: HugeIcon(icon: HugeIcons.strokeRoundedShoppingBag01),
-              label: 'New Product',
+              label: 'Product',
               onTap: () async {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
@@ -165,7 +165,7 @@ class _SalesState extends State<Sales> {
             ),
             SpeedDialChild(
               child: HugeIcon(icon: HugeIcons.strokeRoundedUser),
-              label: 'New Customer',
+              label: 'Customer',
               onTap: () async {
                 await Navigator.of(context).push(
                   MaterialPageRoute(

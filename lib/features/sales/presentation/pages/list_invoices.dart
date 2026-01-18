@@ -54,15 +54,16 @@ class ListInvoices extends StatelessWidget {
               ],
             );
           }
-          return ListView.builder(
+          return ListView.separated(
             physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             itemCount: invoices.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final invoice = invoices[index];
               return Card(
                 elevation: 0,
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
+                child: InkWell(
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -70,17 +71,58 @@ class ListInvoices extends StatelessWidget {
                       ),
                     );
                   },
-                  leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    child: HugeIcon(
-                      icon: HugeIcons.strokeRoundedFile01,
-                      color: Colors.white,
-                      size: 20,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'GHC ${invoice.totalAmount.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            HugeIcon(icon: HugeIcons.strokeRoundedArrowRight01),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Invoice Number',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  invoice.invoiceNumber,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ),
-                  title: Text('Invoice #${invoice.invoiceNumber}'),
-                  subtitle: Text(
-                    '\$${invoice.totalAmount.toStringAsFixed(2)} • ${invoice.status.name}',
                   ),
                 ),
               );
