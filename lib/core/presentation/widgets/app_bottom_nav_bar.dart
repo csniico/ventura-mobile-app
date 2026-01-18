@@ -50,7 +50,7 @@ class AppBottomNavBar extends StatelessWidget {
 
   List<BottomNavigationBarItem> get _navItems => [
     _navItem(icon: HugeIcons.strokeRoundedHome01, label: 'Dashboard'),
-    _navItem(icon: HugeIcons.strokeRoundedInvoice, label: 'Sales'),
+    _navItem(icon: HugeIcons.strokeRoundedCoins01, label: 'Sales'),
     _navItem(icon: HugeIcons.strokeRoundedCalendar03, label: 'Calendar'),
     _navItem(icon: HugeIcons.strokeRoundedUserCircle02, label: 'Profile'),
   ];

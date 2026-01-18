@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/presentation/widgets/app_bottom_nav_bar.dart';
 import 'package:ventura/core/presentation/widgets/main_app_bar.dart';
-import 'package:ventura/core/presentation/widgets/user_avatar.dart';
-import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/appointment/presentation/pages/appointment_page.dart';
 import 'package:ventura/features/auth/presentation/pages/profile.dart';
 import 'package:ventura/features/home/presentation/pages/home.dart';

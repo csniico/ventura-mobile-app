@@ -6,7 +6,6 @@ import 'package:ventura/config/routes.dart';
 import 'package:ventura/core/presentation/themes/app_theme.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/pages/sign_in_page.dart';
-import 'package:ventura/features/welcome/presentation/pages/welcome_page.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
