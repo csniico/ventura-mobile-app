@@ -1,30 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/features/sales/domain/entities/invoice_entity.dart';
-import 'package:ventura/features/sales/presentation/pages/edit_invoice.dart';
 
 class ViewInvoice extends StatelessWidget {
   const ViewInvoice({super.key, required this.invoice});
   final Invoice invoice;
-
-  Color _getStatusColor(String? status) {
-    switch (status?.toLowerCase()) {
-      case 'paid':
-        return Colors.green;
-      case 'pending':
-        return Colors.orange;
-      case 'overdue':
-        return Colors.red;
-      case 'cancelled':
-        return Colors.grey;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -396,14 +376,4 @@ class DottedLinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-Widget _buildInfoRow(String label, String value) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(label),
-      Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
-    ],
-  );
 }
