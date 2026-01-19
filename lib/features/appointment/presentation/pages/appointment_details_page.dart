@@ -12,9 +12,33 @@ class AppointmentDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Appointment Details'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(8.0),
+          child: const SizedBox(height: 8.0),
+        ),
+        leading: IconButton(
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedArrowLeft01,
+            color: Theme.of(context).colorScheme.onPrimary,
+            size: 30,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Appointment Details',
+          style: TextStyle(
+            fontSize: 20,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
         actions: [
-          TextButton(
+          IconButton(
+            icon: HugeIcon(
+              icon: HugeIcons.strokeRoundedPencilEdit02,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 26,
+            ),
             onPressed: () async {
               final result = await Navigator.pushNamed(
                 context,
@@ -25,7 +49,6 @@ class AppointmentDetailsPage extends StatelessWidget {
                 Navigator.pop(context, true);
               }
             },
-            child: const Text('Edit'),
           ),
         ],
       ),
@@ -35,17 +58,15 @@ class AppointmentDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Basic Information Group
+              // Basic Information Group - Blue (calm, professional, trust)
               _buildGroupCard(
                 context,
                 icon: HugeIcons.strokeRoundedInformationCircle,
                 title: 'Basic Information',
                 description: _buildBasicInfoDescription(),
+                cardColor: const Color(0xFF3B82F6), // Blue
                 fields: [
-                  _FieldData(
-                    label: 'Title',
-                    value: appointment.title,
-                  ),
+                  _FieldData(label: 'Title', value: appointment.title),
                   _FieldData(
                     label: 'Description',
                     value: appointment.description,
@@ -55,12 +76,13 @@ class AppointmentDetailsPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Schedule Group
+              // Schedule Group - Purple (time, planning, organization)
               _buildGroupCard(
                 context,
                 icon: HugeIcons.strokeRoundedClock01,
                 title: 'Schedule',
                 description: _buildScheduleDescription(),
+                cardColor: const Color(0xFF8B5CF6), // Purple
                 fields: [
                   _FieldData(
                     label: 'Start',
@@ -74,14 +96,16 @@ class AppointmentDetailsPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Notes Group
+              // Notes Group - Amber (attention, reminders, warmth)
               _buildGroupCard(
                 context,
                 icon: HugeIcons.strokeRoundedNote,
                 title: 'Notes',
-                description: appointment.notes != null && appointment.notes!.isNotEmpty
-                    ? 'Additional notes and reminders for this appointment.'
-                    : 'No notes have been added to this appointment.',
+                description:
+                    appointment.notes != null && appointment.notes!.isNotEmpty
+                        ? 'Additional notes and reminders for this appointment.'
+                        : 'No notes have been added to this appointment.',
+                cardColor: const Color(0xFFF59E0B), // Amber
                 fields: [
                   _FieldData(
                     label: 'Notes',
@@ -93,12 +117,13 @@ class AppointmentDetailsPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Recurring Group
+              // Recurring Group - Green (growth, continuity, routine)
               _buildGroupCard(
                 context,
                 icon: HugeIcons.strokeRoundedRepeat,
                 title: 'Recurrence',
                 description: _buildRecurringDescription(),
+                cardColor: const Color(0xFF10B981), // Green
                 fields: [
                   _FieldData(
                     label: 'Recurring',
@@ -122,19 +147,21 @@ class AppointmentDetailsPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Sync Status Group
+              // Sync Status Group - Teal (technology, connection, sync)
               _buildGroupCard(
                 context,
                 icon: HugeIcons.strokeRoundedCloudSavingDone01,
                 title: 'Sync Status',
                 description: _buildSyncDescription(),
+                cardColor: const Color(0xFF14B8A6), // Teal
                 fields: [
                   _FieldData(
                     label: 'Google Calendar',
-                    value: appointment.googleEventId != null &&
+                    value:
+                        appointment.googleEventId != null &&
                             appointment.googleEventId != 'none'
-                        ? 'Synced'
-                        : null,
+                            ? 'Synced'
+                            : null,
                     emptyHint: 'Not synced',
                   ),
                 ],
@@ -148,8 +175,8 @@ class AppointmentDetailsPage extends StatelessWidget {
   }
 
   String _buildBasicInfoDescription() {
-    final hasDescription = appointment.description != null &&
-        appointment.description!.isNotEmpty;
+    final hasDescription =
+        appointment.description != null && appointment.description!.isNotEmpty;
     if (hasDescription) {
       return 'This appointment is titled "${appointment.title}" with a description provided.';
     }
@@ -163,7 +190,8 @@ class AppointmentDetailsPage extends StatelessWidget {
 
     String durationText;
     if (hours > 0 && minutes > 0) {
-      durationText = '$hours hour${hours > 1 ? 's' : ''} and $minutes minute${minutes > 1 ? 's' : ''}';
+      durationText =
+          '$hours hour${hours > 1 ? 's' : ''} and $minutes minute${minutes > 1 ? 's' : ''}';
     } else if (hours > 0) {
       durationText = '$hours hour${hours > 1 ? 's' : ''}';
     } else {
@@ -178,7 +206,9 @@ class AppointmentDetailsPage extends StatelessWidget {
       return 'This is a one-time appointment that does not repeat.';
     }
 
-    final frequency = _formatFrequency(appointment.recurringFrequency)?.toLowerCase() ?? 'periodically';
+    final frequency =
+        _formatFrequency(appointment.recurringFrequency)?.toLowerCase() ??
+        'periodically';
 
     if (appointment.recurringUntil != null) {
       return 'This appointment repeats $frequency until ${_formatDate(appointment.recurringUntil!)}.';
@@ -188,7 +218,8 @@ class AppointmentDetailsPage extends StatelessWidget {
   }
 
   String _buildSyncDescription() {
-    final isSynced = appointment.googleEventId != null &&
+    final isSynced =
+        appointment.googleEventId != null &&
         appointment.googleEventId != 'none';
     if (isSynced) {
       return 'This appointment is synced with Google Calendar and will appear in both apps.';
@@ -202,27 +233,43 @@ class AppointmentDetailsPage extends StatelessWidget {
     required String title,
     required String description,
     required List<_FieldData> fields,
+    required Color cardColor,
   }) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Create a softer background color based on the card color
+    final backgroundColor = isDark
+        ? cardColor.withValues(alpha: 0.15)
+        : cardColor.withValues(alpha: 0.08);
+
+    final borderColor = isDark
+        ? cardColor.withValues(alpha: 0.3)
+        : cardColor.withValues(alpha: 0.25);
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: borderColor, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          // Header with colored icon
           Row(
             children: [
-              HugeIcon(icon: icon, size: 22, color: theme.colorScheme.primary),
-              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.all(8),
+                child: HugeIcon(
+                  icon: icon,
+                  size: 22,
+                  color: cardColor,
+                ),
+              ),
+              const SizedBox(width: 12),
               Text(
                 title,
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -232,7 +279,7 @@ class AppointmentDetailsPage extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
           // Group Description
           Text(
@@ -244,10 +291,11 @@ class AppointmentDetailsPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Divider
+          // Divider with card color tint
           Divider(
-            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+            color: cardColor.withValues(alpha: 0.2),
             height: 1,
+            thickness: 1,
           ),
           const SizedBox(height: 12),
 
@@ -342,4 +390,3 @@ class _FieldData {
     this.hideLabel = false,
   });
 }
-

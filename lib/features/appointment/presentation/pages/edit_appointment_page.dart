@@ -308,30 +308,26 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Edit appointment', style: TextStyle(fontSize: 16)),
-          centerTitle: true,
-          actions: [
-            Padding(
-              padding: EdgeInsets.only(right: 16),
-              child: BlocBuilder<AppointmentBloc, AppointmentState>(
-                builder: (context, state) {
-                  if (state is AppointmentLoadingState) {
-                    return Center(
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    );
-                  }
-                  return TextButton(
-                    onPressed: _updateAppointment,
-                    child: Text('Save', style: TextStyle(fontSize: 16)),
-                  );
-                },
-              ),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(8.0),
+            child: const SizedBox(height: 8.0),
+          ),
+          leading: IconButton(
+            icon: HugeIcon(
+              icon: HugeIcons.strokeRoundedArrowLeft01,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 30,
             ),
-          ],
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            'Update appointment',
+            style: TextStyle(
+              fontSize: 20,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
         ),
         body: SafeArea(
           child: Form(
@@ -340,7 +336,7 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
               padding: EdgeInsets.all(16),
               child: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     TextInputComponent(
                       controller: _titleController,
@@ -558,6 +554,38 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
                       maxLength: 2000,
                       maxLines: null,
                       minLines: 4,
+                    ),
+                    SizedBox(height: 40),
+                    BlocBuilder<AppointmentBloc, AppointmentState>(
+                      builder: (context, state) {
+                        final isLoading = state is AppointmentLoadingState;
+                        return ElevatedButton(
+                          onPressed: isLoading
+                              ? null
+                              : () => _updateAppointment(),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                          ),
+                          child: isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : const Text(
+                                  'Update Appointment',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        );
+                      },
                     ),
                   ],
                 ),
