@@ -50,7 +50,25 @@ class _EditPersonalProfilePageState extends State<EditPersonalProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(title: Text('Edit Personal Profile')),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(8.0),
+          child: const SizedBox(height: 8.0),
+        ),
+        leading: IconButton(
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedArrowLeft01,
+            color: Theme.of(context).colorScheme.onPrimary,
+            size: 30,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Edit Personal Profile',
+          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+        ),
+      ),
       body: SafeArea(
         child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
@@ -110,7 +128,7 @@ class _EditPersonalProfilePageState extends State<EditPersonalProfilePage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 40),
+                      SizedBox(height: 30),
                       Form(
                         key: _formKey,
                         child: Padding(
@@ -124,7 +142,7 @@ class _EditPersonalProfilePageState extends State<EditPersonalProfilePage> {
                                 onSaved: (value) {},
                                 title: 'First name',
                               ),
-                              SizedBox(height: 40),
+                              SizedBox(height: 30),
                               AuthField(
                                 controller: _lastNameController,
                                 hintText: state.user.lastName ?? '',
@@ -133,7 +151,7 @@ class _EditPersonalProfilePageState extends State<EditPersonalProfilePage> {
                                 title: 'Last name',
                               ),
 
-                              SizedBox(height: 80),
+                              SizedBox(height: 30),
 
                               SubmitFormButton(
                                 title: 'Save',

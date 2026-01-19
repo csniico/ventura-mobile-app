@@ -72,3 +72,23 @@ List<ProfilePageSectionLists> supportAndLegal = [
     color: Colors.red,
   ),
 ];
+
+// Support & Legal without logout (for modern profile page)
+List<ProfilePageSectionLists> supportAndLegalWithoutLogout = [
+  ProfilePageSectionLists(
+    title: 'Help Center',
+    icon: HugeIcons.strokeRoundedHelpCircle,
+    route: 'help-center',
+  ),
+  ProfilePageSectionLists(
+    title: 'Terms of Service',
+    icon: HugeIcons.strokeRoundedFile02,
+    route: 'terms-of-service',
+  ),
+  ProfilePageSectionLists(
+    title: 'Privacy Policy',
+    icon: HugeIcons.strokeRoundedSecurityLock,
+    route: 'privacy-policy',
+  ),
+];
+

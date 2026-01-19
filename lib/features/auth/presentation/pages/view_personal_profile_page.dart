@@ -12,6 +12,19 @@ class ViewPersonalProfilePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(8.0),
+          child: const SizedBox(height: 8.0),
+        ),
+        leading: IconButton(
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedArrowLeft01,
+            color: Theme.of(context).colorScheme.onPrimary,
+            size: 30,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           IconButton(
             onPressed: () {
@@ -19,7 +32,10 @@ class ViewPersonalProfilePage extends StatelessWidget {
             },
             icon: Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: HugeIcon(icon: HugeIcons.strokeRoundedPencilEdit02),
+              child: HugeIcon(
+                icon: HugeIcons.strokeRoundedPencilEdit02,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
           ),
         ],
@@ -76,21 +92,18 @@ class ViewPersonalProfilePage extends StatelessWidget {
                     const SizedBox(height: 12),
                     _buildProfileItem(
                       context,
-                      icon: HugeIcons.strokeRoundedComputer,
                       title: 'Profile Type',
                       value: state.user.isSystem ? 'Owner' : 'Team Member',
                     ),
                     const SizedBox(height: 8),
                     _buildProfileItem(
                       context,
-                      icon: HugeIcons.strokeRoundedCheckmarkBadge01,
                       title: 'Account Status',
                       value: state.user.isActive ? 'Active' : 'Inactive',
                     ),
                     const SizedBox(height: 8),
                     _buildProfileItem(
                       context,
-                      icon: HugeIcons.strokeRoundedMailValidation01,
                       title: 'Email Status',
                       value: state.user.isEmailVerified
                           ? 'Verified'
@@ -132,7 +145,6 @@ class ViewPersonalProfilePage extends StatelessWidget {
 
   Widget _buildProfileItem(
     BuildContext context, {
-    required List<List<dynamic>> icon,
     required String title,
     required String value,
   }) {
@@ -140,8 +152,7 @@ class ViewPersonalProfilePage extends StatelessWidget {
       elevation: 0,
       margin: EdgeInsets.zero,
       child: ListTile(
-        leading: HugeIcon(icon: icon),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w400)),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         trailing: Text(
           value,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/pages/create_business_profile_page.dart';
@@ -75,97 +76,116 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          switch (state) {
-            case AuthFailure():
-              resetButtonState();
-              ToastService.showError(state.message);
-              break;
-            case Authenticated():
-              resetButtonState();
-              ToastService.showSuccess('Email verified successfully!');
-              break;
-            case AuthBusinessNotRegistered():
-              ToastService.showSuccess('Email verified successfully');
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) =>
-                      CreateBusinessProfilePage(user: state.user),
-                ),
-              );
-              break;
-            default:
-              break;
-          }
-        },
-        builder: (context, state) {
-          return SafeArea(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30),
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(vertical: 50),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'Enter Verification Code',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      Text('Check your email for the verification code'),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        maxLength: 6,
-                        onSaved: (value) {
-                          setState(() {
-                            _code = value;
-                          });
-                        },
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'You must enter a six digit verification code';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      InkWell(
-                        onTap: () {
-                          debugPrint('I chose to resend the code!');
-                        },
-                        child: RichText(
-                          text: TextSpan(
-                            text: "Resend",
-                            style: Theme.of(context).textTheme.titleMedium,
-                            children: [
-                              TextSpan(
-                                text: " 60s",
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            ],
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(8.0),
+          child: const SizedBox(height: 8.0),
+        ),
+        leading: IconButton(
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedArrowLeft01,
+            color: Theme.of(context).colorScheme.onPrimary,
+            size: 30,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SafeArea(
+        child: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            switch (state) {
+              case AuthFailure():
+                resetButtonState();
+                ToastService.showError(state.message);
+                break;
+              case Authenticated():
+                resetButtonState();
+                ToastService.showSuccess('Email verified successfully!');
+                break;
+              case AuthBusinessNotRegistered():
+                ToastService.showSuccess('Email verified successfully');
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CreateBusinessProfilePage(user: state.user),
+                  ),
+                );
+                break;
+              default:
+                break;
+            }
+          },
+          builder: (context, state) {
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(vertical: 50),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Enter Verification Code',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 30),
-                      SubmitFormButton(
-                        title: 'Confirm Code',
-                        onPressed: handleConfirmCodeButtonClicked,
-                        isDisabled: _isDisabled,
-                        isLoading: _isLoading,
-                      ),
-                    ],
+                        const SizedBox(height: 30),
+                        Text('Check your email for the verification code'),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          maxLength: 6,
+                          onSaved: (value) {
+                            setState(() {
+                              _code = value;
+                            });
+                          },
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'You must enter a six digit verification code';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        InkWell(
+                          onTap: () {
+                            debugPrint('I chose to resend the code!');
+                          },
+                          child: RichText(
+                            text: TextSpan(
+                              text: "Resend",
+                              style: Theme.of(context).textTheme.titleMedium,
+                              children: [
+                                TextSpan(
+                                  text: " 60s",
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        SubmitFormButton(
+                          title: 'Confirm Code',
+                          onPressed: handleConfirmCodeButtonClicked,
+                          isDisabled: _isDisabled,
+                          isLoading: _isLoading,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

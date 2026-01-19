@@ -23,6 +23,7 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
   String? _password = "";
   String? _confirmPassword = "";
   bool _obscurePassword = true;
+  bool _obscureConfirmationPassword = true;
   bool _isLoading = false;
   bool _isDisabled = false;
 
@@ -47,8 +48,6 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
         _isLoading = true;
         _isDisabled = true;
       });
-      debugPrint("password: $_password");
-      debugPrint("password: $_confirmPassword");
       context.read<AuthBloc>().add(
         AuthResetPassword(
           email: widget.email,
@@ -63,127 +62,144 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(),
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          switch (state) {
-            case AuthFailure():
-              resetButtonState();
-              ToastService.showError(state.message);
-              break;
-            case Authenticated():
-              resetButtonState();
-              ToastService.showSuccess('Password reset successfully');
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => MainScreen()),
-                (_) => false,
-              );
-              break;
-            case AuthBusinessNotRegistered():
-              resetButtonState();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) =>
-                      CreateBusinessProfilePage(user: state.user),
-                ),
-                (_) => false,
-              );
-              break;
-            default:
-              break;
-          }
-        },
-        builder: (context, state) {
-          return Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Text(
-                          'Enter verification code',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        AuthField(
-                          hintText: "Password",
-                          title: "New Password",
-                          obscureText: _obscurePassword,
-                          suffixIcon: Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: IconButton(
-                              icon: HugeIcon(
-                                icon: _obscurePassword
-                                    ? HugeIcons.strokeRoundedView
-                                    : HugeIcons.strokeRoundedViewOffSlash,
-                                color: Colors.grey[600],
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(8.0),
+          child: const SizedBox(height: 8.0),
+        ),
+        leading: IconButton(
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedArrowLeft01,
+            color: Theme.of(context).colorScheme.onPrimary,
+            size: 30,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SafeArea(
+        child: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            switch (state) {
+              case AuthFailure():
+                resetButtonState();
+                ToastService.showError(state.message);
+                break;
+              case Authenticated():
+                resetButtonState();
+                ToastService.showSuccess('Password reset successfully');
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => MainScreen()),
+                  (_) => false,
+                );
+                break;
+              case AuthBusinessNotRegistered():
+                resetButtonState();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CreateBusinessProfilePage(user: state.user),
+                  ),
+                  (_) => false,
+                );
+                break;
+              default:
+                break;
+            }
+          },
+          builder: (context, state) {
+            return Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            'Enter verification code',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          onSaved: (value) {
-                            setState(() {
-                              _password = value;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        AuthField(
-                          hintText: "Password",
-                          title: "Confirm Password",
-                          obscureText: _obscurePassword,
-                          suffixIcon: Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: IconButton(
-                              icon: HugeIcon(
-                                icon: _obscurePassword
-                                    ? HugeIcons.strokeRoundedView
-                                    : HugeIcons.strokeRoundedViewOffSlash,
-                                color: Colors.grey[600],
+                          const SizedBox(height: 10),
+                          AuthField(
+                            hintText: "Password",
+                            title: "New Password",
+                            obscureText: _obscurePassword,
+                            suffixIcon: Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: IconButton(
+                                icon: HugeIcon(
+                                  icon: _obscurePassword
+                                      ? HugeIcons.strokeRoundedView
+                                      : HugeIcons.strokeRoundedViewOffSlash,
+                                  color: Colors.grey[600],
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
                             ),
+                            onSaved: (value) {
+                              setState(() {
+                                _password = value;
+                              });
+                            },
                           ),
-                          onSaved: (value) {
-                            setState(() {
-                              _confirmPassword = value;
-                            });
-                          },
-                        ),
+                          const SizedBox(height: 20),
+                          AuthField(
+                            hintText: "Password",
+                            title: "Confirm Password",
+                            obscureText: _obscureConfirmationPassword,
+                            suffixIcon: Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: IconButton(
+                                icon: HugeIcon(
+                                  icon: _obscureConfirmationPassword
+                                      ? HugeIcons.strokeRoundedView
+                                      : HugeIcons.strokeRoundedViewOffSlash,
+                                  color: Colors.grey[600],
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureConfirmationPassword =
+                                        !_obscureConfirmationPassword;
+                                  });
+                                },
+                              ),
+                            ),
+                            onSaved: (value) {
+                              setState(() {
+                                _confirmPassword = value;
+                              });
+                            },
+                          ),
 
-                        const SizedBox(height: 30),
-                        SubmitFormButton(
-                          title: "Reset Password",
-                          isLoading: _isLoading,
-                          onPressed: _handleSubmit,
-                          isDisabled: _isDisabled,
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(height: 30),
+                          SubmitFormButton(
+                            title: "Reset Password",
+                            isLoading: _isLoading,
+                            onPressed: _handleSubmit,
+                            isDisabled: _isDisabled,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

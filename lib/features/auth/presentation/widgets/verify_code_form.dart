@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';
@@ -62,73 +63,89 @@ class _VerifyCodeFormState extends State<VerifyCodeForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(),
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthFailure) {
-            ToastService.showError(state.message);
-          } else if (state is VerificationCodeConfirmed) {
-            ToastService.showSuccess(state.user.email);
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => NewPasswordForm(
-                  userId: state.user.id,
-                  email: state.user.email,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(8.0),
+          child: const SizedBox(height: 8.0),
+        ),
+        leading: IconButton(
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedArrowLeft01,
+            color: Theme.of(context).colorScheme.onPrimary,
+            size: 30,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SafeArea(
+        child: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthFailure) {
+              ToastService.showError(state.message);
+            } else if (state is VerificationCodeConfirmed) {
+              ToastService.showSuccess(state.user.email);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => NewPasswordForm(
+                    userId: state.user.id,
+                    email: state.user.email,
+                  ),
                 ),
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          return SafeArea(
-            child: Form(
-              key: _formKey,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Text(
-                            'Enter verification code',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
+              );
+            }
+          },
+          builder: (context, state) {
+            return SafeArea(
+              child: Form(
+                key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Text(
+                              'Enter verification code',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 10),
-                          AuthField(
-                            hintText: "Code",
-                            title: "Code",
-                            inputType: TextInputType.text,
-                            onSaved: (value) {
-                              setState(() {
-                                _code = value;
-                              });
-                            },
-                          ),
+                            const SizedBox(height: 10),
+                            AuthField(
+                              hintText: "Code",
+                              title: "Code",
+                              inputType: TextInputType.text,
+                              onSaved: (value) {
+                                setState(() {
+                                  _code = value;
+                                });
+                              },
+                            ),
 
-                          const SizedBox(height: 30),
-                          SubmitFormButton(
-                            title: "Confirm Code",
-                            isLoading: _isLoading,
-                            onPressed: _handleSubmit,
-                            isDisabled: _isDisabled,
-                          ),
-                        ],
-                      ),
-                    ],
+                            const SizedBox(height: 30),
+                            SubmitFormButton(
+                              title: "Confirm Code",
+                              isLoading: _isLoading,
+                              onPressed: _handleSubmit,
+                              isDisabled: _isDisabled,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
