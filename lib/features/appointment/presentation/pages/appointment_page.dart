@@ -172,12 +172,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
           child: Column(
             children: [
               _buildCalendar(_appointments),
-              Divider(
-                height: 1,
-                color: Theme.brightnessOf(context) == Brightness.light
-                    ? Colors.black12
-                    : Colors.white12,
-              ),
+
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _getUserAppointments,
@@ -199,7 +194,9 @@ class _AppointmentPageState extends State<AppointmentPage> {
 
   Widget _buildCalendar(List<Appointment> appointments) {
     return Container(
-      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+      ),
       child: TableCalendar(
         firstDay: DateTime.utc(2020, 1, 1),
         lastDay: DateTime.utc(2030, 12, 31),
@@ -318,33 +315,49 @@ class _AppointmentPageState extends State<AppointmentPage> {
   }
 
   Widget _buildAppointmentCard(Appointment appointment) {
+    final theme = Theme.of(context);
     final timeFormat = DateFormat('h:mm a');
     final startTime = timeFormat.format(appointment.startTime);
     final endTime = timeFormat.format(appointment.endTime);
 
-    // Determine color based on time of day
-    Color getCardColor() {
-      final hour = appointment.startTime.hour;
-      if (hour >= 5 && hour < 12) {
-        // Morning: Soft blue
-        return Colors.blue.shade50;
-      } else if (hour >= 12 && hour < 17) {
-        // Afternoon: Soft orange
-        return Colors.orange.shade50;
-      } else {
-        // Evening/Night: Soft purple
-        return Colors.purple.shade50;
-      }
-    }
+    // Calculate duration string
+    final duration = appointment.endTime.difference(appointment.startTime);
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes % 60;
+    String durationString = '';
+    if (hours > 0) durationString += '$hours hr ';
+    if (minutes > 0) durationString += '$minutes min';
+    durationString = durationString.trim();
 
-    Color getAccentColor() {
-      final hour = appointment.startTime.hour;
-      if (hour >= 5 && hour < 12) {
-        return Colors.blue.shade400;
-      } else if (hour >= 12 && hour < 17) {
-        return Colors.orange.shade400;
+    // Calculate relative time (Time Left)
+    String timeLeft = '';
+    final now = DateTime.now();
+    // Simple status computation for relative time
+    if (now.isAfter(appointment.endTime)) {
+      timeLeft = 'Completed';
+    } else if (now.isAfter(appointment.startTime) &&
+        now.isBefore(appointment.endTime)) {
+      final remaining = appointment.endTime.difference(now);
+      if (remaining.inMinutes < 60) {
+        timeLeft = '${remaining.inMinutes} min remaining';
       } else {
-        return Colors.purple.shade400;
+        timeLeft = '${remaining.inHours} hr remaining';
+      }
+    } else {
+      final difference = appointment.startTime.difference(now);
+      if (difference.inDays == 0 && appointment.startTime.day == now.day) {
+        final hours = difference.inHours;
+        final minutes = difference.inMinutes % 60;
+        if (hours == 0) {
+          timeLeft = 'Starts in $minutes min';
+        } else {
+          timeLeft = 'Starts in $hours hr';
+        }
+      } else if (difference.inDays == 1 ||
+          (difference.inDays == 0 && appointment.startTime.day != now.day)) {
+        timeLeft = 'Tomorrow';
+      } else {
+        timeLeft = 'In ${difference.inDays} days';
       }
     }
 
@@ -353,10 +366,13 @@ class _AppointmentPageState extends State<AppointmentPage> {
       child: Card(
         margin: EdgeInsets.zero,
         elevation: 0,
-        color: getCardColor(),
+        color: theme.colorScheme.surfaceContainerLowest,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: getAccentColor().withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.1),
+            width: 1,
+          ),
         ),
         child: InkWell(
           onTap: () async {
@@ -367,7 +383,6 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     AppointmentDetailsPage(appointment: appointment),
               ),
             );
-            // Refresh if appointment was updated
             if (result == true && mounted) {
               _getUserAppointments();
             }
@@ -382,67 +397,53 @@ class _AppointmentPageState extends State<AppointmentPage> {
               },
             );
           },
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: getAccentColor(),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            appointment.title,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[900],
-                            ),
-                          ),
-                          if (appointment.description!.isNotEmpty) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              appointment.description ?? '',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey[600],
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    Icon(
-                      Icons.chevron_right,
-                      color: Colors.grey[400],
-                      size: 20,
-                    ),
-                  ],
+                // Primary Title: Time Left
+                Text(
+                  timeLeft,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                // Subtitle: Meeting Title
+                Text(
+                  appointment.title,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 12),
+                // Footer: Time | Duration
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: 14, color: getAccentColor()),
-                    const SizedBox(width: 6),
                     Text(
                       '$startTime - $endTime',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[700],
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        '|',
+                        style: TextStyle(
+                          color: theme.colorScheme.outlineVariant,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      durationString,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

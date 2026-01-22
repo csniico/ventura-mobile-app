@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart';
 import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/view_invoice.dart';
 
@@ -61,8 +62,18 @@ class ListInvoices extends StatelessWidget {
             separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final invoice = invoices[index];
+              final totalProducts =
+                  invoice.orders?.expand((o) => o.items).length ?? 0;
+              final formattedDate = invoice.issueDate != null
+                  ? DateFormat('dd/MM/yyyy').format(invoice.issueDate!)
+                  : 'N/A';
               return Card(
                 elevation: 0,
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide.none,
+                ),
                 child: InkWell(
                   onTap: () {
                     Navigator.of(context).push(
@@ -79,7 +90,6 @@ class ListInvoices extends StatelessWidget {
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
                               'GHC ${invoice.totalAmount.toStringAsFixed(2)}',
@@ -91,33 +101,68 @@ class ListInvoices extends StatelessWidget {
                             HugeIcon(icon: HugeIcons.strokeRoundedArrowRight01),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        Text(
+                          invoice.invoiceNumber,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        RichText(
+                          text: TextSpan(
+                            text: 'Customer: ',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: ' ${invoice.customer?.name ?? 'N/A'}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        Text(
+                          'Date: $formattedDate',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Invoice Number',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  invoice.invoiceNumber,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              '${invoice.orders?.length ?? 0} orders',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Container(),
+                            SizedBox(width: 8),
+                            Text(
+                              '$totalProducts products',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                             ),
                           ],
                         ),

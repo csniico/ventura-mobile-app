@@ -13,38 +13,26 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: Theme.brightnessOf(context) == Brightness.dark
-                ? Colors.white12
-                : Colors.black12,
-            width: 1,
-          ),
-        ),
+    return BottomNavigationBar(
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+      elevation: 0,
+      currentIndex: currentIndex,
+      onTap: onTap,
+      iconSize: 34,
+      type: BottomNavigationBarType.fixed,
+      unselectedLabelStyle: const TextStyle(
+        fontFamily: 'Inter',
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
       ),
-      child: BottomNavigationBar(
-        backgroundColor: Theme.of(context).colorScheme.surfaceBright,
-        elevation: 0,
-        currentIndex: currentIndex,
-        onTap: onTap,
-        iconSize: 34,
-        type: BottomNavigationBarType.fixed,
-        unselectedLabelStyle: const TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-        ),
-        selectedLabelStyle: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
-        showUnselectedLabels: true,
-        showSelectedLabels: true,
-        items: _navItems,
+      selectedLabelStyle: TextStyle(
+        fontFamily: 'Inter',
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
       ),
+      showUnselectedLabels: true,
+      showSelectedLabels: true,
+      items: _navItems,
     );
   }
 

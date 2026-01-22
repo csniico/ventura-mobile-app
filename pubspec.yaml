@@ -38,6 +38,7 @@ dependencies:
   cached_network_image: ^3.4.1
   animated_segmented_tab_control: ^2.0.0
   flutter_speed_dial: ^7.0.0
+  pdf: ^3.11.3
 
 dev_dependencies:
   flutter_test:

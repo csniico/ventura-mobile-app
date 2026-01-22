@@ -362,14 +362,9 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       trackOutlineColor: WidgetStateProperty.all(
-                        Theme.brightnessOf(context) == Brightness.light
-                            ? Colors.grey[400]!
-                            : Colors.grey,
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                       ),
-                      inactiveThumbColor:
-                          Theme.brightnessOf(context) == Brightness.light
-                          ? Colors.grey[400]!
-                          : Colors.grey,
+                      inactiveThumbColor: Colors.grey[200],
                       title: Text(
                         'Should this appointment be recurring?',
                         style: TextStyle(
@@ -499,15 +494,16 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
                       maxLines: null,
                       minLines: 4,
                     ),
-                    SizedBox(height: 40,),
+                    SizedBox(height: 40),
                     BlocBuilder<AppointmentBloc, AppointmentState>(
                       builder: (context, state) {
                         final isLoading = state is AppointmentLoadingState;
                         return ElevatedButton(
-                          onPressed: isLoading ? null : () => _saveAppointment(),
+                          onPressed: isLoading
+                              ? null
+                              : () => _saveAppointment(),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 18),
-
                           ),
                           child: isLoading
                               ? const SizedBox(

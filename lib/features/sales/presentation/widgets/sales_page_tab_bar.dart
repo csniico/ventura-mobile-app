@@ -9,20 +9,28 @@ class SalesPageTabBar extends StatelessWidget {
     return SegmentedTabControl(
       height: 50,
       barDecoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.1),
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
-        ),
       ),
       indicatorPadding: EdgeInsets.all(4),
       indicatorDecoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      tabTextColor: Theme.of(context).colorScheme.onSurfaceVariant,
+      tabTextColor: Theme.of(
+        context,
+      ).colorScheme.onSurface.withValues(alpha: 0.4),
       selectedTabTextColor: Theme.of(context).colorScheme.onPrimary,
-      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
       tabs: [
         SegmentTab(label: 'Invoices'),
         SegmentTab(label: 'Orders'),

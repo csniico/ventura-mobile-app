@@ -14,15 +14,16 @@ class CalendarWidget extends StatelessWidget {
     required this.firstDay,
   });
   static Future<DateTime?> show(
-      BuildContext context,
-      DateTime initialDate, {
-        DateTime? firstDay,
-      }) async {
+    BuildContext context,
+    DateTime initialDate, {
+    DateTime? firstDay,
+  }) async {
     DateTime tempDate = initialDate;
 
     return await showModalBottomSheet<DateTime>(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {

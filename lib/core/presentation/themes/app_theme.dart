@@ -7,28 +7,53 @@ class AppTheme {
     splashFactory: NoSplash.splashFactory,
     highlightColor: Colors.transparent,
     // Color scheme (customize per your palette)
-    colorScheme: const ColorScheme.light(
-      primary: Color(0xFF3B82F6),
-      // primary-500
+    colorScheme: ColorScheme.light(
+      primary: const Color.fromARGB(255, 13, 97, 233),
       onPrimary: Colors.white,
-      secondary: Color(0xFF60A5FA),
-      // maybe a lighter primary or accent
+      secondary: const Color(0xFF60A5FA),
       onSecondary: Colors.white,
-      // neutral-800
-      surface: Color(0xFFF5F5F5),
-      onSurface: Color(0xFF262626),
-      error: Color(0xFFEF4444),
-      // error-500
+
+      // Core surfaces
+      surface: const Color.fromARGB(
+        255,
+        235,
+        246,
+        255,
+      ), // Slightly brighter than before (neutral-50)
+      onSurface: const Color(
+        0xFF1F1F1F,
+      ), // For subtle dividers / lower emphasis
+      onSurfaceVariant: const Color(0xFF424242),
+
+      // Container family — this is what you'll use for cards
+      surfaceContainerLowest: const Color(
+        0xFFFFFFFF,
+      ), // Pure white — perfect for standout cards
+      surfaceContainerLow: const Color(0xFFD6D6D6),
+      surfaceContainer: const Color.fromARGB(255, 214, 214, 214),
+      surfaceContainerHigh: const Color.fromARGB(255, 214, 214, 214),
+      surfaceContainerHighest: const Color.fromARGB(255, 214, 214, 214),
+
+      error: const Color(0xFFEF4444),
       onError: Colors.white,
     ),
 
-    // Scaffold / background
-    scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+    scaffoldBackgroundColor: const Color(0xFFF5F5F5), // Matches surface
+
+    cardTheme: const CardThemeData(
+      color: null, // Will use surfaceContainerLowest by default in M3
+      elevation: 0, // No shadow
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+      ),
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+    ),
     // neutral-100
 
     // AppBar Theme
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFFF5F5F5),
+      backgroundColor: Color(0xFFD4D4D8),
       // primary
       foregroundColor: Colors.black87,
       // icon/text color
@@ -146,7 +171,7 @@ class AppTheme {
     // Input (TextField) Theme
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: Colors.grey[200],
+      fillColor: const Color(0xFFFFFFFF),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -210,25 +235,42 @@ class AppTheme {
     splashFactory: NoSplash.splashFactory,
     highlightColor: Colors.transparent,
 
-    colorScheme: const ColorScheme.dark(
-      primary: Color(0xFF2563EB),
-      // primary-600 or dark primary
+    colorScheme: ColorScheme.dark(
+      primary: const Color(0xFF3B82F6),
       onPrimary: Colors.white,
-      secondary: Color(0xFF60A5FA),
-      onSecondary: Colors.black,
-      // neutral-900
-      surface: Color(0xFF1E1E1E),
-      // neutral-300 (dark)
-      onSurface: Color(0xFFF5F5F5),
-      error: Color(0xFFDC2626),
-      // error-600
-      onError: Colors.white,
+      secondary: const Color(0xFF60A5FA),
+      onSecondary: Colors.white,
+
+      // Your requested dark surface as base
+      surface: const Color.fromARGB(255, 46, 52, 56), // #2E3438
+      onSurface: Colors.white, // light gray-blue — good readability
+      onSurfaceVariant: Colors.white, // muted blue-gray text
+      // Container family — layered around your #2E3438 base
+      surfaceContainerLowest: const Color(
+        0xFF1A1F22,
+      ), // deepest layer / background-like
+      surfaceContainerLow: const Color(0xFF24292D),
+      surfaceContainer: const Color.fromARGB(
+        255,
+        46,
+        52,
+        56,
+      ), // matches surface
+      surfaceContainerHigh: const Color(
+        0xFF5A6369,
+      ), // ← recommended for cards — clearly lighter
+      surfaceContainerHighest: const Color(
+        0xFF6B747B,
+      ), // strongest emphasis / selected/hover
+
+      error: const Color(0xFFF87171), // softer red for dark mode
+      onError: const Color(0xFF1F1F1F),
     ),
 
-    scaffoldBackgroundColor: const Color(0xFF1E1E1E),
+    scaffoldBackgroundColor: const Color(0xFF171717),
 
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF1E1E1E),
+      backgroundColor: Color(0xFF171717),
       foregroundColor: Colors.white,
       elevation: 0,
       iconTheme: IconThemeData(color: Colors.white),
@@ -342,7 +384,7 @@ class AppTheme {
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFF2C2C2C),
+      fillColor: const Color(0xFF1A1F22),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),

@@ -17,20 +17,13 @@ class DateTimePickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final darkGrey = Theme.brightnessOf(context) == Brightness.light
-        ? Colors.black54
-        : Colors.white54;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.brightnessOf(context) == Brightness.light
-              ? Colors.grey[200]
-              : const Color(0xFF2C2C2C),
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
           border: Border.all(
-            color: Theme.brightnessOf(context) == Brightness.light
-                ? Color(0xFFD4D4D4)
-                : Color(0xFF3A3A3A),
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
           ),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -45,12 +38,9 @@ class DateTimePickerCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: TextStyle(color: darkGrey)),
+                  Text(title),
                   SizedBox(height: 5),
-                  Text(
-                    subtitle ?? '',
-                    style: TextStyle(color: darkGrey, fontSize: 12),
-                  ),
+                  Text(subtitle ?? '', style: TextStyle(fontSize: 12)),
                 ],
               ),
             ],
