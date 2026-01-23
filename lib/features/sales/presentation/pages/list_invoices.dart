@@ -69,7 +69,7 @@ class ListInvoices extends StatelessWidget {
                   : 'N/A';
               return Card(
                 elevation: 0,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surfaceContainerLowest,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide.none,
@@ -111,7 +111,7 @@ class ListInvoices extends StatelessWidget {
                         const SizedBox(height: 8),
                         RichText(
                           text: TextSpan(
-                            text: 'Customer: ',
+                            text: 'Billed To: ',
                             style: TextStyle(
                               fontSize: 14,
                               color: Theme.of(context).colorScheme.onSurface,

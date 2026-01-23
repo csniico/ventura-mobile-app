@@ -1,75 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart';
 import 'package:ventura/features/sales/domain/entities/order_entity.dart';
+import 'package:ventura/features/sales/domain/entities/order_status.dart';
 import 'package:ventura/features/sales/presentation/pages/edit_order.dart';
 
 class ViewOrder extends StatelessWidget {
   const ViewOrder({super.key, required this.order});
   final Order order;
 
-  Color _getStatusColor(String? status) {
-    switch (status?.toLowerCase()) {
-      case 'pending':
-        return Colors.orange;
-      case 'confirmed':
-        return Colors.blue;
-      case 'completed':
-        return Colors.green;
-      case 'cancelled':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
+  /// Formats a [DateTime] object into a readable string format.
+  /// For example, 1.1.2024 becomes "1st January 2024".
+  String readableDate(DateTime date) {
+    final day = date.day;
+    final month = DateFormat.MMMM().format(date);
+    final year = date.year;
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+    String daySuffix;
+    if (day >= 11 && day <= 13) {
+      daySuffix = 'th';
+    } else {
+      switch (day % 10) {
+        case 1:
+          daySuffix = 'st';
+          break;
+        case 2:
+          daySuffix = 'nd';
+          break;
+        case 3:
+          daySuffix = 'rd';
+          break;
+        default:
+          daySuffix = 'th';
+      }
+    }
+
+    return '$day$daySuffix $month $year';
   }
 
   @override
   Widget build(BuildContext context) {
+    final currencyFormat = NumberFormat.currency(
+      symbol: 'GHC ',
+      decimalDigits: 2,
+    );
+    final createdLabel = 'Created ${readableDate(order.createdAt)}';
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(8.0),
-          child: const SizedBox(height: 8.0),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              order.orderNumber,
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(order.status.name),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  order.status.name.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ],
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(8.0),
+          child: SizedBox(height: 8.0),
         ),
         leading: IconButton(
           icon: HugeIcon(
@@ -78,6 +61,14 @@ class ViewOrder extends StatelessWidget {
             size: 30,
           ),
           onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Order Details',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         actions: [
           IconButton(
@@ -97,14 +88,25 @@ class ViewOrder extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _customerSection(context),
-              _productsSection(context),
-              _orderInfoSection(context),
+              _buildSummaryCard(
+                context: context,
+                amount: currencyFormat.format(order.totalAmount),
+                title: order.customer?.name ?? 'Order ${order.orderNumber}',
+                subtitle: createdLabel,
+                status: order.status,
+              ),
+              const SizedBox(height: 12),
+              if (order.customer != null) _buildCustomerCard(context),
+              const SizedBox(height: 12),
+              if (order.items.isNotEmpty)
+                _buildItemsCard(context, currencyFormat),
+              const SizedBox(height: 12),
+              _buildOrderInfoCard(context, currencyFormat),
             ],
           ),
         ),
@@ -112,252 +114,265 @@ class ViewOrder extends StatelessWidget {
     );
   }
 
-  Widget _customerSection(BuildContext context) {
-    if (order.customer == null) return const SizedBox.shrink();
+  Widget _buildSummaryCard({
+    required BuildContext context,
+    required String amount,
+    required String title,
+    required String subtitle,
+    required OrderStatus status,
+  }) {
+    final statusColor = _statusColor(status);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Card(
-          elevation: 0,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  order.customer!.name,
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                ),
-                const SizedBox(height: 16),
-                if (order.customer!.email != null) ...[
-                  Row(
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
                     children: [
-                      HugeIcon(icon: HugeIcons.strokeRoundedMail01, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          order.customer!.email!,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
+                          fontSize: 12,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
                 ],
-                if (order.customer!.phone != null)
-                  Row(
-                    children: [
-                      HugeIcon(
-                        icon: HugeIcons.strokeRoundedCall,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          order.customer!.phone!,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
-                    ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    amount,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-              ],
-            ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 6,
+                      horizontal: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      _statusLabel(status),
+                      style: TextStyle(
+                        color: statusColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _productsSection(BuildContext context) {
-    if (order.items.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0, left: 12.0, top: 16.0),
-          child: Text(
-            'Products',
-            style: Theme.of(context).textTheme.titleMedium,
+  Widget _buildCustomerCard(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Customer',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-        ),
-        Card(
-          elevation: 0,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Column(
-              children: [
-                Table(
-                  border: TableBorder.all(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withAlpha(51),
-                    width: 1,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  columnWidths: const {
-                    0: FlexColumnWidth(4),
-                    1: FlexColumnWidth(1),
-                    2: FlexColumnWidth(2.5),
-                  },
-                  children: [
-                    TableRow(
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.surfaceContainerHighest,
-                      ),
+          const SizedBox(height: 12),
+          _infoRow('Name', order.customer!.name),
+          if (order.customer!.email != null)
+            _infoRow('Email', order.customer!.email!),
+          if (order.customer!.phone != null)
+            _infoRow('Phone', order.customer!.phone!),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemsCard(BuildContext context, NumberFormat currencyFormat) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Items',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...order.items.map((item) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Text(
-                            'Title',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 14,
-                            ),
+                        Text(
+                          item.name,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Text(
-                            'Qty',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 14,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Text(
-                            'Unit Price',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 14,
-                            ),
-                            textAlign: TextAlign.right,
+                        const SizedBox(height: 4),
+                        Text(
+                          'Qty ${item.quantity} · ${currencyFormat.format(item.price)} each',
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.65),
+                            fontSize: 12,
                           ),
                         ),
                       ],
                     ),
-                    ...order.items.map(
-                      (item) => TableRow(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Text(
-                              item.product?.name ?? 'Unknown Product',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Text(
-                              '${item.quantity}',
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Text(
-                              'GHC ${(item.subTotal / item.quantity).toStringAsFixed(2)}',
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                        ],
-                      ),
+                  ),
+                  Text(
+                    currencyFormat.format(item.subTotal),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 
-  Widget _orderInfoSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Card(
-          elevation: 0,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Order Total',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      'GHC ${order.totalAmount.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Created',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      _formatDate(order.createdAt),
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Last Updated',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      _formatDate(order.updatedAt),
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
-              ],
+  Widget _buildOrderInfoCard(
+    BuildContext context,
+    NumberFormat currencyFormat,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Order Information',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 12),
+          _infoRow('Order Number', order.orderNumber),
+          _infoRow(
+            'Total Amount',
+            currencyFormat.format(order.totalAmount),
+            isBold: true,
+          ),
+          _infoRow('Created', readableDate(order.createdAt)),
+          _infoRow('Last Updated', readableDate(order.updatedAt)),
+        ],
+      ),
     );
+  }
+
+  Widget _infoRow(String label, String value, {bool isBold = false}) {
+    return Builder(
+      builder: (context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacity(0.75),
+                fontSize: 12,
+              ),
+            ),
+            Text(
+              value,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 13,
+                fontWeight: isBold ? FontWeight.w700 : FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _statusLabel(OrderStatus status) {
+    switch (status) {
+      case OrderStatus.pending:
+        return 'Pending';
+      case OrderStatus.completed:
+        return 'Completed';
+      case OrderStatus.cancelled:
+        return 'Cancelled';
+    }
+  }
+
+  Color _statusColor(OrderStatus status) {
+    switch (status) {
+      case OrderStatus.completed:
+        return Colors.green;
+      case OrderStatus.pending:
+        return Colors.orange;
+      case OrderStatus.cancelled:
+        return Colors.red;
+    }
   }
 }
