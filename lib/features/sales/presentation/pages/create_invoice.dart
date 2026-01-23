@@ -64,6 +64,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
           initialDate: _dueDate ?? DateTime.now().add(const Duration(days: 30)),
           firstDay: DateTime.now(),
           lastDay: DateTime.now().add(const Duration(days: 365)),
+          title: 'Select due date',
+          description: 'Set when this invoice should be paid.',
         );
     if (picked != null && picked != _dueDate) {
       setState(() {

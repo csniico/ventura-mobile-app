@@ -176,7 +176,7 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
         data: {'status': status},
       );
       logger.info(response.data.toString());
-      return InvoiceModel.fromJson(response.data['data']);
+      return InvoiceModel.fromJson(response.data);
     } on DioException catch (e) {
       logger.error(e.response.toString());
       return null;

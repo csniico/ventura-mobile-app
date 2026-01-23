@@ -20,6 +20,8 @@ class DatePickerComponent extends StatelessWidget {
     DateTime? initialDate,
     DateTime? firstDay,
     DateTime? lastDay,
+    String? title,
+    String? description,
   }) async {
     DateTime tempDate = initialDate ?? DateTime.now();
     final effectiveFirstDay = firstDay ?? DateTime.now();
@@ -53,6 +55,31 @@ class DatePickerComponent extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    if (title != null || description != null) ...[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (title != null) ...[
+                              Text(
+                                title,
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(height: 6),
+                            ],
+                            if (description != null)
+                              Text(
+                                description,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: Colors.grey.shade700),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     Flexible(
                       child: SingleChildScrollView(
                         child: Padding(

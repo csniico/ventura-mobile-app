@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:ventura/core/services/pdf_service.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
+import 'package:ventura/features/sales/presentation/pages/edit_invoice.dart';
 import 'package:ventura/features/sales/domain/entities/invoice_entity.dart';
 import 'package:ventura/features/sales/domain/entities/invoice_status.dart';
 import 'package:ventura/features/sales/domain/entities/order_item_entity.dart';
@@ -21,10 +22,12 @@ class ViewInvoice extends StatefulWidget {
 class _ViewInvoiceState extends State<ViewInvoice> {
   bool isLoading = false;
   bool isSharing = false;
+  late Invoice _invoice;
 
   @override
   void initState() {
     super.initState();
+    _invoice = widget.invoice;
   }
 
   /// Formats a [DateTime] object into a readable string format.
@@ -58,18 +61,17 @@ class _ViewInvoiceState extends State<ViewInvoice> {
 
   @override
   Widget build(BuildContext context) {
-    final invoice = widget.invoice;
     final currencyFormat = NumberFormat.currency(
       symbol: 'GHC ',
       decimalDigits: 2,
     );
     final allItems =
-        invoice.orders?.expand((order) => order.items).toList() ??
+        _invoice.orders?.expand((order) => order.items).toList() ??
         <OrderItem>[];
-    final paidLabel = invoice.paymentDate != null
-        ? 'Paid ${readableDate(invoice.paymentDate!)}'
-        : invoice.issueDate != null
-        ? 'Issued ${readableDate(invoice.issueDate!)}'
+    final paidLabel = _invoice.paymentDate != null
+        ? 'Paid ${readableDate(_invoice.paymentDate!)}'
+        : _invoice.issueDate != null
+        ? 'Issued ${readableDate(_invoice.issueDate!)}'
         : 'No date set';
 
     return Scaffold(
@@ -96,6 +98,28 @@ class _ViewInvoiceState extends State<ViewInvoice> {
             fontWeight: FontWeight.w600,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: HugeIcon(
+              icon: HugeIcons.strokeRoundedPencilEdit02,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 26,
+            ),
+            onPressed: () async {
+              final updated = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => EditInvoice(invoice: _invoice),
+                ),
+              );
+
+              if (mounted && updated is Invoice) {
+                setState(() {
+                  _invoice = updated;
+                });
+              }
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -108,20 +132,20 @@ class _ViewInvoiceState extends State<ViewInvoice> {
                 children: [
                   _buildSummaryCard(
                     context: context,
-                    amount: currencyFormat.format(invoice.totalAmount),
+                    amount: currencyFormat.format(_invoice.totalAmount),
                     title:
-                        invoice.customer?.name ??
-                        'Invoice ${invoice.invoiceNumber}',
+                        _invoice.customer?.name ??
+                        'Invoice ${_invoice.invoiceNumber}',
                     subtitle: paidLabel,
-                    status: invoice.status,
+                    status: _invoice.status,
                   ),
                   const SizedBox(height: 12),
-                  _buildPaymentDetailsCard(invoice, currencyFormat),
+                  _buildPaymentDetailsCard(_invoice, currencyFormat),
                   const SizedBox(height: 12),
                   if (allItems.isNotEmpty)
                     _buildItemsCard(allItems, currencyFormat),
                   const SizedBox(height: 12),
-                  _buildTotalsCard(invoice, currencyFormat),
+                  _buildTotalsCard(_invoice, currencyFormat),
                   const SizedBox(height: 24),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -518,7 +542,7 @@ class _ViewInvoiceState extends State<ViewInvoice> {
       final business = _businessData();
 
       final pdfFile = await PdfService().generate(
-        widget.invoice,
+        _invoice,
         businessName: business.name,
         businessEmail: business.email,
         businessPhone: business.phone,
@@ -559,7 +583,7 @@ class _ViewInvoiceState extends State<ViewInvoice> {
       final business = _businessData();
 
       final pdfFile = await PdfService().generate(
-        widget.invoice,
+        _invoice,
         businessName: business.name,
         businessEmail: business.email,
         businessPhone: business.phone,
@@ -571,7 +595,7 @@ class _ViewInvoiceState extends State<ViewInvoice> {
 
       await Share.shareXFiles([
         XFile(pdfFile.path),
-      ], text: 'Invoice ${widget.invoice.invoiceNumber}');
+      ], text: 'Invoice ${_invoice.invoiceNumber}');
     } catch (e) {
       if (!mounted) return;
       ToastService.showError('Failed to share PDF: $e');

@@ -282,9 +282,6 @@ class _CreateOrderState extends State<CreateOrder> {
                       onPressed: isLoading ? null : () => _submitForm(context),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
                       ),
                       child: isLoading
                           ? const SizedBox(

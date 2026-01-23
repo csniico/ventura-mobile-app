@@ -6,6 +6,8 @@ import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/domain/entities/order_entity.dart';
 import 'package:ventura/features/sales/domain/entities/order_status.dart';
 import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
+import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
+import 'package:ventura/features/sales/presentation/widgets/date_picker_component.dart';
 import 'package:ventura/init_dependencies.dart';
 
 class EditOrder extends StatefulWidget {
@@ -20,11 +22,16 @@ class _EditOrderState extends State<EditOrder> {
   OrderStatus? _selectedStatus;
   late String _businessId;
   late final OrderBloc _orderBloc;
+  late final InvoiceBloc _invoiceBloc;
+  bool _isCreatingInvoice = false;
+  bool _isRepeatingOrder = false;
+  DateTime? _invoiceDueDate;
 
   @override
   void initState() {
     super.initState();
     _orderBloc = serviceLocator<OrderBloc>();
+    _invoiceBloc = serviceLocator<InvoiceBloc>();
     _selectedStatus = widget.order.status;
     _loadBusinessId();
   }
@@ -41,6 +48,7 @@ class _EditOrderState extends State<EditOrder> {
   @override
   void dispose() {
     _orderBloc.close();
+    _invoiceBloc.close();
     super.dispose();
   }
 
@@ -55,6 +63,80 @@ class _EditOrderState extends State<EditOrder> {
         orderId: widget.order.id,
         businessId: _businessId,
         status: _selectedStatus!.name,
+      ),
+    );
+  }
+
+  Future<void> _createInvoice() async {
+    final customerId = widget.order.customerId;
+    if (customerId == null || customerId.isEmpty) {
+      ToastService.showError('Order has no customer to bill');
+      return;
+    }
+
+    if (_businessId.isEmpty) {
+      ToastService.showError('Business not loaded yet. Please try again.');
+      return;
+    }
+
+    await _openInvoiceDueDateSheet(customerId);
+  }
+
+  Future<void> _openInvoiceDueDateSheet(String customerId) async {
+    final pickedDate = await DatePickerComponent.showDatePickerBottomSheet(
+      context: context,
+      initialDate:
+          _invoiceDueDate ?? DateTime.now().add(const Duration(days: 30)),
+      firstDay: DateTime.now(),
+      lastDay: DateTime.now().add(const Duration(days: 365)),
+      title: 'Select invoice due date',
+      description: 'Choose when this invoice should be paid.',
+    );
+
+    if (pickedDate == null) return;
+
+    setState(() => _invoiceDueDate = pickedDate);
+
+    _invoiceBloc.add(
+      InvoiceCreateEvent(
+        businessId: _businessId,
+        customerId: customerId,
+        orderIds: [widget.order.id],
+        dueDate: pickedDate,
+      ),
+    );
+  }
+
+  void _repeatOrder() {
+    final customerId = widget.order.customerId;
+    if (customerId == null || customerId.isEmpty) {
+      ToastService.showError('Order has no customer to bill');
+      return;
+    }
+
+    if (_businessId.isEmpty) {
+      ToastService.showError('Business not loaded yet. Please try again.');
+      return;
+    }
+
+    final itemsPayload = widget.order.items.map((item) {
+      return {
+        'itemType': item.itemType.toJson(),
+        'name': item.name,
+        'price': item.price,
+        'quantity': item.quantity,
+        if (item.product?.id != null) 'productId': item.product!.id,
+        if (item.service?.id != null) 'serviceId': item.service!.id,
+      };
+    }).toList();
+
+    setState(() => _isRepeatingOrder = true);
+
+    _orderBloc.add(
+      OrderCreateEvent(
+        businessId: _businessId,
+        customerId: customerId,
+        items: itemsPayload,
       ),
     );
   }
@@ -182,8 +264,11 @@ class _EditOrderState extends State<EditOrder> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _orderBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<OrderBloc>.value(value: _orderBloc),
+        BlocProvider<InvoiceBloc>.value(value: _invoiceBloc),
+      ],
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
@@ -208,25 +293,53 @@ class _EditOrderState extends State<EditOrder> {
             onPressed: () => Navigator.pop(context),
           ),
         ),
-        body: BlocConsumer<OrderBloc, OrderState>(
-          listener: (context, state) {
-            if (state is OrderUpdateSuccessState) {
-              ToastService.showSuccess('Order status updated successfully');
-              Navigator.pop(context);
-            } else if (state is OrderErrorState) {
-              ToastService.showError(state.message);
-            }
-          },
-          builder: (context, state) {
-            final isUpdating = state is OrderLoadingState;
+        body: MultiBlocListener(
+          listeners: [
+            BlocListener<OrderBloc, OrderState>(
+              listener: (context, state) {
+                if (state is OrderCreateSuccessState) {
+                  setState(() => _isRepeatingOrder = false);
+                  ToastService.showSuccess('Order repeated successfully');
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => EditOrder(order: state.order),
+                    ),
+                  );
+                } else if (state is OrderUpdateSuccessState) {
+                  ToastService.showSuccess('Order status updated successfully');
+                  Navigator.pop(context);
+                } else if (state is OrderErrorState) {
+                  setState(() => _isRepeatingOrder = false);
+                  ToastService.showError(state.message);
+                }
+              },
+            ),
+            BlocListener<InvoiceBloc, InvoiceState>(
+              listener: (context, state) {
+                if (state is InvoiceCreateSuccessState) {
+                  setState(() => _isCreatingInvoice = false);
+                  ToastService.showSuccess('Invoice created successfully');
+                } else if (state is InvoiceErrorState) {
+                  setState(() => _isCreatingInvoice = false);
+                  ToastService.showError(state.message);
+                } else if (state is InvoiceLoadingState) {
+                  setState(() => _isCreatingInvoice = true);
+                }
+              },
+            ),
+          ],
+          child: BlocBuilder<OrderBloc, OrderState>(
+            builder: (context, state) {
+              final isUpdating = state is OrderLoadingState;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: _canEditOrder
-                  ? _buildEditableContent(context, isUpdating)
-                  : _buildNonEditableContent(context),
-            );
-          },
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: _canEditOrder
+                    ? _buildEditableContent(context, isUpdating)
+                    : _buildNonEditableContent(context),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -234,6 +347,7 @@ class _EditOrderState extends State<EditOrder> {
 
   Widget _buildNonEditableContent(BuildContext context) {
     final isCompleted = widget.order.status == OrderStatus.completed;
+    final hasInvoice = widget.order.invoiceId != null;
 
     return Center(
       child: Column(
@@ -261,40 +375,73 @@ class _EditOrderState extends State<EditOrder> {
               ),
             ),
           ),
-          if (isCompleted) ...[
+          if (isCompleted && !hasInvoice) ...[
             const SizedBox(height: 32),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 24),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                  width: 1,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isCreatingInvoice ? null : _createInvoice,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                  icon: _isCreatingInvoice
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.receipt_long_outlined),
+                  label: Text(
+                    _isCreatingInvoice
+                        ? 'Creating invoice...'
+                        : 'Create Invoice',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
                 ),
               ),
-              child: Column(
-                children: [
-                  Text(
-                    'Generate Invoice',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: Theme.of(context).colorScheme.primary,
+            ),
+          ],
+          if (isCompleted && hasInvoice) ...[
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isRepeatingOrder ? null : _repeatOrder,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    foregroundColor: Theme.of(context).colorScheme.onSecondary,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'If you haven\'t already, you can generate an invoice for this order on the invoice page.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 14,
-                      height: 1.4,
-                    ),
+                  icon: _isRepeatingOrder
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.refresh_outlined),
+                  label: Text(
+                    _isRepeatingOrder ? 'Repeating order...' : 'Repeat Order',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
-                ],
+                ),
               ),
             ),
           ],

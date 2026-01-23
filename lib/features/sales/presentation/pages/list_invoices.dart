@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
+import 'package:ventura/features/sales/domain/entities/invoice_status.dart';
 import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/view_invoice.dart';
 
@@ -10,6 +11,40 @@ class ListInvoices extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color statusColor(InvoiceStatus status) {
+      switch (status) {
+        case InvoiceStatus.paid:
+          return Colors.green;
+        case InvoiceStatus.partiallyPaid:
+          return Colors.orange;
+        case InvoiceStatus.sent:
+          return Colors.blue;
+        case InvoiceStatus.overdue:
+          return Colors.red;
+        case InvoiceStatus.cancelled:
+          return Colors.grey;
+        case InvoiceStatus.draft:
+          return Colors.blueGrey;
+      }
+    }
+
+    String statusLabel(InvoiceStatus status) {
+      switch (status) {
+        case InvoiceStatus.draft:
+          return 'Draft';
+        case InvoiceStatus.sent:
+          return 'Sent';
+        case InvoiceStatus.paid:
+          return 'Paid';
+        case InvoiceStatus.partiallyPaid:
+          return 'Partially Paid';
+        case InvoiceStatus.overdue:
+          return 'Overdue';
+        case InvoiceStatus.cancelled:
+          return 'Cancelled';
+      }
+    }
+
     return BlocBuilder<InvoiceBloc, InvoiceState>(
       builder: (context, state) {
         if (state is InvoiceLoadingState) {
@@ -96,6 +131,26 @@ class ListInvoices extends StatelessWidget {
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: statusColor(
+                                  invoice.status,
+                                ).withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                statusLabel(invoice.status),
+                                style: TextStyle(
+                                  color: statusColor(invoice.status),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                             HugeIcon(icon: HugeIcons.strokeRoundedArrowRight01),
