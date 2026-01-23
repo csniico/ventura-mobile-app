@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
@@ -25,18 +23,22 @@ class Sales extends StatefulWidget {
   State<Sales> createState() => _SalesState();
 }
 
-class _SalesState extends State<Sales> {
+class _SalesState extends State<Sales> with TickerProviderStateMixin {
   late final String _businessId;
   late final InvoiceBloc _invoiceBloc;
   late final OrderBloc _orderBloc;
   late final ProductBloc _productBloc;
   late final CustomerBloc _customerBloc;
+  late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     // Use cached businessId synchronously - user must be logged in to reach this page
     _businessId = UserService().businessId!;
+
+    // Initialize tab controller
+    _tabController = TabController(length: 4, vsync: this);
 
     // Initialize blocs immediately
     _invoiceBloc = serviceLocator<InvoiceBloc>()
@@ -47,6 +49,39 @@ class _SalesState extends State<Sales> {
       ..add(ProductSearchEvent(businessId: _businessId, searchQuery: ''));
     _customerBloc = serviceLocator<CustomerBloc>()
       ..add(CustomerGetEvent(businessId: _businessId));
+  }
+
+  void _onFabPressed() {
+    final currentIndex = _tabController.index;
+
+    switch (currentIndex) {
+      case 0:
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(builder: (context) => const CreateInvoice()),
+            )
+            .then((_) => _refreshInvoices());
+        break;
+      case 1:
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const CreateOrder()))
+            .then((_) => _refreshOrders());
+        break;
+      case 2:
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(builder: (context) => const CreateProducts()),
+            )
+            .then((_) => _refreshProducts());
+        break;
+      case 3:
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(builder: (context) => const CreateCustomers()),
+            )
+            .then((_) => _refreshCustomers());
+        break;
+    }
   }
 
   Future<void> _refreshInvoices() async {
@@ -69,6 +104,7 @@ class _SalesState extends State<Sales> {
 
   @override
   void dispose() {
+    _tabController.dispose();
     _invoiceBloc.close();
     _orderBloc.close();
     _productBloc.close();
@@ -87,97 +123,40 @@ class _SalesState extends State<Sales> {
       ],
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        body: DefaultTabController(
-          length: 4,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SalesPageTabBar(),
-              ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    RefreshIndicator(
-                      onRefresh: _refreshInvoices,
-                      child: ListInvoices(),
-                    ),
-                    RefreshIndicator(
-                      onRefresh: _refreshOrders,
-                      child: ListOrders(),
-                    ),
-                    RefreshIndicator(
-                      onRefresh: _refreshProducts,
-                      child: ListProducts(),
-                    ),
-                    RefreshIndicator(
-                      onRefresh: _refreshCustomers,
-                      child: ListCustomers(),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        floatingActionButton: SpeedDial(
-          animatedIcon: AnimatedIcons.menu_close,
+        body: Column(
           children: [
-            SpeedDialChild(
-              child: HugeIcon(icon: HugeIcons.strokeRoundedDocumentValidation),
-              label: 'Invoice',
-              onTap: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const CreateInvoice(),
-                  ),
-                );
-                if (context.mounted) {
-                  _refreshInvoices();
-                }
-              },
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SalesPageTabBar(controller: _tabController),
             ),
-            SpeedDialChild(
-              child: HugeIcon(icon: HugeIcons.strokeRoundedPackage),
-              label: 'Order',
-              onTap: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const CreateOrder()),
-                );
-                if (context.mounted) {
-                  _refreshOrders();
-                }
-              },
-            ),
-            SpeedDialChild(
-              child: HugeIcon(icon: HugeIcons.strokeRoundedShoppingBag01),
-              label: 'Product',
-              onTap: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const CreateProducts(),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  RefreshIndicator(
+                    onRefresh: _refreshInvoices,
+                    child: ListInvoices(),
                   ),
-                );
-                if (context.mounted) {
-                  _refreshProducts();
-                }
-              },
-            ),
-            SpeedDialChild(
-              child: HugeIcon(icon: HugeIcons.strokeRoundedUser),
-              label: 'Customer',
-              onTap: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const CreateCustomers(),
+                  RefreshIndicator(
+                    onRefresh: _refreshOrders,
+                    child: ListOrders(),
                   ),
-                );
-                if (context.mounted) {
-                  _refreshCustomers();
-                }
-              },
+                  RefreshIndicator(
+                    onRefresh: _refreshProducts,
+                    child: ListProducts(),
+                  ),
+                  RefreshIndicator(
+                    onRefresh: _refreshCustomers,
+                    child: ListCustomers(),
+                  ),
+                ],
+              ),
             ),
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _onFabPressed,
+          child: const Icon(Icons.add),
         ),
       ),
     );

@@ -160,12 +160,14 @@ class ViewProduct extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.1),
+            color: label == 'Out of Stock'
+                ? Theme.of(context).colorScheme.error
+                : Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.0),
           ),
         ),
         child: Column(
@@ -173,19 +175,29 @@ class ViewProduct extends StatelessWidget {
           children: [
             HugeIcon(
               icon: icon,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: label == 'Out of Stock'
+                  ? Theme.of(context).colorScheme.error
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
               size: 24,
             ),
             const SizedBox(height: 12),
             Text(
               value,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: label == 'Out of Stock'
+                    ? Theme.of(context).colorScheme.error
+                    : null,
+              ),
             ),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                color: label == 'Out of Stock'
+                    ? Theme.of(context).colorScheme.error
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -224,7 +236,7 @@ class ViewProduct extends StatelessWidget {
           }
         },
         child: Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           body: Stack(
             children: [
               // 1. Background Image Section
@@ -307,7 +319,9 @@ class ViewProduct extends StatelessWidget {
                   builder: (context, scrollController) {
                     return Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerLowest,
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(32),
                         ),
@@ -350,7 +364,9 @@ class ViewProduct extends StatelessWidget {
                               children: [
                                 _buildStatItem(
                                   context,
-                                  'Available Stock',
+                                  product.availableQuantity == 0
+                                      ? 'Out of Stock'
+                                      : 'Available Stock',
                                   product.availableQuantity.toString(),
                                   HugeIcons.strokeRoundedPackage,
                                 ),

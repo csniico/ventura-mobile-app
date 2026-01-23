@@ -9,6 +9,27 @@ import 'package:ventura/features/sales/presentation/pages/create_customers.dart'
 class ListCustomers extends StatelessWidget {
   const ListCustomers({super.key});
 
+  Color _getCustomerAvatarColor(dynamic customer) {
+    final colors = [
+      Colors.red,
+      Colors.pink,
+      Colors.purple,
+      Colors.indigo,
+      Colors.blue,
+      Colors.cyan,
+      Colors.teal,
+      Colors.green,
+      Colors.lime,
+      Colors.yellow,
+      Colors.amber,
+      Colors.orange,
+      Colors.deepOrange,
+    ];
+
+    final index = customer.id.hashCode % colors.length;
+    return colors[index.abs()];
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CustomerBloc, CustomerState>(
@@ -110,55 +131,60 @@ class ListCustomers extends StatelessWidget {
             );
           }
 
-          return ListView.separated(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            itemCount: state.customers.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 2),
-            itemBuilder: (context, index) {
-              final customer = state.customers[index];
-              return Card(
-                elevation: 0,
-                child: ListTile(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ViewCustomer(customer: customer),
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView.separated(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              itemCount: state.customers.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final customer = state.customers[index];
+                return Card(
+                  color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                  elevation: 0,
+                  child: ListTile(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ViewCustomer(customer: customer),
+                        ),
+                      );
+                    },
+                    leading: CircleAvatar(
+                      backgroundColor: _getCustomerAvatarColor(customer),
+                      child: HugeIcon(
+                        icon: HugeIcons.strokeRoundedUser,
+                        color: Colors.white,
+                        size: 20,
                       ),
-                    );
-                  },
-                  leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    child: HugeIcon(
-                      icon: HugeIcons.strokeRoundedUser,
-                      color: Colors.white,
+                    ),
+                    title: Text(
+                      customer.name,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Text(
+                        customer.phone ?? customer.email ?? 'No contact info',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.5),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    trailing: HugeIcon(
+                      icon: HugeIcons.strokeRoundedArrowRight01,
                       size: 20,
                     ),
                   ),
-                  title: Text(
-                    customer.name,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(
-                      customer.phone ?? customer.email ?? 'No contact info',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.5),
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  trailing: HugeIcon(
-                    icon: HugeIcons.strokeRoundedArrowRight01,
-                    size: 20,
-                  ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         }
 

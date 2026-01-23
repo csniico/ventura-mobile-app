@@ -94,7 +94,7 @@ class ListProducts extends StatelessWidget {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: Theme.of(

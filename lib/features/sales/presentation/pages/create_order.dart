@@ -96,13 +96,17 @@ class _CreateOrderState extends State<CreateOrder> {
         ),
       ],
       child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
-          title: const Text('Create Order'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          title: Text(
+            'Create Order',
+            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+          ),
           leading: IconButton(
             icon: HugeIcon(
               icon: HugeIcons.strokeRoundedArrowLeft01,
-              color: Theme.of(context).iconTheme.color,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: () => Navigator.pop(context),
           ),

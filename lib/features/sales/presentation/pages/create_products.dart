@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
@@ -51,47 +50,91 @@ class _CreateProductsState extends State<CreateProducts> {
 
   Future<void> _pickAndUploadImage({bool isPrimary = true}) async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
-    if (image != null) {
-      if (!mounted) return;
-      setState(() {
-        if (isPrimary) {
+    if (isPrimary) {
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+      if (image != null) {
+        if (!mounted) return;
+        setState(() {
           _isUploadingPrimary = true;
-        } else {
-          _isUploadingSupporting = true;
-        }
-      });
+        });
 
-      final File file = File(image.path);
-      final result = await serviceLocator<AssetUploadImage>().call(
-        AssetUploadImageParams(file: file),
-      );
+        final File file = File(image.path);
+        final result = await serviceLocator<AssetUploadImage>().call(
+          AssetUploadImageParams(file: file),
+        );
 
-      if (!mounted) return;
+        if (!mounted) return;
 
-      result.fold(
-        (failure) {
-          ToastService.showError('Failed to upload image: ${failure.message}');
-        },
-        (url) {
-          setState(() {
-            if (isPrimary) {
+        result.fold(
+          (failure) {
+            ToastService.showError(
+              'Failed to upload image: ${failure.message}',
+            );
+          },
+          (url) {
+            setState(() {
               _primaryImageUrl = url;
-            } else {
-              _supportingImageUrls.add(url);
-            }
-          });
-        },
-      );
+            });
+          },
+        );
 
-      setState(() {
-        if (isPrimary) {
+        setState(() {
           _isUploadingPrimary = false;
-        } else {
-          _isUploadingSupporting = false;
+        });
+      }
+    } else {
+      // Select multiple images for supporting images
+      final List<XFile> images = await picker.pickMultiImage();
+
+      if (images.isNotEmpty) {
+        if (!mounted) return;
+        setState(() {
+          _isUploadingSupporting = true;
+        });
+
+        int successCount = 0;
+        int failureCount = 0;
+
+        // Upload each image one by one
+        for (final image in images) {
+          final File file = File(image.path);
+          final result = await serviceLocator<AssetUploadImage>().call(
+            AssetUploadImageParams(file: file),
+          );
+
+          if (!mounted) break;
+
+          result.fold(
+            (failure) {
+              failureCount++;
+            },
+            (url) {
+              setState(() {
+                _supportingImageUrls.add(url);
+              });
+              successCount++;
+            },
+          );
         }
-      });
+
+        if (!mounted) return;
+
+        setState(() {
+          _isUploadingSupporting = false;
+        });
+
+        // Show feedback to user
+        if (successCount > 0) {
+          ToastService.showSuccess(
+            '$successCount image(s) uploaded successfully',
+          );
+        }
+        if (failureCount > 0) {
+          ToastService.showError('Failed to upload $failureCount image(s)');
+        }
+      }
     }
   }
 

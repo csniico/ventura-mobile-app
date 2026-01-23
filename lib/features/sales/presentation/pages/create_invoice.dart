@@ -119,18 +119,21 @@ class _CreateInvoiceState extends State<CreateInvoice> {
         ),
       ],
       child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.primary,
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(8.0),
             child: const SizedBox(height: 8.0),
           ),
-          title: const Text('Create Invoice'),
+          title: Text(
+            'Create Invoice',
+            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+          ),
           leading: IconButton(
             icon: HugeIcon(
               icon: HugeIcons.strokeRoundedArrowLeft01,
-              color: Theme.of(context).iconTheme.color,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: () => Navigator.pop(context),
           ),

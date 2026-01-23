@@ -2,11 +2,14 @@ import 'package:animated_segmented_tab_control/animated_segmented_tab_control.da
 import 'package:flutter/material.dart';
 
 class SalesPageTabBar extends StatelessWidget {
-  const SalesPageTabBar({super.key});
+  final TabController controller;
+
+  const SalesPageTabBar({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return SegmentedTabControl(
+      controller: controller,
       height: 50,
       barDecoration: BoxDecoration(
         color: Theme.of(
