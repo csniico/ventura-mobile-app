@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/services/user_service.dart';
+import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
+import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/view_customer.dart';
 import 'package:ventura/features/sales/presentation/pages/create_customers.dart';
 import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart';
@@ -395,13 +397,27 @@ class _ListCustomersState extends State<ListCustomers> {
                           ).colorScheme.surfaceContainerLowest,
                           elevation: 0,
                           child: ListTile(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ViewCustomer(customer: customer),
-                                ),
-                              );
+                            onTap: () async {
+                              final result = await Navigator.of(context)
+                                  .push<bool>(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ViewCustomer(customer: customer),
+                                    ),
+                                  );
+
+                              // If an order was created, refresh the orders list
+                              if (result == true && context.mounted) {
+                                context.read<OrderBloc>().add(
+                                  OrderGetListEvent(
+                                    businessId:
+                                        (context.read<AuthBloc>().state
+                                                as Authenticated)
+                                            .user
+                                            .businessId,
+                                  ),
+                                );
+                              }
                             },
                             leading: CircleAvatar(
                               backgroundColor: _getCustomerAvatarColor(

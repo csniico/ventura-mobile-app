@@ -214,6 +214,10 @@ class PdfService {
     // Extract all items from all orders
     final allItems = invoice.orders!.expand((order) => order.items).toList();
 
+    if (allItems.isEmpty) {
+      return pw.SizedBox();
+    }
+
     return pw.Table(
       border: pw.TableBorder.all(color: PdfColors.grey300),
       columnWidths: {
@@ -278,7 +282,10 @@ class PdfService {
   pw.Widget _buildTotalsSection(Invoice invoice, NumberFormat currencyFormat) {
     final totalAmount = currencyFormat.format(invoice.totalAmount);
     final subtotal = currencyFormat.format(invoice.subtotal);
-    final tax = currencyFormat.format(invoice.totalTax);
+    final vat = currencyFormat.format(invoice.vatAmount);
+    final nhil = currencyFormat.format(invoice.nhilAmount);
+    final getfund = currencyFormat.format(invoice.getfundAmount);
+    final totalTax = currencyFormat.format(invoice.totalTax);
 
     return pw.Container(
       decoration: pw.BoxDecoration(
@@ -289,7 +296,27 @@ class PdfService {
       child: pw.Column(
         children: [
           _buildAmountRow('Subtotal', subtotal),
-          _buildAmountRow('Total tax', tax),
+          pw.SizedBox(height: 2),
+          pw.Padding(
+            padding: const pw.EdgeInsets.only(left: 12),
+            child: pw.Column(
+              children: [
+                _buildAmountRow(
+                  'VAT (${(invoice.vatRate * 100).toStringAsFixed(0)}%)',
+                  vat,
+                ),
+                _buildAmountRow(
+                  'NHIL (${(invoice.nhilRate * 100).toStringAsFixed(1)}%)',
+                  nhil,
+                ),
+                _buildAmountRow(
+                  'GETFund (${(invoice.getfundRate * 100).toStringAsFixed(1)}%)',
+                  getfund,
+                ),
+              ],
+            ),
+          ),
+          _buildAmountRow('Total tax', totalTax),
           pw.Divider(thickness: 1, color: PdfColors.grey400),
           _buildAmountRow('Total', totalAmount, isBold: true),
         ],

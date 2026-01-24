@@ -5,9 +5,22 @@ import 'package:ventura/features/sales/domain/entities/order_entity.dart';
 import 'package:ventura/features/sales/domain/entities/order_status.dart';
 import 'package:ventura/features/sales/presentation/pages/edit_order.dart';
 
-class ViewOrder extends StatelessWidget {
+class ViewOrder extends StatefulWidget {
   const ViewOrder({super.key, required this.order});
   final Order order;
+
+  @override
+  State<ViewOrder> createState() => _ViewOrderState();
+}
+
+class _ViewOrderState extends State<ViewOrder> {
+  late Order _order;
+
+  @override
+  void initState() {
+    super.initState();
+    _order = widget.order;
+  }
 
   /// Formats a [DateTime] object into a readable string format.
   /// For example, 1.1.2024 becomes "1st January 2024".
@@ -44,7 +57,7 @@ class ViewOrder extends StatelessWidget {
       symbol: 'GHC ',
       decimalDigits: 2,
     );
-    final createdLabel = 'Created ${readableDate(order.createdAt)}';
+    final createdLabel = 'Created ${readableDate(_order.createdAt)}';
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -77,12 +90,18 @@ class ViewOrder extends StatelessWidget {
               color: Theme.of(context).colorScheme.onPrimary,
               size: 26,
             ),
-            onPressed: () {
-              Navigator.of(context).push(
+            onPressed: () async {
+              final updatedOrder = await Navigator.of(context).push<Order>(
                 MaterialPageRoute(
-                  builder: (context) => EditOrder(order: order),
+                  builder: (context) => EditOrder(order: _order),
                 ),
               );
+
+              if (updatedOrder != null && mounted) {
+                setState(() {
+                  _order = updatedOrder;
+                });
+              }
             },
           ),
         ],
@@ -95,15 +114,15 @@ class ViewOrder extends StatelessWidget {
             children: [
               _buildSummaryCard(
                 context: context,
-                amount: currencyFormat.format(order.totalAmount),
-                title: order.customer?.name ?? 'Order ${order.orderNumber}',
+                amount: currencyFormat.format(_order.totalAmount),
+                title: _order.customer?.name ?? 'Order ${_order.orderNumber}',
                 subtitle: createdLabel,
-                status: order.status,
+                status: _order.status,
               ),
               const SizedBox(height: 12),
-              if (order.customer != null) _buildCustomerCard(context),
+              if (_order.customer != null) _buildCustomerCard(context),
               const SizedBox(height: 12),
-              if (order.items.isNotEmpty)
+              if (_order.items.isNotEmpty)
                 _buildItemsCard(context, currencyFormat),
               const SizedBox(height: 12),
               _buildOrderInfoCard(context, currencyFormat),
@@ -212,11 +231,11 @@ class ViewOrder extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _infoRow('Name', order.customer!.name),
-          if (order.customer!.email != null)
-            _infoRow('Email', order.customer!.email!),
-          if (order.customer!.phone != null)
-            _infoRow('Phone', order.customer!.phone!),
+          _infoRow('Name', _order.customer!.name),
+          if (_order.customer!.email != null)
+            _infoRow('Email', _order.customer!.email!),
+          if (_order.customer!.phone != null)
+            _infoRow('Phone', _order.customer!.phone!),
         ],
       ),
     );
@@ -241,7 +260,7 @@ class ViewOrder extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          ...order.items.map((item) {
+          ..._order.items.map((item) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Row(
@@ -311,14 +330,14 @@ class ViewOrder extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _infoRow('Order Number', order.orderNumber),
+          _infoRow('Order Number', _order.orderNumber),
           _infoRow(
             'Total Amount',
-            currencyFormat.format(order.totalAmount),
+            currencyFormat.format(_order.totalAmount),
             isBold: true,
           ),
-          _infoRow('Created', readableDate(order.createdAt)),
-          _infoRow('Last Updated', readableDate(order.updatedAt)),
+          _infoRow('Created', readableDate(_order.createdAt)),
+          _infoRow('Last Updated', readableDate(_order.updatedAt)),
         ],
       ),
     );

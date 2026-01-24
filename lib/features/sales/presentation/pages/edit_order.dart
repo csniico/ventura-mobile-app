@@ -7,6 +7,7 @@ import 'package:ventura/features/sales/domain/entities/order_entity.dart';
 import 'package:ventura/features/sales/domain/entities/order_status.dart';
 import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
+import 'package:ventura/features/sales/presentation/pages/view_invoice.dart';
 import 'package:ventura/features/sales/presentation/widgets/date_picker_component.dart';
 import 'package:ventura/init_dependencies.dart';
 
@@ -307,7 +308,7 @@ class _EditOrderState extends State<EditOrder> {
                   );
                 } else if (state is OrderUpdateSuccessState) {
                   ToastService.showSuccess('Order status updated successfully');
-                  Navigator.pop(context);
+                  Navigator.pop(context, state.order);
                 } else if (state is OrderErrorState) {
                   setState(() => _isRepeatingOrder = false);
                   ToastService.showError(state.message);
@@ -319,6 +320,12 @@ class _EditOrderState extends State<EditOrder> {
                 if (state is InvoiceCreateSuccessState) {
                   setState(() => _isCreatingInvoice = false);
                   ToastService.showSuccess('Invoice created successfully');
+                  // Navigate to invoice details page with fresh data
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ViewInvoice(invoice: state.invoice),
+                    ),
+                  );
                 } else if (state is InvoiceErrorState) {
                   setState(() => _isCreatingInvoice = false);
                   ToastService.showError(state.message);

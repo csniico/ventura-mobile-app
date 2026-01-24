@@ -56,12 +56,15 @@ class InvoiceModel extends Invoice {
       invoiceNumber: json['invoiceNumber'] ?? '',
       businessId: json['businessId'] ?? '',
       customerId: json['customerId'] ?? '',
-      customer: json['customer'] != null
-          ? CustomerModel.fromJson(json['customer'])
+      customer: json['customer'] != null && json['customer'] is Map
+          ? CustomerModel.fromJson(json['customer'] as Map<String, dynamic>)
           : null,
-      orders: json['orders'] != null
+      orders: json['orders'] != null && json['orders'] is List
           ? (json['orders'] as List)
-                .map((order) => OrderModel.fromJson(order))
+                .where((order) => order != null && order is Map)
+                .map(
+                  (order) => OrderModel.fromJson(order as Map<String, dynamic>),
+                )
                 .toList()
           : null,
       subtotal: (json['subtotal'] is String)

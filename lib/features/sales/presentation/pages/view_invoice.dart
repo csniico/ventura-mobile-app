@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
@@ -6,10 +7,12 @@ import 'package:share_plus/share_plus.dart';
 import 'package:ventura/core/services/pdf_service.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
+import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/edit_invoice.dart';
 import 'package:ventura/features/sales/domain/entities/invoice_entity.dart';
 import 'package:ventura/features/sales/domain/entities/invoice_status.dart';
 import 'package:ventura/features/sales/domain/entities/order_item_entity.dart';
+import 'package:ventura/init_dependencies.dart';
 
 class ViewInvoice extends StatefulWidget {
   const ViewInvoice({super.key, required this.invoice});
@@ -23,11 +26,37 @@ class _ViewInvoiceState extends State<ViewInvoice> {
   bool isLoading = false;
   bool isSharing = false;
   late Invoice _invoice;
+  late final InvoiceBloc _invoiceBloc;
+  late String _businessId;
 
   @override
   void initState() {
     super.initState();
     _invoice = widget.invoice;
+    _invoiceBloc = serviceLocator<InvoiceBloc>();
+    _loadBusinessIdAndRefreshInvoice();
+  }
+
+  Future<void> _loadBusinessIdAndRefreshInvoice() async {
+    final user = await UserService().getUser();
+    if (user != null && mounted) {
+      setState(() {
+        _businessId = user.businessId;
+      });
+      // Always fetch fresh invoice data
+      _invoiceBloc.add(
+        InvoiceGetByIdEvent(
+          invoiceId: widget.invoice.id,
+          businessId: _businessId,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _invoiceBloc.close();
+    super.dispose();
   }
 
   /// Formats a [DateTime] object into a readable string format.
@@ -74,132 +103,152 @@ class _ViewInvoiceState extends State<ViewInvoice> {
         ? 'Issued ${readableDate(_invoice.issueDate!)}'
         : 'No date set';
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(8.0),
-          child: SizedBox(height: 8.0),
-        ),
-        leading: IconButton(
-          icon: HugeIcon(
-            icon: HugeIcons.strokeRoundedArrowLeft01,
-            color: Theme.of(context).colorScheme.onPrimary,
-            size: 30,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Invoice Details',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimary,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: HugeIcon(
-              icon: HugeIcons.strokeRoundedPencilEdit02,
-              color: Theme.of(context).colorScheme.onPrimary,
-              size: 26,
+    return BlocProvider.value(
+      value: _invoiceBloc,
+      child: BlocListener<InvoiceBloc, InvoiceState>(
+        listener: (context, state) {
+          if (state is InvoiceLoadedState) {
+            setState(() {
+              _invoice = state.invoice;
+            });
+          } else if (state is InvoiceErrorState) {
+            ToastService.showError(state.message);
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            bottom: const PreferredSize(
+              preferredSize: Size.fromHeight(8.0),
+              child: SizedBox(height: 8.0),
             ),
-            onPressed: () async {
-              final updated = await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => EditInvoice(invoice: _invoice),
+            leading: IconButton(
+              icon: HugeIcon(
+                icon: HugeIcons.strokeRoundedArrowLeft01,
+                color: Theme.of(context).colorScheme.onPrimary,
+                size: 30,
+              ),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Text(
+              'Invoice Details',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            actions: [
+              IconButton(
+                icon: HugeIcon(
+                  icon: HugeIcons.strokeRoundedPencilEdit02,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  size: 26,
                 ),
-              );
+                onPressed: () async {
+                  final updated = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => EditInvoice(invoice: _invoice),
+                    ),
+                  );
 
-              if (mounted && updated is Invoice) {
-                setState(() {
-                  _invoice = updated;
-                });
-              }
-            },
+                  if (mounted && updated is Invoice) {
+                    setState(() {
+                      _invoice = updated;
+                    });
+                  }
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            padding: const EdgeInsets.all(12.0),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSummaryCard(
-                    context: context,
-                    amount: currencyFormat.format(_invoice.totalAmount),
-                    title:
-                        _invoice.customer?.name ??
-                        'Invoice ${_invoice.invoiceNumber}',
-                    subtitle: paidLabel,
-                    status: _invoice.status,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildPaymentDetailsCard(_invoice, currencyFormat),
-                  const SizedBox(height: 12),
-                  if (allItems.isNotEmpty)
-                    _buildItemsCard(allItems, currencyFormat),
-                  const SizedBox(height: 12),
-                  _buildTotalsCard(_invoice, currencyFormat),
-                  const SizedBox(height: 24),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+          body: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                padding: const EdgeInsets.all(12.0),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ElevatedButton.icon(
-                        onPressed: isLoading || isSharing ? null : _generatePdf,
-                        icon: const Icon(Icons.picture_as_pdf_outlined),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isLoading || isSharing
-                              ? Colors.grey
-                              : Theme.of(context).colorScheme.primary,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 16.0,
-                            horizontal: 16.0,
-                          ),
-                        ),
-                        label: Text(
-                          isLoading ? 'Generating PDF...' : 'View Invoice PDF',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                      _buildSummaryCard(
+                        context: context,
+                        amount: currencyFormat.format(_invoice.totalAmount),
+                        title:
+                            _invoice.customer?.name ??
+                            'Invoice ${_invoice.invoiceNumber}',
+                        subtitle: paidLabel,
+                        status: _invoice.status,
                       ),
                       const SizedBox(height: 12),
-                      ElevatedButton.icon(
-                        onPressed: isLoading || isSharing
-                            ? null
-                            : _shareInvoice,
-                        icon: const Icon(Icons.ios_share_rounded),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isLoading || isSharing
-                              ? Colors.grey
-                              : Theme.of(context).colorScheme.secondary,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 16.0,
-                            horizontal: 16.0,
+                      _buildPaymentDetailsCard(_invoice, currencyFormat),
+                      const SizedBox(height: 12),
+                      if (allItems.isNotEmpty)
+                        _buildItemsCard(allItems, currencyFormat),
+                      const SizedBox(height: 12),
+                      _buildTotalsCard(_invoice, currencyFormat),
+                      const SizedBox(height: 24),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: isLoading || isSharing
+                                ? null
+                                : _generatePdf,
+                            icon: const Icon(Icons.picture_as_pdf_outlined),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isLoading || isSharing
+                                  ? Colors.grey
+                                  : Theme.of(context).colorScheme.primary,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16.0,
+                                horizontal: 16.0,
+                              ),
+                            ),
+                            label: Text(
+                              isLoading
+                                  ? 'Generating PDF...'
+                                  : 'View Invoice PDF',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        ),
-                        label: Text(
-                          isSharing
-                              ? 'Preparing to share...'
-                              : 'Share Invoice PDF',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSecondary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                          const SizedBox(height: 12),
+                          ElevatedButton.icon(
+                            onPressed: isLoading || isSharing
+                                ? null
+                                : _shareInvoice,
+                            icon: const Icon(Icons.ios_share_rounded),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isLoading || isSharing
+                                  ? Colors.grey
+                                  : Theme.of(context).colorScheme.secondary,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16.0,
+                                horizontal: 16.0,
+                              ),
+                            ),
+                            label: Text(
+                              isSharing
+                                  ? 'Preparing to share...'
+                                  : 'Share Invoice PDF',
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSecondary,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -435,12 +484,34 @@ class _ViewInvoiceState extends State<ViewInvoice> {
           ),
           const SizedBox(height: 12),
           _infoRow('Subtotal', currencyFormat.format(invoice.subtotal)),
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Column(
+              children: [
+                _infoRow(
+                  'VAT (${(invoice.vatRate * 100).toStringAsFixed(0)}%)',
+                  currencyFormat.format(invoice.vatAmount),
+                ),
+                _infoRow(
+                  'NHIL (${(invoice.nhilRate * 100).toStringAsFixed(1)}%)',
+                  currencyFormat.format(invoice.nhilAmount),
+                ),
+                _infoRow(
+                  'GETFund (${(invoice.getfundRate * 100).toStringAsFixed(1)}%)',
+                  currencyFormat.format(invoice.getfundAmount),
+                ),
+              ],
+            ),
+          ),
           _infoRow('Total tax', currencyFormat.format(invoice.totalTax)),
+          const SizedBox(height: 8),
           _infoRow(
             'Total amount',
             currencyFormat.format(invoice.totalAmount),
             isBold: true,
           ),
+          const SizedBox(height: 8),
           _infoRow('Amount paid', currencyFormat.format(invoice.amountPaid)),
           _infoRow(
             'Balance due',

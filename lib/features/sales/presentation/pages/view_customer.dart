@@ -22,8 +22,37 @@ class ViewCustomer extends StatefulWidget {
 }
 
 class _ViewCustomerState extends State<ViewCustomer> {
+  late final OrderBloc _orderBloc;
+  bool _orderCreated =
+      false; // Track if an order was created during this session
+
+  @override
+  void initState() {
+    super.initState();
+    _orderBloc = serviceLocator<OrderBloc>();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Load orders once after dependencies are available
+    _orderBloc.add(
+      OrderGetCustomerOrdersEvent(
+        customerId: widget.customer.id,
+        businessId:
+            (context.read<AuthBloc>().state as Authenticated).user.business!.id,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _orderBloc.close();
+    super.dispose();
+  }
+
   void _refreshOrders() {
-    context.read<OrderBloc>().add(
+    _orderBloc.add(
       OrderGetCustomerOrdersEvent(
         customerId: widget.customer.id,
         businessId:
@@ -44,61 +73,60 @@ class _ViewCustomerState extends State<ViewCustomer> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => serviceLocator<OrderBloc>()
-        ..add(
-          OrderGetCustomerOrdersEvent(
-            customerId: widget.customer.id,
-            businessId: (context.read<AuthBloc>().state as Authenticated)
-                .user
-                .business!
-                .id,
-          ),
-        ),
-      child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () async {
-            final result = await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) =>
-                    CreateCustomerOrder(customer: widget.customer),
-              ),
-            );
-            // If order was created successfully, refresh the orders list
-            if (result == true) {
-              _refreshOrders();
-            }
-          },
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          icon: HugeIcon(
-            icon: HugeIcons.strokeRoundedAdd01,
-            color: Colors.white,
-            size: 20,
-          ),
-          label: const Text(
-            'Create Order',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-        body: SafeArea(
-          top: false,
-          child: CustomScrollView(
-            slivers: [
-              _buildHeader(context),
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    _buildActionButtons(),
-                    _contactInfoSection(),
-                    if (widget.customer.notes != null &&
-                        widget.customer.notes!.isNotEmpty)
-                      _notesSection(),
-                  ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.of(context).pop(_orderCreated);
+      },
+      child: BlocProvider.value(
+        value: _orderBloc,
+        child: Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () async {
+              final result = await Navigator.of(context).push<bool>(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      CreateCustomerOrder(customer: widget.customer),
                 ),
-              ),
-              _buildOrdersSection(),
-            ],
+              );
+              // If order was created successfully, refresh the orders list and set the flag
+              if (result == true && mounted) {
+                _orderCreated = true;
+                _refreshOrders();
+              }
+            },
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            icon: HugeIcon(
+              icon: HugeIcons.strokeRoundedAdd01,
+              color: Colors.white,
+              size: 20,
+            ),
+            label: const Text(
+              'Create Order',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          body: SafeArea(
+            top: false,
+            child: CustomScrollView(
+              slivers: [
+                _buildHeader(context),
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      _buildActionButtons(),
+                      _contactInfoSection(),
+                      if (widget.customer.notes != null &&
+                          widget.customer.notes!.isNotEmpty)
+                        _notesSection(),
+                    ],
+                  ),
+                ),
+                _buildOrdersSection(),
+              ],
+            ),
           ),
         ),
       ),
@@ -117,7 +145,7 @@ class _ViewCustomerState extends State<ViewCustomer> {
           color: Colors.white,
           size: 24,
         ),
-        onPressed: () => Navigator.pop(context),
+        onPressed: () => Navigator.pop(context, _orderCreated),
       ),
       actions: [
         IconButton(
