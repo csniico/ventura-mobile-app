@@ -42,3 +42,9 @@ final class CustomerErrorState extends CustomerState {
 
   CustomerErrorState({required this.message});
 }
+
+final class CustomerImportSuccessState extends CustomerState {
+  final List<Customer> importedCustomers;
+
+  CustomerImportSuccessState({required this.importedCustomers});
+}

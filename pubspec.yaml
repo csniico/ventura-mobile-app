@@ -41,6 +41,7 @@ dependencies:
   pdf: ^3.11.3
   open_file: ^3.5.10
   share_plus: ^12.0.1
+  flutter_native_contact_picker: ^0.0.11
 
 dev_dependencies:
   flutter_test:

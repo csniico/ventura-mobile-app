@@ -90,6 +90,7 @@ import 'package:ventura/features/sales/domain/use_cases/get_order_stats.dart';
 import 'package:ventura/features/sales/domain/use_cases/get_orders.dart';
 import 'package:ventura/features/sales/domain/use_cases/get_product_by_id.dart';
 import 'package:ventura/features/sales/domain/use_cases/get_service_by_id.dart';
+import 'package:ventura/features/sales/domain/use_cases/import_customers.dart';
 import 'package:ventura/features/sales/domain/use_cases/search_orders.dart';
 import 'package:ventura/features/sales/domain/use_cases/search_resources.dart';
 import 'package:ventura/features/sales/domain/use_cases/update_customer.dart';
@@ -303,6 +304,9 @@ void _initSalesDependencies() {
     ..registerFactory(
       () => DeleteCustomer(customerRepository: serviceLocator()),
     )
+    ..registerFactory(
+      () => ImportCustomers(customerRepository: serviceLocator()),
+    )
     // USE CASES - Invoice
     ..registerFactory(() => CreateInvoice(invoiceRepository: serviceLocator()))
     ..registerFactory(() => GetInvoices(invoiceRepository: serviceLocator()))
@@ -349,6 +353,7 @@ void _initSalesDependencies() {
         createCustomer: serviceLocator(),
         updateCustomer: serviceLocator(),
         deleteCustomer: serviceLocator(),
+        importCustomers: serviceLocator(),
       ),
     )
     ..registerFactory(

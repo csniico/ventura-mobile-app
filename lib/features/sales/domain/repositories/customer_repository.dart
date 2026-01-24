@@ -35,4 +35,9 @@ abstract interface class CustomerRepository {
     required String customerId,
     required String businessId,
   });
+
+  Future<fpdart.Either<Failure, List<Customer>>> importCustomers({
+    required String businessId,
+    required List<Map<String, dynamic>> customers,
+  });
 }

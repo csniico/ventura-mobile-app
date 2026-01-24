@@ -135,4 +135,22 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
       return null;
     }
   }
+
+  @override
+  Future<Map<String, dynamic>?> importCustomers({
+    required String businessId,
+    required List<Map<String, dynamic>> customers,
+  }) async {
+    try {
+      final response = await dio.post(
+        '${routes.serverUrl}/customers/import',
+        data: {'businessId': businessId, 'customers': customers},
+      );
+      logger.info(response.data.toString());
+      return response.data as Map<String, dynamic>?;
+    } on DioException catch (e) {
+      logger.error(e.response.toString());
+      return null;
+    }
+  }
 }

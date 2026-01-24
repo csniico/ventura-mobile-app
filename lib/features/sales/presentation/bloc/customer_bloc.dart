@@ -6,6 +6,7 @@ import 'package:ventura/features/sales/domain/use_cases/delete_customer.dart';
 import 'package:ventura/features/sales/domain/use_cases/get_customer_by_id.dart';
 import 'package:ventura/features/sales/domain/use_cases/get_customers.dart';
 import 'package:ventura/features/sales/domain/use_cases/update_customer.dart';
+import 'package:ventura/features/sales/domain/use_cases/import_customers.dart';
 
 part 'customer_event.dart';
 part 'customer_state.dart';
@@ -16,6 +17,7 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
   final CreateCustomer _createCustomer;
   final UpdateCustomer _updateCustomer;
   final DeleteCustomer _deleteCustomer;
+  final ImportCustomers _importCustomers;
 
   CustomerBloc({
     required GetCustomers getCustomers,
@@ -23,11 +25,13 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     required CreateCustomer createCustomer,
     required UpdateCustomer updateCustomer,
     required DeleteCustomer deleteCustomer,
+    required ImportCustomers importCustomers,
   }) : _getCustomers = getCustomers,
        _getCustomerById = getCustomerById,
        _createCustomer = createCustomer,
        _updateCustomer = updateCustomer,
        _deleteCustomer = deleteCustomer,
+       _importCustomers = importCustomers,
        super(CustomerInitial()) {
     on<CustomerEvent>((event, emit) => emit(CustomerLoadingState()));
     on<CustomerGetEvent>(_onCustomerGetEvent);
@@ -35,6 +39,7 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     on<CustomerCreateEvent>(_onCustomerCreateEvent);
     on<CustomerUpdateEvent>(_onCustomerUpdateEvent);
     on<CustomerDeleteEvent>(_onCustomerDeleteEvent);
+    on<CustomerImportEvent>(_onCustomerImportEvent);
   }
 
   void _onCustomerGetEvent(
@@ -127,6 +132,25 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     res.fold(
       (failure) => emit(CustomerErrorState(message: failure.message)),
       (message) => emit(CustomerDeleteSuccessState(message: message)),
+    );
+  }
+
+  void _onCustomerImportEvent(
+    CustomerImportEvent event,
+    Emitter<CustomerState> emit,
+  ) async {
+    final res = await _importCustomers(
+      ImportCustomersParams(
+        businessId: event.businessId,
+        customers: event.customers,
+      ),
+    );
+
+    res.fold(
+      (failure) => emit(CustomerErrorState(message: failure.message)),
+      (importedCustomers) => emit(
+        CustomerImportSuccessState(importedCustomers: importedCustomers),
+      ),
     );
   }
 }

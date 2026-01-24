@@ -33,4 +33,9 @@ abstract interface class CustomerRemoteDataSource {
     required String customerId,
     required String businessId,
   });
+
+  Future<Map<String, dynamic>?> importCustomers({
+    required String businessId,
+    required List<Map<String, dynamic>> customers,
+  });
 }

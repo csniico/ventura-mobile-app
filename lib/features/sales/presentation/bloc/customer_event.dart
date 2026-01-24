@@ -58,3 +58,10 @@ final class CustomerDeleteEvent extends CustomerEvent {
 
   CustomerDeleteEvent({required this.customerId, required this.businessId});
 }
+
+final class CustomerImportEvent extends CustomerEvent {
+  final String businessId;
+  final List<Map<String, dynamic>> customers;
+
+  CustomerImportEvent({required this.businessId, required this.customers});
+}

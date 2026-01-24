@@ -126,4 +126,36 @@ class CustomerRepositoryImpl implements CustomerRepository {
       return fpdart.left(Failure('Failed to delete customer'));
     }
   }
+
+  @override
+  Future<fpdart.Either<Failure, List<Customer>>> importCustomers({
+    required String businessId,
+    required List<Map<String, dynamic>> customers,
+  }) async {
+    try {
+      final result = await customerRemoteDataSource.importCustomers(
+        businessId: businessId,
+        customers: customers,
+      );
+      if (result == null) {
+        return fpdart.left(Failure('Failed to import customers'));
+      }
+      final customersData = result['customers'] as List?;
+      if (customersData == null) {
+        return fpdart.left(Failure('No customers returned from import'));
+      }
+      final importedCustomers = await customerRemoteDataSource.getCustomers(
+        businessId: businessId,
+      );
+      if (importedCustomers == null) {
+        return fpdart.left(Failure('Failed to fetch updated customers'));
+      }
+      return fpdart.right(
+        importedCustomers.map((model) => model.toEntity()).toList(),
+      );
+    } catch (e) {
+      logger.error('Error importing customers: $e');
+      return fpdart.left(Failure('Failed to import customers'));
+    }
+  }
 }
