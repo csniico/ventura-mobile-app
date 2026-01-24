@@ -9,6 +9,8 @@ import 'package:ventura/features/sales/domain/entities/order_entity.dart';
 import 'package:ventura/features/sales/domain/entities/order_status.dart';
 import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/edit_customer.dart';
+import 'package:ventura/features/sales/presentation/pages/view_order.dart';
+import 'package:ventura/features/sales/presentation/pages/create_customer_order.dart';
 import 'package:ventura/init_dependencies.dart';
 
 class ViewCustomer extends StatefulWidget {
@@ -20,6 +22,16 @@ class ViewCustomer extends StatefulWidget {
 }
 
 class _ViewCustomerState extends State<ViewCustomer> {
+  void _refreshOrders() {
+    context.read<OrderBloc>().add(
+      OrderGetCustomerOrdersEvent(
+        customerId: widget.customer.id,
+        businessId:
+            (context.read<AuthBloc>().state as Authenticated).user.business!.id,
+      ),
+    );
+  }
+
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
     await launchUrl(launchUri);
@@ -45,6 +57,30 @@ class _ViewCustomerState extends State<ViewCustomer> {
         ),
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () async {
+            final result = await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>
+                    CreateCustomerOrder(customer: widget.customer),
+              ),
+            );
+            // If order was created successfully, refresh the orders list
+            if (result == true) {
+              _refreshOrders();
+            }
+          },
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedAdd01,
+            color: Colors.white,
+            size: 20,
+          ),
+          label: const Text(
+            'Create Order',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
         body: SafeArea(
           top: false,
           child: CustomScrollView(
@@ -487,92 +523,102 @@ class _ViewCustomerState extends State<ViewCustomer> {
     return Card(
       color: theme.colorScheme.surfaceContainerLowest,
       elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: statusColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => ViewOrder(order: order)),
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: HugeIcon(
+                          icon: HugeIcons.strokeRoundedShoppingBag01,
+                          color: statusColor,
+                          size: 20,
+                        ),
                       ),
-                      child: HugeIcon(
-                        icon: HugeIcons.strokeRoundedShoppingBag01,
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Order #${order.id.substring(0, 8)}',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            DateFormat('MMM dd, yyyy').format(order.createdAt),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      _getStatusText(order.status),
+                      style: theme.textTheme.labelSmall?.copyWith(
                         color: statusColor,
-                        size: 20,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Order #${order.id.substring(0, 8)}',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          DateFormat('MMM dd, yyyy').format(order.createdAt),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
                   ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    _getStatusText(order.status),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: statusColor,
-                      fontWeight: FontWeight.w600,
+                ],
+              ),
+              const SizedBox(height: 12),
+              Divider(
+                height: 1,
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total Amount',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Divider(
-              height: 1,
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total Amount',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                  Text(
+                    NumberFormat.currency(
+                      symbol: '\$',
+                    ).format(order.totalAmount),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
-                ),
-                Text(
-                  NumberFormat.currency(symbol: '\$').format(order.totalAmount),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
