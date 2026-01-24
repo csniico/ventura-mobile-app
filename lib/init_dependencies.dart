@@ -104,6 +104,12 @@ import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/product_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/service_bloc.dart';
+import 'package:ventura/features/home/data/data_sources/remote/dashboard_remote_data_source.dart';
+import 'package:ventura/features/home/data/data_sources/remote/implementations/dashboard_remote_data_source_impl.dart';
+import 'package:ventura/features/home/data/repositories/dashboard_repository_impl.dart';
+import 'package:ventura/features/home/domain/repositories/dashboard_repository.dart';
+import 'package:ventura/features/home/domain/use_cases/get_dashboard_data.dart';
+import 'package:ventura/features/home/presentation/bloc/dashboard_bloc.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -113,6 +119,7 @@ Future<void> initDependencies() async {
   _initAuthDependencies();
   _initAppointmentDependencies();
   _initSalesDependencies();
+  _initHomeDependencies();
   serviceLocator.registerLazySingleton(() => UserService());
   serviceLocator.registerLazySingleton(() => BusinessService());
 }
@@ -394,4 +401,22 @@ void _initSalesDependencies() {
         deleteService: serviceLocator(),
       ),
     );
+}
+
+void _initHomeDependencies() {
+  serviceLocator
+    // DATA SOURCES
+    ..registerFactory<DashboardRemoteDataSource>(
+      () => DashboardRemoteDataSourceImpl(dio: serviceLocator()),
+    )
+    // REPOSITORIES
+    ..registerFactory<DashboardRepository>(
+      () => DashboardRepositoryImpl(remoteDataSource: serviceLocator()),
+    )
+    // USE CASES
+    ..registerFactory(
+      () => GetDashboardData(dashboardRepository: serviceLocator()),
+    )
+    // BLOCS
+    ..registerFactory(() => DashboardBloc(getDashboardData: serviceLocator()));
 }

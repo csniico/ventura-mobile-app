@@ -18,6 +18,7 @@ class ServerRoutes {
   final String createAppointment = '/appointments';
   final String getUserAppointments = '/appointments/user';
   final String getBusinessAppointments = '/appointments/business';
+  final String dashboardSummary = '/dashboard/summary';
 
   String deleteAppointment(String appointmentId) =>
       '/appointments/$appointmentId';
@@ -65,4 +66,6 @@ class ServerRoutes {
   String updateInvoicePayment(String invoiceId) =>
       '/invoices/$invoiceId/payment';
   String updateInvoiceStatus(String invoiceId) => '/invoices/$invoiceId/status';
+
+  // Dashboard routes
 }
