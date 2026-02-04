@@ -4,7 +4,6 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/resources/profile_page_section_lists.dart';
-import 'package:ventura/features/auth/presentation/widgets/profile_modern_header.dart';
 import 'package:ventura/features/auth/presentation/widgets/profile_section_card.dart';
 
 class Profile extends StatefulWidget {
@@ -25,7 +24,7 @@ class _ProfileState extends State<Profile> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is Unauthenticated) {
@@ -39,13 +38,72 @@ class _ProfileState extends State<Profile> {
             return CustomScrollView(
               slivers: [
                 // Modern header with user avatar, name and business
-                SliverToBoxAdapter(
-                  child: ProfileModernHeader(
-                    userAvatarUrl: state.user.avatarUrl,
-                    userName:
-                        '${state.user.firstName} ${state.user.lastName ?? ''}'
-                            .trim(),
-                    businessName: state.user.business?.name ?? '',
+                SliverAppBar(
+                  expandedHeight: 200,
+                  pinned: true,
+                  backgroundColor: theme.colorScheme.primary,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            theme.colorScheme.primary,
+                            theme.colorScheme.primary.withValues(alpha: 0.8),
+                          ],
+                        ),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 45,
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.3,
+                              ),
+                              backgroundImage: state.user.avatarUrl != null
+                                  ? NetworkImage(state.user.avatarUrl!)
+                                  : null,
+                              child: state.user.avatarUrl == null
+                                  ? Text(
+                                      state.user.firstName.isNotEmpty
+                                          ? state.user.firstName[0]
+                                                .toUpperCase()
+                                          : '?',
+                                      style: const TextStyle(
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              '${state.user.firstName} ${state.user.lastName ?? ''}'
+                                  .trim(),
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            if (state.user.business?.name != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Text(
+                                  state.user.business!.name,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
 
@@ -123,9 +181,9 @@ class _ProfileState extends State<Profile> {
 
   Widget _buildSignOutCard(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Card(
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       elevation: 0,
       margin: EdgeInsets.zero,
       child: ListTile(

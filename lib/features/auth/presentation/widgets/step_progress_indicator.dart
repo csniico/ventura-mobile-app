@@ -31,6 +31,7 @@ class StepProgressIndicator extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
+            SizedBox(height: 24),
             Text(
               'Step $displayStep of $totalSteps',
               style: TextStyle(

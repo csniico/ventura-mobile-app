@@ -58,7 +58,7 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                         state.draft.address ??
                         widget.user.business?.address ??
                         '',
-                    title: 'Address *',
+                    title: 'Address',
                     hint: 'eg. Madina, near post office',
                     onChanged: (value) {
                       context
@@ -71,9 +71,6 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                           .businessAddressChanged(value!);
                     },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your business address';
-                      }
                       return null;
                     },
                   ),
@@ -95,9 +92,6 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                           .businessCountryChanged(value!);
                     },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your country';
-                      }
                       return null;
                     },
                   ),
@@ -117,9 +111,6 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                           .businessStateChanged(value!);
                     },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your state or region';
-                      }
                       return null;
                     },
                   ),
@@ -139,16 +130,13 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                       );
                     },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your city';
-                      }
                       return null;
                     },
                   ),
                   _textInputField(
                     initialValue:
                         state.draft.email ?? widget.user.business?.email ?? '',
-                    title: 'Business Email (optional',
+                    title: 'Business Email',
                     hint: 'eg. user@ventura.com',
                     onChanged: (value) {
                       context
@@ -180,9 +168,6 @@ class _CreateBusinessContactPageState extends State<CreateBusinessContactPage> {
                           .businessPhoneChanged(value!);
                     },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your business phone number';
-                      }
                       return null;
                     },
                   ),

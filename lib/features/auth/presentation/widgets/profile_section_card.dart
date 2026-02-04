@@ -17,14 +17,11 @@ class ProfileSectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Card(
       elevation: 0,
       margin: EdgeInsets.zero,
-      color: isDark
-          ? theme.colorScheme.surface.withValues(alpha: 0.5)
-          : theme.colorScheme.surface,
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -47,11 +44,7 @@ class ProfileSectionCard extends StatelessWidget {
           ...items.asMap().entries.map((entry) {
             final item = entry.value;
 
-            return Column(
-              children: [
-                _buildListTile(context, item),
-              ],
-            );
+            return Column(children: [_buildListTile(context, item)]);
           }),
 
           // Bottom padding
@@ -110,4 +103,3 @@ class ProfileSectionCard extends StatelessWidget {
     );
   }
 }
-

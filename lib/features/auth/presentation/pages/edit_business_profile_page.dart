@@ -14,7 +14,10 @@ class EditBusinessProfilePage extends StatelessWidget {
         child: BlocConsumer<AuthBloc, AuthState>(
           builder: (_, state) {
             if (state is Authenticated) {
-              return CreateBusinessProfilePage(user: state.user);
+              return CreateBusinessProfilePage(
+                user: state.user,
+                isUpdating: true,
+              );
             }
             return const Center(child: CircularProgressIndicator());
           },

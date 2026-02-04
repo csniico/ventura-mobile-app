@@ -42,7 +42,9 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       key: const Key('main_screen_scaffold'),
-      appBar: MainAppBar(),
+      appBar: _currentIndex != 3
+          ? MainAppBar()
+          : AppBar(backgroundColor: Theme.of(context).colorScheme.primary),
       body: SafeArea(child: RepaintBoundary(child: _buildBody())),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentIndex,
