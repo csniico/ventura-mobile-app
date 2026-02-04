@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:ventura/core/presentation/pages/main_screen.dart';
 import 'package:ventura/core/services/toast_service.dart';
+import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/cubit/login_cubit.dart';
 
 class SignInWithGoogle extends StatefulWidget {
@@ -140,53 +142,78 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          side: BorderSide(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.grey[700]!
-                : Colors.grey[500]!,
-            width: 1,
-          ),
-          splashFactory: NoSplash.splashFactory,
-        ),
-        onPressed: isLoading || !_isInitialized ? null : continueWithGoogle,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (isLoading)
-              SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            else
-              Image.asset(
-                "assets/images/google.png",
-                height: 20,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.black,
-              ),
-            const SizedBox(width: 10),
-            Text(
-              widget.title,
-              style: TextStyle(
-                color: Theme.brightnessOf(context) == Brightness.dark
-                    ? Colors.white
-                    : Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+    return BlocListener<LoginCubit, LoginState>(
+      listener: (context, state) {
+        if (state is LoginSuccess) {
+          if (mounted) {
+            setState(() => isLoading = false);
+          }
+          // Update AuthBloc session
+          context.read<AuthBloc>().add(AuthSessionUpdated(state.user));
+          // Manually navigate to MainScreen
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const MainScreen()),
+            (route) => false,
+          );
+        } else if (state is LoginError) {
+          if (mounted) {
+            setState(() => isLoading = false);
+          }
+          ToastService.showError(state.message);
+        } else if (state is LoginLoading) {
+          if (mounted) {
+            setState(() => isLoading = true);
+          }
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 20),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            side: BorderSide(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[700]!
+                  : Colors.grey[500]!,
+              width: 1,
             ),
-          ],
+            splashFactory: NoSplash.splashFactory,
+          ),
+          onPressed: isLoading || !_isInitialized ? null : continueWithGoogle,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isLoading)
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              else
+                Image.asset(
+                  "assets/images/google.png",
+                  height: 20,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                ),
+              const SizedBox(width: 10),
+              Text(
+                widget.title,
+                style: TextStyle(
+                  color: Theme.brightnessOf(context) == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
