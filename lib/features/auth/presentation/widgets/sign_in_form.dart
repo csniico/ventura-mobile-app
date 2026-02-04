@@ -43,7 +43,7 @@ class _SignInFormState extends State<SignInForm> {
     });
   }
 
-  void _handleSubmit() async {
+  void _handleSubmit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() {
@@ -88,7 +88,7 @@ class _SignInFormState extends State<SignInForm> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Image.asset(
-                          "assets/images/icon.png",
+                          "assets/images/ventura-logo.png",
                           height: 100,
                           color: Theme.of(context).colorScheme.primary,
                         ),
@@ -164,7 +164,7 @@ class _SignInFormState extends State<SignInForm> {
                         SubmitFormButton(
                           title: "Sign In",
                           isLoading: _isLoading,
-                          onPressed: _handleSubmit,
+                          onPressed: () => _handleSubmit(context),
                           isDisabled: _isDisabled,
                         ),
                         const SizedBox(height: 30),

@@ -37,7 +37,7 @@ class _VerifyEmailFormState extends State<VerifyEmailForm> {
     });
   }
 
-  void _handleSubmit() async {
+  void _handleSubmit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() {
@@ -78,9 +78,12 @@ class _VerifyEmailFormState extends State<VerifyEmailForm> {
 
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => VerifyCodeForm(
-                      email: state.email,
-                      shortToken: state.shortToken,
+                    builder: (_) => BlocProvider.value(
+                      value: context.read<PasswordRecoveryCubit>(),
+                      child: VerifyCodeForm(
+                        email: state.email,
+                        shortToken: state.shortToken,
+                      ),
                     ),
                   ),
                 );
@@ -128,7 +131,7 @@ class _VerifyEmailFormState extends State<VerifyEmailForm> {
                               SubmitFormButton(
                                 title: "Verify Email",
                                 isLoading: _isLoading,
-                                onPressed: _handleSubmit,
+                                onPressed: () => _handleSubmit(context),
                                 isDisabled: _isDisabled,
                               ),
                             ],

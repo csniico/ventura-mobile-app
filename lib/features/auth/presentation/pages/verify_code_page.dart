@@ -52,7 +52,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     }
   }
 
-  void handleConfirmCodeButtonClicked() {
+  void handleConfirmCodeButtonClicked(BuildContext context) {
     setState(() {
       _isDisabled = true;
       _isLoading = true;
@@ -97,9 +97,8 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
               } else if (state is EmailVerificationVerified) {
                 resetButtonState();
                 ToastService.showSuccess('Email verified successfully!');
-                // Update AuthBloc session
+                // Update AuthBloc session - App widget will automatically navigate
                 context.read<AuthBloc>().add(AuthSessionUpdated(state.user));
-                // Navigation will be handled by App widget based on AuthBloc state
               }
             },
             child: BlocBuilder<EmailVerificationCubit, EmailVerificationState>(
@@ -167,7 +166,8 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                           const SizedBox(height: 30),
                           SubmitFormButton(
                             title: 'Confirm Code',
-                            onPressed: handleConfirmCodeButtonClicked,
+                            onPressed: () =>
+                                handleConfirmCodeButtonClicked(context),
                             isDisabled: _isDisabled,
                             isLoading:
                                 _isLoading ||

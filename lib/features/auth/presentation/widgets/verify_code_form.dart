@@ -41,7 +41,7 @@ class _VerifyCodeFormState extends State<VerifyCodeForm> {
     });
   }
 
-  void _handleSubmit() async {
+  void _handleSubmit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() {
@@ -86,8 +86,13 @@ class _VerifyCodeFormState extends State<VerifyCodeForm> {
               ToastService.showSuccess('Code verified successfully');
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) =>
-                      NewPasswordForm(userId: state.userId, email: state.email),
+                  builder: (_) => BlocProvider.value(
+                    value: context.read<PasswordRecoveryCubit>(),
+                    child: NewPasswordForm(
+                      userId: state.userId,
+                      email: state.email,
+                    ),
+                  ),
                 ),
               );
             }
@@ -130,7 +135,7 @@ class _VerifyCodeFormState extends State<VerifyCodeForm> {
                             SubmitFormButton(
                               title: "Confirm Code",
                               isLoading: _isLoading,
-                              onPressed: _handleSubmit,
+                              onPressed: () => _handleSubmit(context),
                               isDisabled: _isDisabled,
                             ),
                           ],

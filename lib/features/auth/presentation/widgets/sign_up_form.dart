@@ -44,7 +44,7 @@ class _SignUpFormState extends State<SignUpForm> {
     });
   }
 
-  void handleSignUpButtonClicked() {
+  void handleSignUpButtonClicked(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() {
@@ -102,7 +102,7 @@ class _SignUpFormState extends State<SignUpForm> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Image.asset(
-                          "assets/images/icon.png",
+                          "assets/images/ventura-logo.png",
                           height: 100,
                           color: Theme.of(context).colorScheme.primary,
                         ),
@@ -186,7 +186,7 @@ class _SignUpFormState extends State<SignUpForm> {
                         SubmitFormButton(
                           title: "Create Account",
                           isLoading: _isLoading,
-                          onPressed: handleSignUpButtonClicked,
+                          onPressed: () => handleSignUpButtonClicked(context),
                           isDisabled: _isDisabled,
                         ),
                         const SizedBox(height: 30),

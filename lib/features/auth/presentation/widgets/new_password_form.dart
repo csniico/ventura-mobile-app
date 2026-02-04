@@ -40,7 +40,7 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
     });
   }
 
-  void _handleSubmit() async {
+  void _handleSubmit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() {
@@ -81,10 +81,10 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
               ToastService.showError(state.message);
             } else if (state is PasswordRecoverySuccess) {
               resetButtonState();
-              ToastService.showSuccess('Password reset successfully');
-              // Update AuthBloc session
-              context.read<AuthBloc>().add(AuthSessionUpdated(state.user));
-              // Navigation handled by App widget
+              ToastService.showSuccess(
+                'Password reset successfully. Please log in with your new password.',
+              );
+              // Navigate back to sign-in page - user must log in again
               Navigator.of(context).popUntil((route) => route.isFirst);
             }
           },
@@ -169,7 +169,7 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
                           SubmitFormButton(
                             title: "Reset Password",
                             isLoading: _isLoading,
-                            onPressed: _handleSubmit,
+                            onPressed: () => _handleSubmit(context),
                             isDisabled: _isDisabled,
                           ),
                         ],

@@ -37,7 +37,8 @@ class App extends StatelessWidget {
         builder: (context, state) {
           return switch (state) {
             Authenticated() => const MainScreen(),
-            AuthenticatedButEmailUnverified() => const VerifyCodePage(),
+            AuthenticatedButEmailUnverified() =>
+              const SignInPage(), // User needs to verify via email link, keep on sign-in page
             AuthenticatedButNoBusinessProfile() => CreateBusinessProfilePage(
               user: state.user,
             ),
