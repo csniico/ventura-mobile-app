@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/services/toast_service.dart';
-import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ventura/features/auth/presentation/cubit/password_recovery_cubit.dart';
 import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';
 import 'package:ventura/features/auth/presentation/widgets/new_password_form.dart';
 import 'package:ventura/features/auth/presentation/widgets/submit_form_button.dart';
@@ -48,13 +48,10 @@ class _VerifyCodeFormState extends State<VerifyCodeForm> {
         _isLoading = true;
         _isDisabled = true;
       });
-      debugPrint("code: $_code");
-      context.read<AuthBloc>().add(
-        AuthResetPasswordConfirmVerificationCode(
-          code: _code!,
-          email: widget.email,
-          shortToken: widget.shortToken,
-        ),
+      context.read<PasswordRecoveryCubit>().verifyResetCode(
+        code: _code!,
+        email: widget.email,
+        shortToken: widget.shortToken,
       );
     }
   }
@@ -79,18 +76,18 @@ class _VerifyCodeFormState extends State<VerifyCodeForm> {
         ),
       ),
       body: SafeArea(
-        child: BlocConsumer<AuthBloc, AuthState>(
+        child: BlocConsumer<PasswordRecoveryCubit, PasswordRecoveryState>(
           listener: (context, state) {
-            if (state is AuthFailure) {
+            if (state is PasswordRecoveryError) {
+              resetButtonState();
               ToastService.showError(state.message);
-            } else if (state is VerificationCodeConfirmed) {
-              ToastService.showSuccess(state.user.email);
+            } else if (state is PasswordRecoveryCodeVerified) {
+              resetButtonState();
+              ToastService.showSuccess('Code verified successfully');
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => NewPasswordForm(
-                    userId: state.user.id,
-                    email: state.user.email,
-                  ),
+                  builder: (context) =>
+                      NewPasswordForm(userId: state.userId, email: state.email),
                 ),
               );
             }

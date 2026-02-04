@@ -44,7 +44,7 @@ class _CreateBusinessDetailsState extends State<CreateBusinessDetails> {
           case BusinessCreateSuccess():
             ToastService.showSuccess('Business profile created successfully');
             context.read<AuthBloc>().add(
-              UserProfileCreateSuccess(
+              BusinessProfileCreated(
                 user: state.user,
                 business: state.business,
               ),

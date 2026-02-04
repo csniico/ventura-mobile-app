@@ -16,45 +16,33 @@ class _WelcomeState extends State<WelcomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: BlocBuilder<AuthBloc, AuthState>(
-          builder: (context, state) {
-            if (state is Authenticating) {
-              return Center(child: CircularProgressIndicator());
-            }
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "assets/images/icon.png",
-                        height: 100,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      TextComponent(text: "Welcome to Ventura", type: "title"),
-                      SizedBox(height: 20),
-                    ],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/images/icon.png",
+                    height: 100,
+                    color: Theme.of(context).primaryColor,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 70,
-                    right: 70,
-                    bottom: 40,
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () =>
-                        Navigator.of(context).pushNamed('/sign-in'),
-                    child: Text("Continue"),
-                  ),
-                ),
-              ],
-            );
-          },
+                  TextComponent(text: "Welcome to Ventura", type: "title"),
+                  SizedBox(height: 20),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 70, right: 70, bottom: 40),
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(context).pushNamed('/sign-in'),
+                child: Text("Continue"),
+              ),
+            ),
+          ],
         ),
       ),
     );

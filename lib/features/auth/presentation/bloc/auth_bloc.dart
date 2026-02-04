@@ -1,323 +1,122 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ventura/config/app_logger.dart';
 import 'package:ventura/core/domain/entities/business_entity.dart';
-import 'package:ventura/core/domain/use_cases/asset_upload_image.dart';
 import 'package:ventura/core/domain/use_cases/local_get_user.dart';
 import 'package:ventura/core/domain/use_cases/local_save_user.dart';
 import 'package:ventura/core/domain/use_cases/local_sign_out.dart';
 import 'package:ventura/core/domain/use_cases/remote_get_user.dart';
-import 'package:ventura/core/domain/use_cases/remote_update_user_profile.dart';
 import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.dart';
 import 'package:ventura/core/domain/use_cases/use_case.dart';
 import 'package:ventura/core/services/internet_service.dart';
-import 'package:ventura/features/auth/domain/entities/server_sign_up.dart';
 import 'package:ventura/core/domain/entities/user_entity.dart';
-import 'package:ventura/features/auth/domain/use_cases/confirm_email.dart';
-import 'package:ventura/features/auth/domain/use_cases/confirm_verification_code.dart';
-import 'package:ventura/features/auth/domain/use_cases/reset_password.dart';
-import 'package:ventura/features/auth/domain/use_cases/user_sign_in.dart';
-import 'package:ventura/features/auth/domain/use_cases/user_sign_in_with_google.dart';
-import 'package:ventura/features/auth/domain/use_cases/user_sign_up.dart';
 
 part 'auth_event.dart';
-
 part 'auth_state.dart';
 
+/// AuthBloc - Manages authentication session state only
+/// Responsibilities:
+/// - Check if user has valid session on app start
+/// - Update session when other features authenticate
+/// - Handle sign out
+/// - Persist user data locally
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final logger = AppLogger('AuthBloc');
-  final UserSignUp _userSignUp;
-  final UserSignIn _userSignIn;
   final LocalGetUser _localGetUser;
   final LocalSaveUser _localSaveUser;
   final LocalSignOut _localSignOut;
   final RemoteGetUser _remoteGetUser;
-  final ConfirmEmail _confirmEmail;
-  final UserSignInWithGoogle _userSignInWithGoogle;
-  final ConfirmVerificationCode _confirmVerificationCode;
-  final ResetPassword _resetPassword;
-  final RemoteUpdateUserProfile _remoteUpdateUserProfile;
-  final AssetUploadImage _assetUploadImage;
   final AppUserCubit _appUserCubit;
 
   AuthBloc({
-    required UserSignUp userSignUp,
-    required UserSignIn userSignIn,
     required LocalGetUser localGetUser,
     required LocalSaveUser localSaveUser,
     required LocalSignOut localSignOut,
-    required ConfirmEmail confirmEmail,
-    required UserSignInWithGoogle userSignInWithGoogle,
-    required ConfirmVerificationCode confirmVerificationCode,
-    required ResetPassword resetPassword,
     required AppUserCubit appUserCubit,
     required RemoteGetUser remoteGetUser,
-    required RemoteUpdateUserProfile remoteUpdateUserProfile,
-    required AssetUploadImage assetUploadImage,
   }) : _appUserCubit = appUserCubit,
-       _userSignIn = userSignIn,
-       _userSignUp = userSignUp,
        _localGetUser = localGetUser,
        _localSaveUser = localSaveUser,
        _localSignOut = localSignOut,
-       _confirmEmail = confirmEmail,
-       _userSignInWithGoogle = userSignInWithGoogle,
-       _confirmVerificationCode = confirmVerificationCode,
-       _resetPassword = resetPassword,
        _remoteGetUser = remoteGetUser,
-       _remoteUpdateUserProfile = remoteUpdateUserProfile,
-       _assetUploadImage = assetUploadImage,
-       super(AuthInitial()) {
-    on<AuthResetState>((event, emit) => emit(AuthInitial()));
-    on<AuthEvent>((_, emit) => emit(Authenticating()));
+       super(Unauthenticated()) {
     on<AppStarted>(_onAppStarted);
-    on<AuthSignUp>(_onAuthSignUp);
-    on<AuthSignIn>(_onAuthSignIn);
+    on<AuthSessionUpdated>(_onAuthSessionUpdated);
     on<AuthSignOut>(_onAuthSignOut);
-    on<AuthSignInWithGoogle>(_onAuthSignInWithGoogle);
-    on<AuthConfirmVerificationCode>(_onAuthConfirmVerificationCode);
-    on<AuthVerifyEmail>(_onAuthVerifyEmail);
-    on<AuthResetPasswordConfirmVerificationCode>(
-      _onAuthResetPasswordConfirmVerificationCode,
-    );
-    on<AuthResetPassword>(_onAuthResetPassword);
-    on<UserProfileCreateSuccess>(_onUserProfileCreateSuccess);
-    on<UserAvatarProfileChanged>(_onUserAvatarProfileChanged);
-    on<UserFirstNameChanged>(_onUserFirstNameChanged);
-    on<UserLastNameChanged>(_onUserLastNameChanged);
-    on<EditUserProfileEvent>(_onEditUserProfileEvent);
+    on<BusinessProfileCreated>(_onBusinessProfileCreated);
   }
 
-  void _onAuthSignOut(AuthEvent event, Emitter<AuthState> emit) async {
+  void _onAuthSignOut(AuthSignOut event, Emitter<AuthState> emit) async {
     await _localSignOut(NoParams());
     _appUserCubit.clearUser();
-    emit(UnAuthenticated());
-  }
-
-  void _onAuthSignUp(AuthSignUp event, Emitter<AuthState> emit) async {
-    debugPrint('signup process triggered');
-    final res = await _userSignUp(
-      UserSignUpParams(
-        email: event.email,
-        password: event.password,
-        firstName: event.firstName,
-        lastName: event.lastName,
-        avatarUrl: event.avatarUrl,
-      ),
-    );
-    res.fold((failure) => emit(AuthFailure(failure.message)), (user) {
-      _localSaveUser(UserParams(user: user.user));
-      _appUserCubit.updateUser(user.user);
-      emit(SignupAwaitingEmailVerification(user));
-    });
+    emit(Unauthenticated());
   }
 
   void _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {
-    logger.info('app started.');
+    logger.info('App started - checking for existing session.');
     final res = await _localGetUser(NoParams());
 
     final user = res.fold((l) => null, (user) => user);
 
     if (user == null) {
-      logger.info('user not found in local storage.');
-      emit(UnAuthenticated());
+      logger.info('No user found in local storage.');
+      emit(Unauthenticated());
       return;
     }
 
     final bool connected = await InternetService().isUserConnected();
     if (!connected) {
-      logger.info('user not connected to the internet, return local user');
-      emitAuthenticated(user, emit);
+      logger.info('User not connected to internet, using local user data.');
+      _updateSession(user, emit);
       return;
     }
 
-    logger.info('user found in local storage, fetching from remote.');
+    logger.info('User found in local storage, fetching from remote.');
     final remoteRes = await _remoteGetUser(
       RemoteGetUserParams(userId: user.id),
     );
 
-    remoteRes.fold(
-      (l) => emit(AuthFailure(l.message)),
-      (user) => emitAuthenticated(user, emit),
-    );
+    remoteRes.fold((failure) {
+      logger.error('Failed to fetch remote user: ${failure.message}');
+      // Use local user if remote fetch fails
+      _updateSession(user, emit);
+    }, (remoteUser) => _updateSession(remoteUser, emit));
   }
 
-  void _onAuthSignIn(AuthSignIn event, Emitter<AuthState> emit) async {
-    final res = await _userSignIn(
-      UserSignInParams(email: event.email, password: event.password),
-    );
-    res.fold(
-      (l) => emit(AuthFailure(l.message)),
-      (user) => emitAuthenticated(user, emit),
-    );
-  }
-
-  void _onAuthSignInWithGoogle(
-    AuthSignInWithGoogle event,
-    Emitter<AuthState> emit,
-  ) async {
-    final res = await _userSignInWithGoogle(
-      UserSignInWithGoogleParams(
-        email: event.email,
-        googleId: event.googleId,
-        firstName: event.firstName,
-        lastName: event.lastName,
-        avatarUrl: event.avatarUrl,
-      ),
-    );
-    res.fold(
-      (l) => emit(AuthFailure(l.message)),
-      (user) => emitAuthenticated(user, emit),
-    );
-  }
-
-  void _onAuthConfirmVerificationCode(
-    AuthConfirmVerificationCode event,
-    Emitter<AuthState> emit,
-  ) async {
-    final res = await _confirmVerificationCode(
-      ConfirmVerificationCodeParams(
-        code: event.code,
-        email: event.email,
-        shortToken: event.shortToken,
-      ),
-    );
-    res.fold(
-      (l) => emit(AuthFailure(l.message)),
-      (user) => emitAuthenticated(user, emit),
-    );
-  }
-
-  void _onAuthVerifyEmail(
-    AuthVerifyEmail event,
-    Emitter<AuthState> emit,
-  ) async {
-    final res = await _confirmEmail(ConfirmEmailParams(email: event.email));
-    res.fold(
-      (failure) {
-        logger.error(failure.message);
-        emit(AuthFailure(failure.message));
-      },
-      (success) => emit(
-        AuthEmailIsVerified(
-          email: event.email,
-          message: success.message,
-          shortToken: success.shortToken,
-        ),
-      ),
-    );
-  }
-
-  void _onAuthResetPasswordConfirmVerificationCode(
-    AuthResetPasswordConfirmVerificationCode event,
-    Emitter<AuthState> emit,
-  ) async {
-    final res = await _confirmVerificationCode(
-      ConfirmVerificationCodeParams(
-        code: event.code,
-        email: event.email,
-        shortToken: event.shortToken,
-      ),
-    );
-    res.fold(
-      (failure) => emit(AuthFailure(failure.message)),
-      (user) => emit(VerificationCodeConfirmed(user)),
-    );
-  }
-
-  void _onAuthResetPassword(
-    AuthResetPassword event,
-    Emitter<AuthState> emit,
-  ) async {
-    final res = await _resetPassword(
-      ResetPasswordParams(userId: event.userId, newPassword: event.newPassword),
-    );
-    res.fold(
-      (failure) => emit(AuthFailure(failure.message)),
-      (user) => emitAuthenticated(user, emit),
-    );
-  }
-
-  void _onUserProfileCreateSuccess(
-    UserProfileCreateSuccess event,
+  void _onAuthSessionUpdated(
+    AuthSessionUpdated event,
     Emitter<AuthState> emit,
   ) {
-    final User user = event.user.copyWith(
+    logger.info('Session updated for user: ${event.user.email}');
+    _updateSession(event.user, emit);
+  }
+
+  void _onBusinessProfileCreated(
+    BusinessProfileCreated event,
+    Emitter<AuthState> emit,
+  ) {
+    logger.info('Business profile created: ${event.business.id}');
+    final User updatedUser = event.user.copyWith(
       businessId: event.business.id,
       business: event.business,
     );
-    emitAuthenticated(user, emit);
+    _updateSession(updatedUser, emit);
   }
 
-  void _onUserAvatarProfileChanged(
-    UserAvatarProfileChanged event,
-    Emitter<AuthState> emit,
-  ) async {
-    final File? file = event.file;
-    if (file == null) {
-      emitAuthenticated(event.user, emit);
-      return;
-    }
-    final res = await _assetUploadImage(AssetUploadImageParams(file: file));
-    res.fold((failure) => emitAuthenticated(event.user, emit), (imageUrl) {
-      final User user = event.user.copyWith(avatarUrl: imageUrl);
-      emitAuthenticated(user, emit);
-    });
-  }
-
-  void _onUserFirstNameChanged(
-    UserFirstNameChanged event,
-    Emitter<AuthState> emit,
-  ) {
-    logger.info('first name changed to ${event.firstName}');
-    final User user = event.user.copyWith(firstName: event.firstName);
-    logger.info('Updated user first name to ${user.firstName}');
-    emitAuthenticated(user, emit);
-  }
-
-  void _onUserLastNameChanged(
-    UserLastNameChanged event,
-    Emitter<AuthState> emit,
-  ) {
-    final User user = event.user.copyWith(lastName: event.lastName);
-    emitAuthenticated(user, emit);
-  }
-
-  void _onEditUserProfileEvent(
-    EditUserProfileEvent event,
-    Emitter<AuthState> emit,
-  ) async {
-    final res = await _remoteUpdateUserProfile(
-      RemoteUpdateUserProfileParams(
-        firstName: event.firstName,
-        userId: event.userId,
-        lastName: event.lastName,
-        avatarUrl: event.avatarUrl,
-      ),
-    );
-
-    res.fold(
-      (failure) => emitAuthenticated(event.user, emit),
-      (user) => emitAuthenticated(user, emit),
-    );
-  }
-
-  void emitAuthenticated(User user, Emitter<AuthState> emit) {
+  void _updateSession(User user, Emitter<AuthState> emit) {
     _localSaveUser(UserParams(user: user));
     _appUserCubit.updateUser(user);
+
     if (!user.isEmailVerified) {
-      logger.error('Email is not verified for user ${user.email}');
-      return emit(
-        SignupAwaitingEmailVerification(
-          ServerSignUp(user: user, shortToken: 'login'),
-        ),
-      );
+      logger.warn('User email not verified: ${user.email}');
+      emit(AuthenticatedButEmailUnverified(user));
+      return;
     }
+
     if (user.businessId.isEmpty) {
-      logger.error('Business is not registered for user ${user.email}');
-      return emit(AuthBusinessNotRegistered(user: user));
+      logger.warn('User has no business profile: ${user.email}');
+      emit(AuthenticatedButNoBusinessProfile(user));
+      return;
     }
 
     emit(Authenticated(user));

@@ -95,12 +95,12 @@ flutter_launcher_icons:
 flutter_native_splash:
   color: "#ffffff"
   color_dark: "#000000"
-  image: "assets/images/icon.png"
-  image_dark: "assets/images/icon.png"
+  image: "assets/images/ventura-logo.png"
+  image_dark: "assets/images/ventura-logo.png"
   android_gravity: center
   ios_content_mode: scaleAspectFit
   fullscreen: true
   android_12:
     color: "#ffffff"
-    image: "assets/images/icon.png"
+    image: "assets/images/ventura-logo.png"
     icon_background_color: "#ffffff"

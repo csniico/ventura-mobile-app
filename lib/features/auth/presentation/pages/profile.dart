@@ -28,7 +28,7 @@ class _ProfileState extends State<Profile> {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is UnAuthenticated) {
+          if (state is Unauthenticated) {
             Navigator.of(
               context,
             ).pushNamedAndRemoveUntil('/sign-in', (_) => false);
@@ -43,7 +43,8 @@ class _ProfileState extends State<Profile> {
                   child: ProfileModernHeader(
                     userAvatarUrl: state.user.avatarUrl,
                     userName:
-                        '${state.user.firstName} ${state.user.lastName ?? ''}'.trim(),
+                        '${state.user.firstName} ${state.user.lastName ?? ''}'
+                            .trim(),
                     businessName: state.user.business?.name ?? '',
                   ),
                 ),
@@ -113,9 +114,7 @@ class _ProfileState extends State<Profile> {
             );
           }
           return Center(
-            child: CircularProgressIndicator(
-              color: theme.colorScheme.primary,
-            ),
+            child: CircularProgressIndicator(color: theme.colorScheme.primary),
           );
         },
       ),
@@ -153,9 +152,7 @@ class _ProfileState extends State<Profile> {
         ),
         subtitle: Text(
           'End your current session',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: Colors.red[400],
-          ),
+          style: theme.textTheme.bodySmall?.copyWith(color: Colors.red[400]),
         ),
         trailing: HugeIcon(
           icon: HugeIcons.strokeRoundedArrowRight01,
@@ -172,9 +169,7 @@ class _ProfileState extends State<Profile> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             HugeIcon(

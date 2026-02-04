@@ -5,13 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ventura/core/services/toast_service.dart';
-import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ventura/features/auth/presentation/cubit/login_cubit.dart';
 
 class SignInWithGoogle extends StatefulWidget {
   final String title;
-  final AuthState state;
 
-  const SignInWithGoogle({super.key, required this.title, required this.state});
+  const SignInWithGoogle({super.key, required this.title});
 
   @override
   State<SignInWithGoogle> createState() => _SignInWithGoogleState();
@@ -86,14 +85,12 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
     final firstName = nameParts.isNotEmpty ? nameParts.first : '';
     final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
-    context.read<AuthBloc>().add(
-      AuthSignInWithGoogle(
-        email: googleUser.email,
-        googleId: googleUser.id,
-        firstName: firstName,
-        lastName: lastName,
-        avatarUrl: googleUser.photoUrl,
-      ),
+    context.read<LoginCubit>().signInWithGoogle(
+      email: googleUser.email,
+      googleId: googleUser.id,
+      firstName: firstName,
+      lastName: lastName,
+      avatarUrl: googleUser.photoUrl,
     );
   }
 
@@ -157,10 +154,7 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
           ),
           splashFactory: NoSplash.splashFactory,
         ),
-        onPressed:
-            isLoading || !_isInitialized || widget.state == Authenticating()
-            ? null
-            : continueWithGoogle,
+        onPressed: isLoading || !_isInitialized ? null : continueWithGoogle,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

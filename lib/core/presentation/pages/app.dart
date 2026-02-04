@@ -5,14 +5,14 @@ import 'package:ventura/core/presentation/pages/main_screen.dart';
 import 'package:ventura/config/routes.dart';
 import 'package:ventura/core/presentation/themes/app_theme.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ventura/features/auth/presentation/pages/create_business_profile_page.dart';
 import 'package:ventura/features/auth/presentation/pages/sign_in_page.dart';
+import 'package:ventura/features/auth/presentation/pages/verify_code_page.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
 class App extends StatelessWidget {
-  App({super.key});
-
-  final AppRoutes _appRoutes = AppRoutes.instance;
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,21 +26,23 @@ class App extends StatelessWidget {
         listener: (context, state) {
           if (state is Authenticated) {
             context.read<AppUserCubit>().updateUser(state.user);
-            navigatorKey.currentState?.pushNamedAndRemoveUntil(
-              _appRoutes.main,
-              (_) => false,
-            );
-          } else if (state is UnAuthenticated) {
+          } else if (state is Unauthenticated) {
             context.read<AppUserCubit>().clearUser();
+          } else if (state is AuthenticatedButEmailUnverified) {
+            context.read<AppUserCubit>().updateUser(state.user);
+          } else if (state is AuthenticatedButNoBusinessProfile) {
+            context.read<AppUserCubit>().updateUser(state.user);
           }
         },
         builder: (context, state) {
-          switch (state) {
-            case Authenticated():
-              return const MainScreen();
-            default:
-              return const SignInPage();
-          }
+          return switch (state) {
+            Authenticated() => const MainScreen(),
+            AuthenticatedButEmailUnverified() => const VerifyCodePage(),
+            AuthenticatedButNoBusinessProfile() => CreateBusinessProfilePage(
+              user: state.user,
+            ),
+            Unauthenticated() => const SignInPage(),
+          };
         },
       ),
       routes: AppRoutes.routes,

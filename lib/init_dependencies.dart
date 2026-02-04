@@ -51,6 +51,11 @@ import 'package:ventura/features/auth/domain/use_cases/user_sign_in_with_google.
 import 'package:ventura/features/auth/domain/use_cases/user_sign_up.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/cubit/business_creation_cubit.dart';
+import 'package:ventura/features/auth/presentation/cubit/login_cubit.dart';
+import 'package:ventura/features/auth/presentation/cubit/registration_cubit.dart';
+import 'package:ventura/features/auth/presentation/cubit/email_verification_cubit.dart';
+import 'package:ventura/features/auth/presentation/cubit/password_recovery_cubit.dart';
+import 'package:ventura/features/auth/presentation/cubit/user_profile_cubit.dart';
 import 'package:ventura/features/sales/data/data_sources/remote/abstract_interfaces/customer_remote_data_source.dart';
 import 'package:ventura/features/sales/data/data_sources/remote/abstract_interfaces/invoice_remote_data_source.dart';
 import 'package:ventura/features/sales/data/data_sources/remote/abstract_interfaces/order_remote_data_source.dart';
@@ -204,21 +209,47 @@ void _initAuthDependencies() {
         createBusinessProfile: serviceLocator(),
       ),
     )
+    // Simplified AuthBloc - session management only
     ..registerLazySingleton(
       () => AuthBloc(
-        userSignIn: serviceLocator(),
-        userSignUp: serviceLocator(),
         localGetUser: serviceLocator(),
         localSaveUser: serviceLocator(),
         localSignOut: serviceLocator(),
-        confirmEmail: serviceLocator(),
-        userSignInWithGoogle: serviceLocator(),
-        confirmVerificationCode: serviceLocator(),
-        resetPassword: serviceLocator(),
         appUserCubit: serviceLocator(),
         remoteGetUser: serviceLocator(),
-        assetUploadImage: serviceLocator(),
+      ),
+    )
+    // Feature-specific auth cubits
+    ..registerFactory(
+      () => LoginCubit(
+        userSignIn: serviceLocator(),
+        userSignInWithGoogle: serviceLocator(),
+        localSaveUser: serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => RegistrationCubit(
+        userSignUp: serviceLocator(),
+        localSaveUser: serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => EmailVerificationCubit(
+        confirmEmail: serviceLocator(),
+        confirmVerificationCode: serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => PasswordRecoveryCubit(
+        confirmEmail: serviceLocator(),
+        confirmVerificationCode: serviceLocator(),
+        resetPassword: serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => UserProfileCubit(
         remoteUpdateUserProfile: serviceLocator(),
+        assetUploadImage: serviceLocator(),
       ),
     );
 }

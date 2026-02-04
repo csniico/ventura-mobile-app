@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:ventura/core/presentation/pages/main_screen.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:ventura/features/auth/presentation/pages/create_business_profile_page.dart';
+import 'package:ventura/features/auth/presentation/cubit/password_recovery_cubit.dart';
 import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';
 import 'package:ventura/features/auth/presentation/widgets/submit_form_button.dart';
 
@@ -48,12 +47,9 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
         _isLoading = true;
         _isDisabled = true;
       });
-      context.read<AuthBloc>().add(
-        AuthResetPassword(
-          email: widget.email,
-          newPassword: _password!,
-          userId: widget.userId,
-        ),
+      context.read<PasswordRecoveryCubit>().resetPassword(
+        userId: widget.userId,
+        newPassword: _password!,
       );
     }
   }
@@ -78,33 +74,18 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
         ),
       ),
       body: SafeArea(
-        child: BlocConsumer<AuthBloc, AuthState>(
+        child: BlocConsumer<PasswordRecoveryCubit, PasswordRecoveryState>(
           listener: (context, state) {
-            switch (state) {
-              case AuthFailure():
-                resetButtonState();
-                ToastService.showError(state.message);
-                break;
-              case Authenticated():
-                resetButtonState();
-                ToastService.showSuccess('Password reset successfully');
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => MainScreen()),
-                  (_) => false,
-                );
-                break;
-              case AuthBusinessNotRegistered():
-                resetButtonState();
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        CreateBusinessProfilePage(user: state.user),
-                  ),
-                  (_) => false,
-                );
-                break;
-              default:
-                break;
+            if (state is PasswordRecoveryError) {
+              resetButtonState();
+              ToastService.showError(state.message);
+            } else if (state is PasswordRecoverySuccess) {
+              resetButtonState();
+              ToastService.showSuccess('Password reset successfully');
+              // Update AuthBloc session
+              context.read<AuthBloc>().add(AuthSessionUpdated(state.user));
+              // Navigation handled by App widget
+              Navigator.of(context).popUntil((route) => route.isFirst);
             }
           },
           builder: (context, state) {
