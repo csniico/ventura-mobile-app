@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ventura/core/presentation/widgets/text_component.dart';
-import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});

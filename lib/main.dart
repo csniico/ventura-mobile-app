@@ -11,6 +11,7 @@ import 'package:ventura/core/presentation/pages/app.dart';
 import 'package:ventura/features/appointment/presentation/bloc/appointment_bloc.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/init_dependencies.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,22 +29,34 @@ void main() async {
   await dotenv.load(fileName: '.env');
   await initDependencies();
 
-  runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider<AppUserCubit>(
-          create: (_) => serviceLocator<AppUserCubit>(),
+  await SentryFlutter.init(
+    (options) {
+      options.dsn =
+          'https://5ecccc596439f8611fc9fd058619cb23@o4509548115001344.ingest.de.sentry.io/4510905790431312';
+      options.tracesSampleRate = 1.0;
+      options.profilesSampleRate = 1.0;
+      options.replay.sessionSampleRate = 1.0;
+      options.replay.onErrorSampleRate = 1.0;
+    },
+    appRunner: () => runApp(
+      SentryWidget(
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<AppUserCubit>(
+              create: (_) => serviceLocator<AppUserCubit>(),
+            ),
+            BlocProvider<AuthBloc>(
+              create: (_) => serviceLocator<AuthBloc>()..add(AppStarted()),
+            ),
+            BlocProvider<AppointmentBloc>(
+              create: (_) => serviceLocator<AppointmentBloc>(),
+            ),
+          ],
+          child: GestureDetector(
+            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+            child: App(),
+          ),
         ),
-        BlocProvider<AuthBloc>(
-          create: (_) => serviceLocator<AuthBloc>()..add(AppStarted()),
-        ),
-        BlocProvider<AppointmentBloc>(
-          create: (_) => serviceLocator<AppointmentBloc>(),
-        ),
-      ],
-      child: GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: App(),
       ),
     ),
   );

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/services/toast_service.dart';
-import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/cubit/password_recovery_cubit.dart';
 import 'package:ventura/features/auth/presentation/widgets/auth_field.dart';
 import 'package:ventura/features/auth/presentation/widgets/submit_form_button.dart';
@@ -47,6 +46,11 @@ class _NewPasswordFormState extends State<NewPasswordForm> {
         _isLoading = true;
         _isDisabled = true;
       });
+      if (_password != _confirmPassword) {
+        resetButtonState();
+        ToastService.showError('Passwords do not match. Please try again.');
+        return;
+      }
       context.read<PasswordRecoveryCubit>().resetPassword(
         userId: widget.userId,
         newPassword: _password!,

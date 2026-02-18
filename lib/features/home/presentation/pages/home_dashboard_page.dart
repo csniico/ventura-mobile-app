@@ -164,29 +164,29 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
     }
   }
 
-  Widget _buildWelcomeSection(Authenticated state) {
-    final businessName = state.user.business?.name ?? 'Your Business';
-    final timeOfDay = _getGreeting();
+  // Widget _buildWelcomeSection(Authenticated state) {
+  //   final businessName = state.user.business?.name ?? 'Your Business';
+  //   final timeOfDay = _getGreeting();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '$timeOfDay,',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          businessName,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text(
+  //         '$timeOfDay,',
+  //         style: Theme.of(context).textTheme.titleMedium?.copyWith(
+  //           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+  //         ),
+  //       ),
+  //       const SizedBox(height: 4),
+  //       Text(
+  //         businessName,
+  //         style: Theme.of(
+  //           context,
+  //         ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildSectionHeader(String title) {
     return Text(
@@ -873,14 +873,14 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
     }
   }
 
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) {
-      return 'Good Morning';
-    } else if (hour < 17) {
-      return 'Good Afternoon';
-    } else {
-      return 'Good Evening';
-    }
-  }
+  // String _getGreeting() {
+  //   final hour = DateTime.now().hour;
+  //   if (hour < 12) {
+  //     return 'Good Morning';
+  //   } else if (hour < 17) {
+  //     return 'Good Afternoon';
+  //   } else {
+  //     return 'Good Evening';
+  //   }
+  // }
 }

@@ -7,7 +7,6 @@ import 'package:ventura/core/presentation/themes/app_theme.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/pages/create_business_profile_page.dart';
 import 'package:ventura/features/auth/presentation/pages/sign_in_page.dart';
-import 'package:ventura/features/auth/presentation/pages/verify_code_page.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
