@@ -81,6 +81,7 @@ class _SignUpFormState extends State<SignUpForm> {
               arguments: {
                 'email': state.serverSignUp.user.email,
                 'shortToken': state.serverSignUp.shortToken,
+                'userId': state.serverSignUp.user.id,
               },
             );
           } else if (state is RegistrationError) {

@@ -7,8 +7,10 @@ import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/domain/entities/customer_entity.dart';
 import 'package:ventura/features/sales/domain/entities/product_entity.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
+import 'package:ventura/features/sales/domain/entities/order_entity.dart';
 import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/product_bloc.dart';
+import 'package:ventura/features/sales/presentation/pages/create_invoice.dart';
 import 'package:ventura/features/sales/presentation/widgets/text_input_component.dart';
 import 'package:ventura/init_dependencies.dart';
 
@@ -81,6 +83,65 @@ class _CreateOrderState extends State<CreateOrder> {
     }
   }
 
+  void _showInvoicePrompt(BuildContext context, Order order) {
+    showModalBottomSheet(
+      context: context,
+      builder: (sheetCtx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Create an Invoice?',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Would you like to create a receipt, proforma, or standard invoice for this order?',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.pop(sheetCtx);
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Skip'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(sheetCtx);
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => CreateInvoice(
+                              preselectedCustomer: _selectedCustomer,
+                              preselectedOrders: [order],
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text('Create Invoice'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -115,7 +176,7 @@ class _CreateOrderState extends State<CreateOrder> {
           listener: (context, state) {
             if (state is OrderCreateSuccessState) {
               ToastService.showSuccess('Order created successfully');
-              Navigator.pop(context);
+              _showInvoicePrompt(context, state.order);
             } else if (state is OrderErrorState) {
               ToastService.showError(state.message);
             }

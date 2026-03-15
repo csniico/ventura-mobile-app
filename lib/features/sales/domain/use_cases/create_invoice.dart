@@ -18,6 +18,7 @@ class CreateInvoice implements UseCase<Invoice, CreateInvoiceParams> {
       customerId: params.customerId,
       orderIds: params.orderIds,
       dueDate: params.dueDate,
+      invoiceType: params.invoiceType,
       notes: params.notes,
     );
   }
@@ -28,6 +29,7 @@ class CreateInvoiceParams {
   final String customerId;
   final List<String> orderIds;
   final DateTime? dueDate;
+  final String? invoiceType;
   final String? notes;
 
   CreateInvoiceParams({
@@ -35,6 +37,7 @@ class CreateInvoiceParams {
     required this.customerId,
     required this.orderIds,
     this.dueDate,
+    this.invoiceType,
     this.notes,
   });
 }

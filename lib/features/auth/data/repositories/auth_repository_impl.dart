@@ -130,6 +130,18 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, void>> resendVerificationCode({
+    required String userId,
+  }) async {
+    try {
+      await authRemoteDataSource.resendVerificationCode(userId: userId);
+      return right(null);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, String>> signOut() {
     // TODO: implement signOut
     throw UnimplementedError();

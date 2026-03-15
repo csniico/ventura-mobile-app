@@ -6,6 +6,7 @@ abstract interface class InvoiceRemoteDataSource {
     required String customerId,
     required List<String> orderIds,
     DateTime? dueDate,
+    String? invoiceType,
     String? notes,
   });
 

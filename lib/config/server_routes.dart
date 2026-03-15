@@ -11,6 +11,7 @@ class ServerRoutes {
   final String signUp = '/auth/signup';
   final String confirmEmail = '/auth/confirm-email';
   final String confirmVerificationCode = '/auth/verify-code';
+  final String resendVerificationCode = '/auth/resend-code';
   final String resetPassword = '/auth/reset-password';
   final String refreshToken = '/auth/refresh-token';
   final String uploadImageAsset = '/assets/images';

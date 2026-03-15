@@ -20,8 +20,8 @@ class UpdateAppointment
       startTime: params.startTime,
       endTime: params.endTime,
       isRecurring: params.isRecurring,
-      userId: params.userId,
       businessId: params.businessId,
+      customerId: params.customerId,
       description: params.description,
       notes: params.notes,
       recurringUntil: params.recurringUntil,
@@ -36,8 +36,8 @@ class UpdateAppointmentParams {
   final DateTime startTime;
   final DateTime endTime;
   final bool isRecurring;
-  final String userId;
   final String businessId;
+  String? customerId;
   String? description;
   String? notes;
   DateTime? recurringUntil;
@@ -49,8 +49,8 @@ class UpdateAppointmentParams {
     required this.startTime,
     required this.endTime,
     required this.isRecurring,
-    required this.userId,
     required this.businessId,
+    this.customerId,
     this.description,
     this.notes,
     this.recurringUntil,

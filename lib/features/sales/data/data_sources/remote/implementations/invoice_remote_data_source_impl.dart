@@ -17,6 +17,7 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
     required String customerId,
     required List<String> orderIds,
     DateTime? dueDate,
+    String? invoiceType,
     String? notes,
   }) async {
     try {
@@ -27,6 +28,7 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
           'customerId': customerId,
           'orderIds': orderIds,
           if (dueDate != null) 'dueDate': dueDate.toIso8601String(),
+          if (invoiceType != null) 'invoiceType': invoiceType,
           if (notes != null) 'notes': notes,
         },
       );

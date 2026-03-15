@@ -33,10 +33,10 @@ void main() async {
     (options) {
       options.dsn =
           'https://5ecccc596439f8611fc9fd058619cb23@o4509548115001344.ingest.de.sentry.io/4510905790431312';
-      options.tracesSampleRate = 1.0;
-      options.profilesSampleRate = 1.0;
-      options.replay.sessionSampleRate = 1.0;
-      options.replay.onErrorSampleRate = 1.0;
+      options.tracesSampleRate = 0.1;
+      options.profilesSampleRate = 0.1;
+      options.replay.sessionSampleRate = 0.1;
+      options.replay.onErrorSampleRate = 0.1;
     },
     appRunner: () => runApp(
       SentryWidget(

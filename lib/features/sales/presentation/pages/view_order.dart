@@ -3,6 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:ventura/features/sales/domain/entities/order_entity.dart';
 import 'package:ventura/features/sales/domain/entities/order_status.dart';
+import 'package:ventura/features/sales/presentation/pages/create_invoice.dart';
 import 'package:ventura/features/sales/presentation/pages/edit_order.dart';
 
 class ViewOrder extends StatefulWidget {
@@ -106,6 +107,22 @@ class _ViewOrderState extends State<ViewOrder> {
           ),
         ],
       ),
+      floatingActionButton: _order.invoiceId == null
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => CreateInvoice(
+                      preselectedCustomer: _order.customer,
+                      preselectedOrders: [_order],
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.receipt_long_outlined),
+              label: const Text('Create Invoice'),
+            )
+          : null,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(12.0),

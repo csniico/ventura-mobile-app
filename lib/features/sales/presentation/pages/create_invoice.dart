@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/domain/entities/customer_entity.dart';
+import 'package:ventura/features/sales/domain/entities/invoice_type.dart';
 import 'package:ventura/features/sales/domain/entities/order_entity.dart';
 import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/invoice_bloc.dart';
@@ -13,7 +14,14 @@ import 'package:ventura/features/sales/presentation/widgets/text_input_component
 import 'package:ventura/init_dependencies.dart';
 
 class CreateInvoice extends StatefulWidget {
-  const CreateInvoice({super.key});
+  const CreateInvoice({
+    super.key,
+    this.preselectedCustomer,
+    this.preselectedOrders,
+  });
+
+  final Customer? preselectedCustomer;
+  final List<Order>? preselectedOrders;
 
   @override
   State<CreateInvoice> createState() => _CreateInvoiceState();
@@ -25,12 +33,20 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   Customer? _selectedCustomer;
   final List<String> _selectedOrderIds = [];
   DateTime? _dueDate;
+  InvoiceType _invoiceType = InvoiceType.standard;
   late String _businessId;
+
+  bool get _isPreselected =>
+      widget.preselectedCustomer != null && widget.preselectedOrders != null;
 
   @override
   void initState() {
     super.initState();
     _businessId = '';
+    _selectedCustomer = widget.preselectedCustomer;
+    if (widget.preselectedOrders != null) {
+      _selectedOrderIds.addAll(widget.preselectedOrders!.map((o) => o.id));
+    }
     _loadBusinessId();
   }
 
@@ -53,8 +69,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     });
   }
 
-  double _calculateTotalAmount(List<Order> selectedOrders) {
-    return selectedOrders.fold(0.0, (sum, order) => sum + order.totalAmount);
+  double _calculateTotalAmount(List<Order> orders) {
+    return orders.fold(0.0, (sum, order) => sum + order.totalAmount);
   }
 
   Future<void> _selectDueDate(BuildContext context) async {
@@ -92,6 +108,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
           customerId: _selectedCustomer!.id,
           orderIds: _selectedOrderIds,
           dueDate: _dueDate,
+          invoiceType: _invoiceType.toJson(),
           notes: _notesController.text.trim().isEmpty
               ? null
               : _notesController.text.trim(),
@@ -159,69 +176,104 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Customer Selection
-                    BlocBuilder<CustomerBloc, CustomerState>(
-                      builder: (context, customerState) {
-                        if (customerState is CustomerListLoadedState) {
-                          return DropdownButtonFormField<Customer>(
-                            initialValue: _selectedCustomer,
-                            decoration: InputDecoration(
-                              labelText: 'Customer',
-                              hintText: 'Select customer',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            items: customerState.customers.map((customer) {
-                              return DropdownMenuItem<Customer>(
-                                value: customer,
-                                child: Text(customer.name),
-                              );
-                            }).toList(),
-                            onChanged: isLoading
-                                ? null
-                                : (Customer? value) {
-                                    setState(() {
-                                      _selectedCustomer = value;
-                                      _selectedOrderIds
-                                          .clear(); // Clear selected orders when customer changes
-                                    });
-                                    // Load orders for selected customer
-                                    if (value != null) {
-                                      context.read<OrderBloc>().add(
-                                        OrderGetCustomerOrdersEvent(
-                                          customerId: value.id,
-                                          businessId: _businessId,
-                                        ),
-                                      );
-                                    }
-                                  },
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please select a customer';
-                              }
-                              return null;
-                            },
-                          );
-                        } else if (customerState is CustomerLoadingState) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else {
-                          // Load customers if not loaded
-                          context.read<CustomerBloc>().add(
-                            CustomerGetEvent(businessId: _businessId),
-                          );
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                      },
+                    // Invoice Type Selector
+                    Text(
+                      'Invoice Type',
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w600),
                     ),
+                    const SizedBox(height: 12),
+                    SegmentedButton<InvoiceType>(
+                      segments: const [
+                        ButtonSegment(
+                          value: InvoiceType.standard,
+                          label: Text('Standard'),
+                        ),
+                        ButtonSegment(
+                          value: InvoiceType.receipt,
+                          label: Text('Receipt'),
+                        ),
+                        ButtonSegment(
+                          value: InvoiceType.proforma,
+                          label: Text('Proforma'),
+                        ),
+                      ],
+                      selected: {_invoiceType},
+                      onSelectionChanged: isLoading
+                          ? null
+                          : (Set<InvoiceType> value) {
+                              setState(() => _invoiceType = value.first);
+                            },
+                    ),
+
                     const SizedBox(height: 24),
 
-                    // Orders Selection (only show if customer is selected)
-                    if (_selectedCustomer != null) ...[
+                    // Customer Section
+                    if (_isPreselected)
+                      _buildPreselectedCustomerCard(context)
+                    else
+                      BlocBuilder<CustomerBloc, CustomerState>(
+                        builder: (context, customerState) {
+                          if (customerState is CustomerListLoadedState) {
+                            return DropdownButtonFormField<Customer>(
+                              initialValue: _selectedCustomer,
+                              decoration: InputDecoration(
+                                labelText: 'Customer',
+                                hintText: 'Select customer',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              items: customerState.customers.map((customer) {
+                                return DropdownMenuItem<Customer>(
+                                  value: customer,
+                                  child: Text(customer.name),
+                                );
+                              }).toList(),
+                              onChanged: isLoading
+                                  ? null
+                                  : (Customer? value) {
+                                      setState(() {
+                                        _selectedCustomer = value;
+                                        _selectedOrderIds.clear();
+                                      });
+                                      if (value != null) {
+                                        context.read<OrderBloc>().add(
+                                          OrderGetCustomerOrdersEvent(
+                                            customerId: value.id,
+                                            businessId: _businessId,
+                                          ),
+                                        );
+                                      }
+                                    },
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please select a customer';
+                                }
+                                return null;
+                              },
+                            );
+                          } else if (customerState is CustomerLoadingState) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else {
+                            context.read<CustomerBloc>().add(
+                              CustomerGetEvent(businessId: _businessId),
+                            );
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        },
+                      ),
+
+                    const SizedBox(height: 24),
+
+                    // Orders Section
+                    if (_isPreselected)
+                      _buildPreselectedOrdersSummary(context)
+                    else if (_selectedCustomer != null) ...[
                       Text(
                         'Select Orders to Include',
                         style: Theme.of(context).textTheme.titleMedium
@@ -235,10 +287,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                             final availableOrders = orderState.orders
                                 .where(
                                   (order) =>
-                                      order.invoiceId ==
-                                          null && // Only orders not already invoiced
-                                      order.status.name !=
-                                          'cancelled', // Exclude cancelled orders
+                                      order.invoiceId == null &&
+                                      order.status.name != 'cancelled',
                                 )
                                 .toList();
 
@@ -335,7 +385,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                         },
                       ),
 
-                      // Selected Orders Summary
                       if (_selectedOrderIds.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         BlocBuilder<OrderBloc, OrderState>(
@@ -348,38 +397,9 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                                   )
                                   .toList();
 
-                              return Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.primary.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Invoice Summary',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleSmall
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      '${selectedOrders.length} order(s) selected',
-                                    ),
-                                    Text(
-                                      'Total Amount: ₵${_calculateTotalAmount(selectedOrders).toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              return _buildOrdersSummaryCard(
+                                context,
+                                selectedOrders,
                               );
                             }
                             return const SizedBox.shrink();
@@ -413,7 +433,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
 
                     const SizedBox(height: 32),
 
-                    // Create Invoice Button
                     ElevatedButton(
                       onPressed: isLoading ? null : () => _submitForm(context),
                       style: ElevatedButton.styleFrom(
@@ -433,9 +452,9 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                                 ),
                               ),
                             )
-                          : const Text(
-                              'Create Invoice',
-                              style: TextStyle(
+                          : Text(
+                              'Create ${_invoiceType.displayName}',
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -447,6 +466,99 @@ class _CreateInvoiceState extends State<CreateInvoice> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildPreselectedCustomerCard(BuildContext context) {
+    final customer = widget.preselectedCustomer!;
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.12),
+            child: Text(
+              customer.name.isNotEmpty ? customer.name[0].toUpperCase() : '?',
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  customer.name,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (customer.email != null)
+                  Text(
+                    customer.email!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPreselectedOrdersSummary(BuildContext context) {
+    final orders = widget.preselectedOrders!;
+    final total = _calculateTotalAmount(orders);
+    return _buildOrdersSummaryCard(context, orders, total: total);
+  }
+
+  Widget _buildOrdersSummaryCard(
+    BuildContext context,
+    List<Order> orders, {
+    double? total,
+  }) {
+    final theme = Theme.of(context);
+    final displayTotal = total ?? _calculateTotalAmount(orders);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Invoice Summary',
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ...orders.map(
+            (o) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text('• Order #${o.orderNumber}'),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Total: ₵${displayTotal.toStringAsFixed(2)}',
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ],
       ),
     );
   }

@@ -19,6 +19,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   String? _code;
   String? _email;
   String? _shortToken;
+  String? _userId;
   bool _initialized = false;
   bool _isLoading = false;
   bool _isDisabled = false;
@@ -47,6 +48,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       setState(() {
         _email = args['email'] as String;
         _shortToken = args['shortToken'] as String;
+        _userId = args['userId'] as String?;
         _initialized = true;
       });
     }
@@ -139,10 +141,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                           const SizedBox(height: 10),
                           InkWell(
                             onTap: () {
-                              if (_email != null) {
+                              if (_email != null && _userId != null) {
                                 context
                                     .read<EmailVerificationCubit>()
-                                    .resendCode(email: _email!);
+                                    .resendCode(userId: _userId!, email: _email!);
                                 ToastService.showInfo(
                                   'Resending verification code...',
                                 );

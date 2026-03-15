@@ -17,6 +17,7 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
     required String customerId,
     required List<String> orderIds,
     DateTime? dueDate,
+    String? invoiceType,
     String? notes,
   }) async {
     try {
@@ -25,6 +26,7 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
         customerId: customerId,
         orderIds: orderIds,
         dueDate: dueDate,
+        invoiceType: invoiceType,
         notes: notes,
       );
       if (invoice == null) {

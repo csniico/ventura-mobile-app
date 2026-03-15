@@ -8,8 +8,8 @@ final class AppointmentCreateEvent extends AppointmentEvent {
   final DateTime startTime;
   final DateTime endTime;
   final bool isRecurring;
-  final String userId;
   final String businessId;
+  final String? customerId;
   final String? description;
   final String? notes;
   final DateTime? recurringUntil;
@@ -20,8 +20,8 @@ final class AppointmentCreateEvent extends AppointmentEvent {
     required this.startTime,
     required this.endTime,
     required this.isRecurring,
-    required this.userId,
     required this.businessId,
+    this.customerId,
     this.description,
     this.notes,
     this.recurringUntil,
@@ -42,8 +42,8 @@ final class AppointmentUpdateEvent extends AppointmentEvent {
   final DateTime startTime;
   final DateTime endTime;
   final bool isRecurring;
-  final String userId;
   final String businessId;
+  final String? customerId;
   final String? description;
   final String? notes;
   final DateTime? recurringUntil;
@@ -55,8 +55,8 @@ final class AppointmentUpdateEvent extends AppointmentEvent {
     required this.startTime,
     required this.endTime,
     required this.isRecurring,
-    required this.userId,
     required this.businessId,
+    this.customerId,
     this.description,
     this.notes,
     this.recurringUntil,

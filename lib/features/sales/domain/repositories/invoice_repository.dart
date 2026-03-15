@@ -8,6 +8,7 @@ abstract interface class InvoiceRepository {
     required String customerId,
     required List<String> orderIds,
     DateTime? dueDate,
+    String? invoiceType,
     String? notes,
   });
 

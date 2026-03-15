@@ -52,6 +52,7 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
         customerId: event.customerId,
         orderIds: event.orderIds,
         dueDate: event.dueDate,
+        invoiceType: event.invoiceType,
         notes: event.notes,
       ),
     );

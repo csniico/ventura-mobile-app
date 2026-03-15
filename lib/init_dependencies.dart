@@ -46,6 +46,7 @@ import 'package:ventura/features/auth/domain/use_cases/confirm_email.dart';
 import 'package:ventura/features/auth/domain/use_cases/confirm_verification_code.dart';
 import 'package:ventura/features/auth/domain/use_cases/create_business_profile.dart';
 import 'package:ventura/features/auth/domain/use_cases/reset_password.dart';
+import 'package:ventura/features/auth/domain/use_cases/resend_verification_code.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_in_with_google.dart';
 import 'package:ventura/features/auth/domain/use_cases/user_sign_up.dart';
@@ -188,6 +189,9 @@ void _initAuthDependencies() {
     ..registerFactory(
       () => ConfirmVerificationCode(authRepository: serviceLocator()),
     )
+    ..registerFactory(
+      () => ResendVerificationCode(authRepository: serviceLocator()),
+    )
     ..registerFactory(() => UserSignUp(authRepository: serviceLocator()))
     ..registerFactory(() => ResetPassword(authRepository: serviceLocator()))
     ..registerFactory(
@@ -237,6 +241,7 @@ void _initAuthDependencies() {
       () => EmailVerificationCubit(
         confirmEmail: serviceLocator(),
         confirmVerificationCode: serviceLocator(),
+        resendVerificationCode: serviceLocator(),
       ),
     )
     ..registerFactory(

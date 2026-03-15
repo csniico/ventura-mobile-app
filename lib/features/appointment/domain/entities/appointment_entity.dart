@@ -2,6 +2,7 @@ class Appointment {
   final String id;
   final String userId;
   final String businessId;
+  final String? customerId;
   final String? googleEventId;
   final String title;
   final DateTime startTime;
@@ -16,6 +17,7 @@ class Appointment {
     required this.id,
     required this.userId,
     required this.businessId,
+    this.customerId,
     this.googleEventId,
     required this.title,
     required this.startTime,
@@ -31,6 +33,7 @@ class Appointment {
     String? id,
     String? userId,
     String? businessId,
+    String? customerId,
     String? googleEventId,
     String? title,
     DateTime? startTime,
@@ -45,6 +48,7 @@ class Appointment {
       id: id ?? this.id,
       userId: userId ?? this.userId,
       businessId: businessId ?? this.businessId,
+      customerId: customerId ?? this.customerId,
       googleEventId: googleEventId ?? this.googleEventId,
       title: title ?? this.title,
       startTime: startTime ?? this.startTime,

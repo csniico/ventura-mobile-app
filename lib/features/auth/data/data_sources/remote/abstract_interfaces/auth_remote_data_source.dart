@@ -30,6 +30,8 @@ abstract interface class AuthRemoteDataSource {
     required String email,
   });
 
+  Future<void> resendVerificationCode({required String userId});
+
   Future<UserModel> confirmVerificationCode({
     required String code,
     required String email,

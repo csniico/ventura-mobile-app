@@ -8,6 +8,7 @@ final class InvoiceCreateEvent extends InvoiceEvent {
   final String customerId;
   final List<String> orderIds;
   final DateTime? dueDate;
+  final String? invoiceType;
   final String? notes;
 
   InvoiceCreateEvent({
@@ -15,6 +16,7 @@ final class InvoiceCreateEvent extends InvoiceEvent {
     required this.customerId,
     required this.orderIds,
     this.dueDate,
+    this.invoiceType,
     this.notes,
   });
 }

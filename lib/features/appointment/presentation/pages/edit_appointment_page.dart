@@ -177,8 +177,8 @@ class _EditAppointmentPageState extends State<EditAppointmentPage> {
             startTime: startDateTime,
             endTime: endDateTime,
             isRecurring: isRecurring,
-            userId: user.id,
             businessId: user.businessId,
+            customerId: widget.appointment.customerId,
             description: _descriptionController.text.isEmpty
                 ? null
                 : _descriptionController.text,

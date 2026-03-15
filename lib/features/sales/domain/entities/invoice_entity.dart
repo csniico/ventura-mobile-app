@@ -1,4 +1,5 @@
 import 'invoice_status.dart';
+import 'invoice_type.dart';
 import 'payment_method.dart';
 import 'customer_entity.dart';
 import 'order_entity.dart';
@@ -10,6 +11,8 @@ class Invoice {
   final String customerId;
   final Customer? customer;
   final List<Order>? orders;
+
+  final InvoiceType invoiceType;
 
   // Financial Details - Ghana VAT Structure
   final double subtotal;
@@ -55,6 +58,7 @@ class Invoice {
     required this.customerId,
     this.customer,
     this.orders,
+    this.invoiceType = InvoiceType.standard,
     required this.subtotal,
     this.vatRate = 0.15,
     required this.vatAmount,
@@ -82,6 +86,7 @@ class Invoice {
     String? customerId,
     Customer? customer,
     List<Order>? orders,
+    InvoiceType? invoiceType,
     double? subtotal,
     double? vatRate,
     double? vatAmount,
@@ -108,6 +113,7 @@ class Invoice {
       customerId: customerId ?? this.customerId,
       customer: customer ?? this.customer,
       orders: orders ?? this.orders,
+      invoiceType: invoiceType ?? this.invoiceType,
       subtotal: subtotal ?? this.subtotal,
       vatRate: vatRate ?? this.vatRate,
       vatAmount: vatAmount ?? this.vatAmount,

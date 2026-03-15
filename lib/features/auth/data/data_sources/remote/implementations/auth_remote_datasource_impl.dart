@@ -106,6 +106,18 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
   }
 
   @override
+  Future<void> resendVerificationCode({required String userId}) async {
+    try {
+      await dio.post(
+        '${routes.serverUrl}${routes.resendVerificationCode}',
+        data: {'id': userId},
+      );
+    } on DioException catch (e) {
+      throw ServerException.fromDioError(e);
+    }
+  }
+
+  @override
   Future<void> signOut() {
     // TODO: implement signOut
     throw UnimplementedError();

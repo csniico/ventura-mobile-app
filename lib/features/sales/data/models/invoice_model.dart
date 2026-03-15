@@ -1,5 +1,6 @@
 import 'package:ventura/features/sales/domain/entities/invoice_entity.dart';
 import 'package:ventura/features/sales/domain/entities/invoice_status.dart';
+import 'package:ventura/features/sales/domain/entities/invoice_type.dart';
 import 'package:ventura/features/sales/domain/entities/payment_method.dart';
 import 'package:ventura/features/sales/data/models/customer_model.dart';
 import 'package:ventura/features/sales/data/models/order_model.dart';
@@ -12,6 +13,7 @@ class InvoiceModel extends Invoice {
     required super.customerId,
     super.customer,
     super.orders,
+    super.invoiceType = InvoiceType.standard,
     required super.subtotal,
     super.vatRate = 0.15,
     required super.vatAmount,
@@ -59,6 +61,9 @@ class InvoiceModel extends Invoice {
       customer: json['customer'] != null && json['customer'] is Map
           ? CustomerModel.fromJson(json['customer'] as Map<String, dynamic>)
           : null,
+      invoiceType: json['invoiceType'] != null
+          ? InvoiceType.fromJson(json['invoiceType'])
+          : InvoiceType.standard,
       orders: json['orders'] != null && json['orders'] is List
           ? (json['orders'] as List)
                 .where((order) => order != null && order is Map)
@@ -126,6 +131,7 @@ class InvoiceModel extends Invoice {
       customerId: invoice.customerId,
       customer: invoice.customer,
       orders: invoice.orders,
+      invoiceType: invoice.invoiceType,
       subtotal: invoice.subtotal,
       vatRate: invoice.vatRate,
       vatAmount: invoice.vatAmount,
@@ -156,6 +162,9 @@ class InvoiceModel extends Invoice {
       customer: map['customer'] != null
           ? CustomerModel.fromMap(map['customer'])
           : null,
+      invoiceType: map['invoiceType'] != null
+          ? InvoiceType.fromJson(map['invoiceType'])
+          : InvoiceType.standard,
       orders: map['orders'] != null
           ? (map['orders'] as List)
                 .map((order) => OrderModel.fromMap(order))
@@ -218,6 +227,7 @@ class InvoiceModel extends Invoice {
       'invoiceNumber': invoiceNumber,
       'businessId': businessId,
       'customerId': customerId,
+      'invoiceType': invoiceType.toJson(),
       'customer': customer != null
           ? CustomerModel.fromEntity(customer!).toJson()
           : null,
@@ -251,6 +261,7 @@ class InvoiceModel extends Invoice {
       'invoiceNumber': invoiceNumber,
       'businessId': businessId,
       'customerId': customerId,
+      'invoiceType': invoiceType.toJson(),
       'customer': customer != null
           ? CustomerModel.fromEntity(customer!).toMap()
           : null,
@@ -286,6 +297,7 @@ class InvoiceModel extends Invoice {
       customerId: customerId,
       customer: customer,
       orders: orders,
+      invoiceType: invoiceType,
       subtotal: subtotal,
       vatRate: vatRate,
       vatAmount: vatAmount,

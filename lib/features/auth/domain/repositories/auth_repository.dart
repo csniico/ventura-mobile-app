@@ -33,6 +33,10 @@ abstract interface class AuthRepository {
     required String email,
   });
 
+  Future<Either<Failure, void>> resendVerificationCode({
+    required String userId,
+  });
+
   Future<Either<Failure, User>> confirmVerificationCode({
     required String code,
     required String email,

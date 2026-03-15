@@ -113,7 +113,6 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
             startTime: startDateTime,
             endTime: endDateTime,
             isRecurring: isRecurring,
-            userId: user.id,
             businessId: user.businessId,
             description: _descriptionController.text.isEmpty
                 ? null

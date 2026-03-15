@@ -269,7 +269,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
-      childAspectRatio: 1.5,
+      childAspectRatio: 1.2,
       children: [
         _buildStatCard(
           title: 'Total Orders',
