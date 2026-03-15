@@ -496,7 +496,7 @@ class _EditOrderState extends State<EditOrder> {
               child: Container(
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? _getStatusColor(status).withOpacity(0.08)
+                      ? _getStatusColor(status).withValues(alpha: 0.08)
                       : Theme.of(context).cardColor,
                   border: Border.all(
                     color: isSelected
@@ -572,10 +572,10 @@ class _EditOrderState extends State<EditOrder> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _getStatusColor(_selectedStatus!).withOpacity(0.05),
+              color: _getStatusColor(_selectedStatus!).withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: _getStatusColor(_selectedStatus!).withOpacity(0.3),
+                color: _getStatusColor(_selectedStatus!).withValues(alpha: 0.3),
                 width: 1,
               ),
             ),

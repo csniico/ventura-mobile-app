@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/sales/domain/entities/customer_entity.dart';
 import 'package:ventura/features/sales/domain/entities/order_entity.dart';
 import 'package:ventura/features/sales/domain/entities/order_status.dart';
+import 'package:ventura/features/sales/presentation/bloc/customer_bloc.dart';
 import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/edit_customer.dart';
 import 'package:ventura/features/sales/presentation/pages/view_order.dart';
@@ -79,9 +81,18 @@ class _ViewCustomerState extends State<ViewCustomer> {
         if (didPop) return;
         Navigator.of(context).pop(_orderCreated);
       },
-      child: BlocProvider.value(
-        value: _orderBloc,
-        child: Scaffold(
+      child: BlocListener<CustomerBloc, CustomerState>(
+        listener: (context, state) {
+          if (state is CustomerDeleteSuccessState) {
+            ToastService.showSuccess('Customer deleted');
+            Navigator.of(context).pop('deleted');
+          } else if (state is CustomerErrorState) {
+            ToastService.showError(state.message);
+          }
+        },
+        child: BlocProvider.value(
+          value: _orderBloc,
+          child: Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () async {
@@ -129,6 +140,40 @@ class _ViewCustomerState extends State<ViewCustomer> {
             ),
           ),
         ),
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context) {
+    final businessId =
+        (context.read<AuthBloc>().state as Authenticated).user.business!.id;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Customer'),
+        content: Text(
+          'Are you sure you want to delete ${widget.customer.name}? This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              context.read<CustomerBloc>().add(
+                CustomerDeleteEvent(
+                  customerId: widget.customer.id,
+                  businessId: businessId,
+                ),
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
       ),
     );
   }
@@ -161,6 +206,14 @@ class _ViewCustomerState extends State<ViewCustomer> {
               ),
             );
           },
+        ),
+        IconButton(
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedDelete02,
+            color: Colors.white,
+            size: 22,
+          ),
+          onPressed: () => _showDeleteConfirmation(context),
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(

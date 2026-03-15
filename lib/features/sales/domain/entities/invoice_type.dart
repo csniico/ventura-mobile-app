@@ -10,7 +10,7 @@ enum InvoiceType {
       case InvoiceType.proforma:
         return 'PROFORMA';
       case InvoiceType.receipt:
-        return 'RECIEPT'; // DB enum has typo until migration runs
+        return 'RECEIPT'; // DB enum has typo until migration runs
     }
   }
 

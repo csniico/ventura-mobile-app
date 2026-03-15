@@ -217,7 +217,20 @@ class _ListCustomersState extends State<ListCustomers> {
         Expanded(
           child: BlocListener<CustomerBloc, CustomerState>(
             listener: (context, state) {
-              if (state is CustomerImportSuccessState) {
+              if (state is CustomerDeleteSuccessState) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Customer deleted'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                final businessId = UserService().businessId;
+                if (businessId != null) {
+                  context.read<CustomerBloc>().add(
+                    CustomerGetEvent(businessId: businessId),
+                  );
+                }
+              } else if (state is CustomerImportSuccessState) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -398,11 +411,14 @@ class _ListCustomersState extends State<ListCustomers> {
                           elevation: 0,
                           child: ListTile(
                             onTap: () async {
+                              final customerBloc = context.read<CustomerBloc>();
                               final result = await Navigator.of(context)
-                                  .push<bool>(
+                                  .push<Object?>(
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          ViewCustomer(customer: customer),
+                                      builder: (ctx) => BlocProvider.value(
+                                        value: customerBloc,
+                                        child: ViewCustomer(customer: customer),
+                                      ),
                                     ),
                                   );
 

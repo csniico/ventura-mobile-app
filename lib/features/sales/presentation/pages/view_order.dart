@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:ventura/features/sales/domain/entities/order_entity.dart';
 import 'package:ventura/features/sales/domain/entities/order_status.dart';
 import 'package:ventura/features/sales/presentation/pages/create_invoice.dart';
@@ -229,11 +230,17 @@ class _ViewOrderState extends State<ViewOrder> {
   }
 
   Widget _buildCustomerCard(BuildContext context) {
+    final customer = _order.customer!;
+    final theme = Theme.of(context);
+    final initials = customer.name.isNotEmpty
+        ? customer.name.trim().split(' ').map((w) => w[0]).take(2).join()
+        : '?';
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        color: theme.colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -242,17 +249,84 @@ class _ViewOrderState extends State<ViewOrder> {
           Text(
             'Customer',
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
+              color: theme.colorScheme.onSurface,
               fontSize: 14,
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 12),
-          _infoRow('Name', _order.customer!.name),
-          if (_order.customer!.email != null)
-            _infoRow('Email', _order.customer!.email!),
-          if (_order.customer!.phone != null)
-            _infoRow('Phone', _order.customer!.phone!),
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 24,
+                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+                child: Text(
+                  initials.toUpperCase(),
+                  style: TextStyle(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      customer.name,
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                    if (customer.phone != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        customer.phone!,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                    if (customer.email != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        customer.email!,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              if (customer.phone != null)
+                IconButton(
+                  onPressed: () =>
+                      launchUrl(Uri(scheme: 'tel', path: customer.phone)),
+                  icon: HugeIcon(
+                    icon: HugeIcons.strokeRoundedCall,
+                    color: theme.colorScheme.primary,
+                    size: 22,
+                  ),
+                ),
+              if (customer.email != null)
+                IconButton(
+                  onPressed: () =>
+                      launchUrl(Uri(scheme: 'mailto', path: customer.email)),
+                  icon: HugeIcon(
+                    icon: HugeIcons.strokeRoundedMail01,
+                    color: theme.colorScheme.primary,
+                    size: 22,
+                  ),
+                ),
+            ],
+          ),
         ],
       ),
     );
@@ -301,7 +375,7 @@ class _ViewOrderState extends State<ViewOrder> {
                           style: TextStyle(
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withOpacity(0.65),
+                            ).colorScheme.onSurface.withValues(alpha: 0.65),
                             fontSize: 12,
                           ),
                         ),
@@ -372,7 +446,7 @@ class _ViewOrderState extends State<ViewOrder> {
               style: TextStyle(
                 color: Theme.of(
                   context,
-                ).colorScheme.onSurface.withOpacity(0.75),
+                ).colorScheme.onSurface.withValues(alpha: 0.75),
                 fontSize: 12,
               ),
             ),

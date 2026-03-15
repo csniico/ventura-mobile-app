@@ -145,7 +145,7 @@ class _PendingOrdersPageState extends State<PendingOrdersPage> {
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.6),
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -213,9 +213,11 @@ class _PendingOrdersPageState extends State<PendingOrdersPage> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
+                      color: Colors.orange.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                      border: Border.all(
+                        color: Colors.orange.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Text(
                       'PENDING',
@@ -235,7 +237,7 @@ class _PendingOrdersPageState extends State<PendingOrdersPage> {
                     icon: HugeIcons.strokeRoundedCalendar03,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.6),
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                     size: 16,
                   ),
                   const SizedBox(width: 6),
@@ -244,7 +246,7 @@ class _PendingOrdersPageState extends State<PendingOrdersPage> {
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.6),
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -252,7 +254,7 @@ class _PendingOrdersPageState extends State<PendingOrdersPage> {
                     icon: HugeIcons.strokeRoundedShoppingBag01,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.6),
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                     size: 16,
                   ),
                   const SizedBox(width: 6),
@@ -261,7 +263,7 @@ class _PendingOrdersPageState extends State<PendingOrdersPage> {
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.6),
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],

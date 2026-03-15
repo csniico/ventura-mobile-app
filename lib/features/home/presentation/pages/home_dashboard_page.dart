@@ -174,7 +174,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
   //       Text(
   //         '$timeOfDay,',
   //         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-  //           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+  //           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
   //         ),
   //       ),
   //       const SizedBox(height: 4),
@@ -395,7 +395,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,7 +405,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: HugeIcon(icon: icon, color: color, size: 20),
@@ -419,8 +419,8 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                   ),
                   decoration: BoxDecoration(
                     color: (isPositive ?? true)
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.red.withOpacity(0.1),
+                        ? Colors.green.withValues(alpha: 0.1)
+                        : Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -438,7 +438,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
           Text(
             title,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 4),
@@ -453,7 +453,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
             Text(
               subtitle,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 fontSize: 11,
               ),
             ),
@@ -491,7 +491,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
           Text(
             title,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -512,16 +512,16 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3), width: 1),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: HugeIcon(icon: icon, color: color, size: 24),
@@ -543,7 +543,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.6),
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -591,7 +591,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.5),
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
               ),
@@ -649,7 +649,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                                   ?.copyWith(
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.onSurface.withOpacity(0.6),
+                                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                                   ),
                             ),
                           ],
@@ -673,7 +673,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                     children: [
                       CircleAvatar(
                         radius: 20,
-                        backgroundColor: Colors.blue.withOpacity(0.1),
+                        backgroundColor: Colors.blue.withValues(alpha: 0.1),
                         child: Text(
                           customer.name.isNotEmpty
                               ? customer.name[0].toUpperCase()
@@ -703,7 +703,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                                   ?.copyWith(
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.onSurface.withOpacity(0.6),
+                                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                                   ),
                             ),
                           ],
@@ -748,7 +748,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.5),
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
               ),
@@ -767,7 +767,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
+                        color: color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: HugeIcon(icon: icon, color: color, size: 20),
@@ -789,7 +789,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                                 ?.copyWith(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.onSurface.withOpacity(0.6),
+                                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                                 ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -801,7 +801,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                                 ?.copyWith(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.onSurface.withOpacity(0.4),
+                                  ).colorScheme.onSurface.withValues(alpha: 0.4),
                                   fontSize: 11,
                                 ),
                           ),

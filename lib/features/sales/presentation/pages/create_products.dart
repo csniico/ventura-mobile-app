@@ -383,7 +383,7 @@ class _CreateProductsState extends State<CreateProducts> {
                                       icon: const Icon(Icons.close),
                                       style: IconButton.styleFrom(
                                         backgroundColor: Colors.black
-                                            .withOpacity(0.5),
+                                            .withValues(alpha: 0.5),
                                         foregroundColor: Colors.white,
                                       ),
                                     ),
@@ -440,8 +440,8 @@ class _CreateProductsState extends State<CreateProducts> {
                                         child: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
-                                            color: Colors.black.withOpacity(
-                                              0.5,
+                                            color: Colors.black.withValues(
+                                              alpha: 0.5,
                                             ),
                                             shape: BoxShape.circle,
                                           ),

@@ -664,9 +664,10 @@ class _ViewInvoiceState extends State<ViewInvoice> {
 
       if (!mounted) return;
 
-      await Share.shareXFiles([
-        XFile(pdfFile.path),
-      ], text: 'Invoice ${_invoice.invoiceNumber}');
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile(pdfFile.path)],
+        text: 'Invoice ${_invoice.invoiceNumber}',
+      ));
     } catch (e) {
       if (!mounted) return;
       ToastService.showError('Failed to share PDF: $e');
