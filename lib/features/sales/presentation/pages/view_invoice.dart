@@ -118,7 +118,7 @@ class _ViewInvoiceState extends State<ViewInvoice> {
         child: Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
           appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             bottom: const PreferredSize(
               preferredSize: Size.fromHeight(8.0),
               child: SizedBox(height: 8.0),
@@ -126,7 +126,7 @@ class _ViewInvoiceState extends State<ViewInvoice> {
             leading: IconButton(
               icon: HugeIcon(
                 icon: HugeIcons.strokeRoundedArrowLeft01,
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 30,
               ),
               onPressed: () => Navigator.pop(context),
@@ -134,7 +134,7 @@ class _ViewInvoiceState extends State<ViewInvoice> {
             title: Text(
               'Invoice Details',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
               ),
@@ -143,7 +143,7 @@ class _ViewInvoiceState extends State<ViewInvoice> {
               IconButton(
                 icon: HugeIcon(
                   icon: HugeIcons.strokeRoundedPencilEdit02,
-                  color: Theme.of(context).colorScheme.onPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 26,
                 ),
                 onPressed: () async {

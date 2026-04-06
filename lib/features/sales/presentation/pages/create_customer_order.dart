@@ -96,15 +96,15 @@ class _CreateCustomerOrderState extends State<CreateCustomerOrder> {
       child: Scaffold(
         backgroundColor: theme.colorScheme.surface,
         appBar: AppBar(
-          backgroundColor: theme.colorScheme.primary,
+          backgroundColor: theme.colorScheme.surface,
           title: Text(
             'Create Order',
-            style: TextStyle(color: theme.colorScheme.onPrimary),
+            style: TextStyle(color: theme.colorScheme.onSurface),
           ),
           leading: IconButton(
             icon: HugeIcon(
               icon: HugeIcons.strokeRoundedArrowLeft01,
-              color: theme.colorScheme.onPrimary,
+              color: theme.colorScheme.onSurface,
               size: 24,
             ),
             onPressed: () => Navigator.pop(context),

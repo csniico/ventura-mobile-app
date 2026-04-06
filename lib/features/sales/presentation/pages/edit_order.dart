@@ -271,9 +271,9 @@ class _EditOrderState extends State<EditOrder> {
         BlocProvider<InvoiceBloc>.value(value: _invoiceBloc),
       ],
       child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(8.0),
             child: const SizedBox(height: 8.0),
@@ -282,13 +282,13 @@ class _EditOrderState extends State<EditOrder> {
             'Update Order Status',
             style: TextStyle(
               fontSize: 20,
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           leading: IconButton(
             icon: HugeIcon(
               icon: HugeIcons.strokeRoundedArrowLeft01,
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 30,
             ),
             onPressed: () => Navigator.pop(context),

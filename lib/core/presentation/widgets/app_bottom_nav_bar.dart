@@ -18,7 +18,7 @@ class AppBottomNavBar extends StatelessWidget {
       elevation: 0,
       currentIndex: currentIndex,
       onTap: onTap,
-      iconSize: 34,
+      iconSize: 24,
       type: BottomNavigationBarType.fixed,
       unselectedLabelStyle: const TextStyle(
         fontFamily: 'Inter',

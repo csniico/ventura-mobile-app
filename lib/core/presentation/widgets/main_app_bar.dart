@@ -20,7 +20,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(12.0),
         child: const SizedBox(height: 12.0),
@@ -38,13 +38,13 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
           Text(
             optimizeText(_userService.user?.firstName ?? 'Ventura'),
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           Text(
             optimizeText(_userService.user?.business?.name ?? 'ventura'),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
@@ -58,7 +58,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             },
             icon: HugeIcon(
               icon: HugeIcons.strokeRoundedSearch01,
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 30,
             ),
           ),

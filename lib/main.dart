@@ -29,35 +29,36 @@ void main() async {
   await dotenv.load(fileName: '.env');
   await initDependencies();
 
-  await SentryFlutter.init(
-    (options) {
-      options.dsn =
-          'https://5ecccc596439f8611fc9fd058619cb23@o4509548115001344.ingest.de.sentry.io/4510905790431312';
-      options.tracesSampleRate = 0.1;
-      options.profilesSampleRate = 0.1;
-      options.replay.sessionSampleRate = 0.1;
-      options.replay.onErrorSampleRate = 0.1;
-    },
-    appRunner: () => runApp(
-      SentryWidget(
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider<AppUserCubit>(
-              create: (_) => serviceLocator<AppUserCubit>(),
-            ),
-            BlocProvider<AuthBloc>(
-              create: (_) => serviceLocator<AuthBloc>()..add(AppStarted()),
-            ),
-            BlocProvider<AppointmentBloc>(
-              create: (_) => serviceLocator<AppointmentBloc>(),
-            ),
-          ],
-          child: GestureDetector(
-            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-            child: App(),
-          ),
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<AppUserCubit>(
+          create: (_) => serviceLocator<AppUserCubit>(),
         ),
+        BlocProvider<AuthBloc>(
+          create: (_) => serviceLocator<AuthBloc>()..add(AppStarted()),
+        ),
+        BlocProvider<AppointmentBloc>(
+          create: (_) => serviceLocator<AppointmentBloc>(),
+        ),
+      ],
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: App(),
       ),
     ),
   );
+
+  // await SentryFlutter.init(
+  //   (options) {
+  //     options.dsn =
+  //         'https://5ecccc596439f8611fc9fd058619cb23@o4509548115001344.ingest.de.sentry.io/4510905790431312';
+  //     options.tracesSampleRate = 0.1;
+  //     options.profilesSampleRate = 0.1;
+  //     options.replay.sessionSampleRate = 0.1;
+  //     options.replay.onErrorSampleRate = 0.1;
+  //   },
+  //   appRunner: () => ,
+  // );
+
 }

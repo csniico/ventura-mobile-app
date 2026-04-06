@@ -108,15 +108,15 @@ class _ViewCustomerState extends State<ViewCustomer> {
                 _refreshOrders();
               }
             },
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             icon: HugeIcon(
               icon: HugeIcons.strokeRoundedAdd01,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 20,
             ),
-            label: const Text(
+            label: Text(
               'Create Order',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface,)
             ),
           ),
           body: SafeArea(
