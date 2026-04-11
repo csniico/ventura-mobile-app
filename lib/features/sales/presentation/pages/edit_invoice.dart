@@ -235,7 +235,7 @@ class _EditInvoiceState extends State<EditInvoice> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<PaymentMethod>(
-                    value: _selectedPaymentMethod,
+                    initialValue: _selectedPaymentMethod,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
