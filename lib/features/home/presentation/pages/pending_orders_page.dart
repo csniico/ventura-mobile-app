@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/ventura_app_bar.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/app_bar_type.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/sales/domain/entities/order_entity.dart';
 import 'package:ventura/features/sales/presentation/bloc/order_bloc.dart';
@@ -57,23 +59,9 @@ class _PendingOrdersPageState extends State<PendingOrdersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        iconTheme: IconThemeData(
-          color: Theme.of(context).colorScheme.onPrimary,
-        ),
-        leading: IconButton(
-          icon: HugeIcon(
-            icon: HugeIcons.strokeRoundedArrowLeft01,
-            color: Theme.of(context).colorScheme.onPrimary,
-            size: 24,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        titleTextStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
-          color: Theme.of(context).colorScheme.onPrimary,
-        ),
-        title: const Text('Pending Orders'),
+      appBar: VenturaAppBar(
+        type: AppBarType.secondary,
+        title: 'Pending Orders',
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

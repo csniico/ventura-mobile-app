@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ventura/core/presentation/widgets/app_bottom_nav_bar.dart';
-import 'package:ventura/core/presentation/widgets/main_app_bar.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/ventura_app_bar.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/app_bar_type.dart';
 import 'package:ventura/features/appointment/presentation/pages/appointment_page.dart';
 import 'package:ventura/features/auth/presentation/pages/profile.dart';
 import 'package:ventura/features/home/presentation/pages/home.dart';
@@ -43,8 +44,8 @@ class _MainScreenState extends State<MainScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       key: const Key('main_screen_scaffold'),
       appBar: _currentIndex != 3
-          ? MainAppBar()
-          : AppBar(backgroundColor: Theme.of(context).colorScheme.primary),
+          ? VenturaAppBar(type: AppBarType.dashboard)
+          : null,
       body: SafeArea(child: RepaintBoundary(child: _buildBody())),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentIndex,

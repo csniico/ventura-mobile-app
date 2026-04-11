@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/ventura_app_bar.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/app_bar_type.dart';
 
 class NotFoundPage extends StatelessWidget {
   const NotFoundPage({super.key});
@@ -6,9 +8,9 @@ class NotFoundPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Page Not Found'),
-        centerTitle: true,
+      appBar: VenturaAppBar(
+        type: AppBarType.minimal,
+        title: 'Page Not Found',
       ),
       body: const Center(
         child: Text(

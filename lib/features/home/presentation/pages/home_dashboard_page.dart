@@ -328,7 +328,7 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const OutOfStockProductsPage(),
+                builder: (context) => OutOfStockProductsPage(),
               ),
             ).then((_) => _refreshDashboard());
           },

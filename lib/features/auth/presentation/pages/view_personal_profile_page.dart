@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ventura/features/auth/presentation/widgets/profile_user_image.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/ventura_app_bar.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/app_bar_type.dart';
 
 class ViewPersonalProfilePage extends StatelessWidget {
   const ViewPersonalProfilePage({super.key});
@@ -11,20 +13,9 @@ class ViewPersonalProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(8.0),
-          child: const SizedBox(height: 8.0),
-        ),
-        leading: IconButton(
-          icon: HugeIcon(
-            icon: HugeIcons.strokeRoundedArrowLeft01,
-            color: Theme.of(context).colorScheme.onPrimary,
-            size: 30,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: VenturaAppBar(
+        type: AppBarType.secondary,
+        title: 'Personal Information',
         actions: [
           IconButton(
             onPressed: () {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/ventura_app_bar.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/app_bar_type.dart';
 
 class SecurityPage extends StatelessWidget {
   const SecurityPage({super.key});
@@ -7,25 +8,7 @@ class SecurityPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(8.0),
-          child: const SizedBox(height: 8.0),
-        ),
-        title: Text(
-          'Security',
-          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-        ),
-        leading: IconButton(
-          icon: HugeIcon(
-            icon: HugeIcons.strokeRoundedArrowLeft01,
-            color: Theme.of(context).colorScheme.onPrimary,
-            size: 30,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar: VenturaAppBar(type: AppBarType.secondary, title: 'Security'),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
