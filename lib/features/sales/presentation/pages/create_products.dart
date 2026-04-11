@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/ventura_app_bar.dart';
 import 'package:ventura/core/domain/use_cases/asset_upload_image.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
@@ -191,28 +192,8 @@ class _CreateProductsState extends State<CreateProducts> {
       create: (context) => serviceLocator<ProductBloc>(),
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(8.0),
-            child: const SizedBox(height: 8.0),
-          ),
-          title: Text(
-            'Create Product',
-            style: TextStyle(
-              fontSize: 20,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          leading: IconButton(
-            icon: HugeIcon(
-              icon: HugeIcons.strokeRoundedArrowLeft01,
-              color: Theme.of(context).colorScheme.onSurface,
-              size: 30,
-            ),
-            onPressed: () => Navigator.pop(context),
-          ),
-          actions: [], // Removed actions
+        appBar: VenturaAppBar(
+          title: 'Create Product',
         ),
         body: SafeArea(
           child: BlocListener<ProductBloc, ProductState>(

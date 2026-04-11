@@ -34,16 +34,11 @@ class AppointmentDetailsPage extends StatelessWidget {
       appBar: VenturaAppBar(
         type: AppBarType.secondary,
         title: 'Appointment Details',
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        titleTextStyle: TextStyle(
-          fontSize: 20,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
         actions: [
           IconButton(
             icon: HugeIcon(
               icon: HugeIcons.strokeRoundedPencilEdit02,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).appBarTheme.foregroundColor,
               size: 26,
             ),
             onPressed: () async {

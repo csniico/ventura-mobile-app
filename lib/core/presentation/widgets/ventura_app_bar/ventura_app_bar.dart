@@ -14,7 +14,6 @@ class VenturaAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.backgroundColor,
     this.titleTextStyle,
-    this.showBottomDivider = true,
     this.customLeading,
     this.centerTitle = false,
     this.profileImageUrl,
@@ -29,7 +28,6 @@ class VenturaAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final Color? backgroundColor;
   final TextStyle? titleTextStyle;
-  final bool showBottomDivider;
   final Widget? customLeading;
   final bool centerTitle;
 
@@ -66,14 +64,7 @@ class VenturaAppBar extends StatelessWidget implements PreferredSizeWidget {
 
       case AppBarType.secondary:
       case AppBarType.minimal:
-        return IconButton(
-          icon: HugeIcon(
-            icon: HugeIcons.strokeRoundedArrowLeft01,
-            color: _getTitleColor(context),
-            size: 30,
-          ),
-          onPressed: onBackPressed ?? () => Navigator.pop(context),
-        );
+        return null;
     }
   }
 
@@ -137,47 +128,31 @@ class VenturaAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  PreferredSize _buildBottomDivider() {
-    final height = type == AppBarType.dashboard ? 12.0 : 8.0;
-    return PreferredSize(
-      preferredSize: Size.fromHeight(height),
-      child: SizedBox(height: height),
-    );
-  }
-
   Color _getBackgroundColor(BuildContext context) {
     if (backgroundColor != null) return backgroundColor!;
-
-    final colorScheme = Theme.of(context).colorScheme;
-    return switch (type) {
-      AppBarType.dashboard => colorScheme.surface,
-      AppBarType.secondary || AppBarType.minimal => colorScheme.primary,
-    };
+    return Theme.of(context).appBarTheme.backgroundColor ??
+        Theme.of(context).colorScheme.surface;
   }
 
   Color _getTitleColor(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return switch (type) {
-      AppBarType.dashboard => colorScheme.onSurface,
-      AppBarType.secondary || AppBarType.minimal => colorScheme.onPrimary,
-    };
+    return Theme.of(context).appBarTheme.foregroundColor ??
+        Theme.of(context).colorScheme.onSurface;
   }
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: _getBackgroundColor(context),
-      bottom: showBottomDivider ? _buildBottomDivider() : null,
       leading: _buildLeading(context),
       title: _buildTitle(context),
       centerTitle: centerTitle,
       actions: type == AppBarType.dashboard
           ? [_buildActions(context)!]
           : actions,
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: type != AppBarType.dashboard,
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 12.0);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

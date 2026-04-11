@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/ventura_app_bar.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/sales/domain/entities/customer_entity.dart';
@@ -95,20 +96,8 @@ class _CreateCustomerOrderState extends State<CreateCustomerOrder> {
       ],
       child: Scaffold(
         backgroundColor: theme.colorScheme.surface,
-        appBar: AppBar(
-          backgroundColor: theme.colorScheme.surface,
-          title: Text(
-            'Create Order',
-            style: TextStyle(color: theme.colorScheme.onSurface),
-          ),
-          leading: IconButton(
-            icon: HugeIcon(
-              icon: HugeIcons.strokeRoundedArrowLeft01,
-              color: theme.colorScheme.onSurface,
-              size: 24,
-            ),
-            onPressed: () => Navigator.pop(context),
-          ),
+        appBar: VenturaAppBar(
+          title: 'Create Order',
         ),
         body: BlocConsumer<OrderBloc, OrderState>(
           listener: (context, state) {

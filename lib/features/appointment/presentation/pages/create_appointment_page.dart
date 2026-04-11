@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/core/common/utils/date_time_util.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/app_bar_type.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/ventura_app_bar.dart';
 import 'package:ventura/core/services/toast_service.dart';
 import 'package:ventura/core/services/user_service.dart';
 import 'package:ventura/features/appointment/presentation/bloc/appointment_bloc.dart';
@@ -247,27 +249,9 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(8.0),
-            child: const SizedBox(height: 8.0),
-          ),
-          leading: IconButton(
-            icon: HugeIcon(
-              icon: HugeIcons.strokeRoundedArrowLeft01,
-              color: Theme.of(context).colorScheme.onSurface,
-              size: 30,
-            ),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Text(
-            'Add appointment',
-            style: TextStyle(
-              fontSize: 20,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
+        appBar: VenturaAppBar(
+          type: AppBarType.secondary,
+          title: 'Add appointment',
         ),
         body: SafeArea(
           child: Form(

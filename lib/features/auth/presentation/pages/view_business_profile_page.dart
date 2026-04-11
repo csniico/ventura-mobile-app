@@ -25,7 +25,7 @@ class ViewBusinessProfilePage extends StatelessWidget {
               padding: const EdgeInsets.only(right: 8.0),
               child: HugeIcon(
                 icon: HugeIcons.strokeRoundedPencilEdit02,
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: Theme.of(context).appBarTheme.foregroundColor,
               ),
             ),
           ),

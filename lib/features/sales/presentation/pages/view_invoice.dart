@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
+import 'package:ventura/core/presentation/widgets/ventura_app_bar/ventura_app_bar.dart';
 import 'package:open_file/open_file.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ventura/core/services/pdf_service.dart';
@@ -117,28 +118,8 @@ class _ViewInvoiceState extends State<ViewInvoice> {
         },
         child: Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.surface,
-            bottom: const PreferredSize(
-              preferredSize: Size.fromHeight(8.0),
-              child: SizedBox(height: 8.0),
-            ),
-            leading: IconButton(
-              icon: HugeIcon(
-                icon: HugeIcons.strokeRoundedArrowLeft01,
-                color: Theme.of(context).colorScheme.onSurface,
-                size: 30,
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: Text(
-              'Invoice Details',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          appBar: VenturaAppBar(
+            title: 'Invoice Details',
             actions: [
               IconButton(
                 icon: HugeIcon(

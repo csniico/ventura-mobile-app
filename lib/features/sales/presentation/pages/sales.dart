@@ -126,7 +126,7 @@ class _SalesState extends State<Sales> with TickerProviderStateMixin {
         body: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(6),
               child: SalesPageTabBar(controller: _tabController),
             ),
             Expanded(

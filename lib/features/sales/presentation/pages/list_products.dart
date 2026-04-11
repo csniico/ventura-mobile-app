@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:ventura/core/presentation/widgets/adaptive_image.dart';
 import 'package:ventura/features/sales/presentation/bloc/product_bloc.dart';
 import 'package:ventura/features/sales/presentation/pages/view_product.dart';
 
@@ -23,92 +24,81 @@ class _ListProductsState extends State<ListProducts> {
   }
 
   void _showPriceFilterDialog() {
+    final minController = TextEditingController(
+      text: _minPrice.toStringAsFixed(0),
+    );
+    final maxController = TextEditingController(
+      text: _maxPrice.toStringAsFixed(0),
+    );
+
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Price Range'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: const InputDecoration(
-                        labelText: 'Min Price',
-                        prefixText: 'GHS ',
-                      ),
-                      keyboardType: TextInputType.number,
-                      controller: TextEditingController(
-                        text: _minPrice.toStringAsFixed(0),
-                      ),
-                      onChanged: (value) {
-                        final price = double.tryParse(value);
-                        if (price != null) {
-                          setState(() {
-                            _minPrice = price;
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: TextField(
-                      decoration: const InputDecoration(
-                        labelText: 'Max Price',
-                        prefixText: 'GHS ',
-                      ),
-                      keyboardType: TextInputType.number,
-                      controller: TextEditingController(
-                        text: _maxPrice.toStringAsFixed(0),
-                      ),
-                      onChanged: (value) {
-                        final price = double.tryParse(value);
-                        if (price != null) {
-                          setState(() {
-                            _maxPrice = price;
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'GHS ${_minPrice.toStringAsFixed(0)} - GHS ${_maxPrice.toStringAsFixed(0)}',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _minPrice = 0;
-                  _maxPrice = 10000;
-                });
-                Navigator.pop(context);
-              },
-              child: const Text('Reset'),
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Price Range',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Min Price',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
+            const SizedBox(height: 6),
+            TextField(
+              controller: minController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                prefixText: 'GHS ',
+                hintText: '100',
+              ),
             ),
-            FilledButton(
-              onPressed: () {
-                setState(() {});
-                Navigator.pop(context);
-              },
-              child: const Text('Apply'),
+            const SizedBox(height: 16),
+            const Text(
+              'Max Price',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 6),
+            TextField(
+              controller: maxController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                prefixText: 'GHS ',
+                hintText: '1000',
+              ),
             ),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _minPrice = 0;
+                _maxPrice = 10000;
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('Reset'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final min = double.tryParse(minController.text) ?? 0;
+              final max = double.tryParse(maxController.text) ?? 10000;
+              setState(() {
+                _minPrice = min;
+                _maxPrice = max;
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('Apply'),
+          ),
+        ],
       ),
     );
   }
@@ -119,46 +109,57 @@ class _ListProductsState extends State<ListProducts> {
       children: [
         // Search and Filter Bar
         Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search products...',
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              setState(() {
-                                _searchController.clear();
-                              });
-                            },
-                          )
-                        : null,
-                  ),
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                ),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.filter_list),
-                onPressed: _showPriceFilterDialog,
-                tooltip: 'Price Filter',
-                style: IconButton.styleFrom(
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.surfaceContainerLowest,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+          padding: const EdgeInsets.all(6),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search products...',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                setState(() {
+                                  _searchController.clear();
+                                });
+                              },
+                            )
+                          : null,
+                    ),
+                    onChanged: (value) {
+                      setState(() {});
+                    },
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                AspectRatio(
+                  aspectRatio: 1,
+                  child: IconButton(
+                    icon: const Icon(Icons.filter_list),
+                    onPressed: _showPriceFilterDialog,
+                    tooltip: 'Price Filter',
+                    style: IconButton.styleFrom(
+                      backgroundColor: Theme.of(
+                        context,
+                      ).inputDecorationTheme.fillColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side:
+                            Theme.of(
+                              context,
+                            ).inputDecorationTheme.enabledBorder?.borderSide ??
+                            const BorderSide(color: Color(0xFFD4D4D4)),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         // Products Grid
@@ -234,8 +235,7 @@ class _ListProductsState extends State<ListProducts> {
                   );
                 }
 
-                // Define placeholder images order
-                final List<String> placeholderImages = [
+                const placeholderImages = [
                   'assets/images/headphones.jpeg',
                   'assets/images/shampoo.webp',
                   'assets/images/sneakers.jpg',
@@ -243,25 +243,23 @@ class _ListProductsState extends State<ListProducts> {
                 ];
 
                 return GridView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(6),
                   physics: const AlwaysScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 0.65,
+                    childAspectRatio: 0.75,
                   ),
                   itemCount: products.length,
                   itemBuilder: (context, index) {
                     final product = products[index];
-
-                    final ImageProvider imageProvider =
+                    final inStock = product.availableQuantity > 0;
+                    final imagePath =
                         (product.primaryImage != null &&
                             product.primaryImage!.isNotEmpty)
-                        ? NetworkImage(product.primaryImage!) as ImageProvider
-                        : AssetImage(
-                            placeholderImages[index % placeholderImages.length],
-                          );
+                        ? product.primaryImage!
+                        : placeholderImages[index % placeholderImages.length];
 
                     return GestureDetector(
                       onTap: () {
@@ -276,97 +274,74 @@ class _ListProductsState extends State<ListProducts> {
                           color: Theme.of(
                             context,
                           ).colorScheme.surfaceContainerLowest,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.1),
-                          ),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Product Image
                             Expanded(
-                              flex: 3,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(16),
-                                  ),
-                                  image: DecorationImage(
-                                    image: imageProvider,
-                                    fit: BoxFit.cover,
-                                  ),
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(12),
+                                ),
+                                child: AdaptiveImage(
+                                  path: imagePath,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
                                 ),
                               ),
                             ),
-
-                            // Product Details
-                            Expanded(
-                              flex: 2,
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          product.name,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'GHS ${product.price.toStringAsFixed(2)}',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                          ),
-                                        ),
-                                      ],
+                            Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          '${product.availableQuantity} in stock',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
-                                                .withValues(alpha: 0.6),
-                                          ),
-                                        ),
-                                        Text(
-                                          '24 sold', // Hardcoded as requested
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
-                                                .withValues(alpha: 0.8),
-                                          ),
-                                        ),
-                                      ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'GHS ${product.price.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: inStock
+                                          ? Colors.green.withValues(alpha: 0.1)
+                                          : Colors.red.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(
+                                        color: inStock
+                                            ? Colors.green
+                                            : Colors.red,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      inStock ? 'In Stock' : 'Out of Stock',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: inStock
+                                            ? Colors.green
+                                            : Colors.red,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
