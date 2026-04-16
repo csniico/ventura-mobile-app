@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ventura/core/presentation/pages/main_screen.dart';
 import 'package:ventura/core/services/toast_service.dart';
@@ -25,9 +24,16 @@ class _SignInWithGoogleState extends State<SignInWithGoogle> {
   bool isLoading = false;
   bool _isInitialized = false;
 
-  String? serverUrl = dotenv.env['SERVER_URL'];
-  String? clientId = dotenv.env['GOOGLE_CLIENT_ID'];
-  String? serverClientId = dotenv.env['GOOGLE_SERVER_CLIENT_ID'];
+  String? serverUrl = const String.fromEnvironment('SERVER_URL').isEmpty
+      ? null
+      : const String.fromEnvironment('SERVER_URL');
+  String? clientId = const String.fromEnvironment('GOOGLE_CLIENT_ID').isEmpty
+      ? null
+      : const String.fromEnvironment('GOOGLE_CLIENT_ID');
+  String? serverClientId =
+      const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID').isEmpty
+      ? null
+      : const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID');
 
   @override
   void initState() {

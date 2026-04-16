@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ventura/config/routes.dart';
 import 'package:ventura/core/services/toast_service.dart';
@@ -22,7 +21,9 @@ class SignInForm extends StatefulWidget {
 class _SignInFormState extends State<SignInForm> {
   final routes = AppRoutes.instance;
   final _formKey = GlobalKey<FormState>();
-  String? serverUrl = dotenv.env['SERVER_URL'];
+  String? serverUrl = const String.fromEnvironment('SERVER_URL').isEmpty
+      ? null
+      : const String.fromEnvironment('SERVER_URL');
   String? _email = "";
   String? _password = "";
   bool _obscurePassword = true;

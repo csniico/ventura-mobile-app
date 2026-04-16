@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ventura/core/presentation/cubit/app_user_cubit/app_user_cubit.dart';
 import 'package:ventura/core/presentation/pages/app.dart';
 import 'package:ventura/features/appointment/presentation/bloc/appointment_bloc.dart';
@@ -9,8 +8,6 @@ import 'package:ventura/init_dependencies.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await dotenv.load(fileName: '.env');
   await initDependencies();
 
   runApp(
