@@ -420,7 +420,7 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
                           ),
                           SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            value: selectedFrequency,
+                            initialValue: selectedFrequency,
                             isExpanded: false,
                             menuMaxHeight: 300,
                             decoration: InputDecoration(
